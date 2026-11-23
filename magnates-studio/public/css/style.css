@@ -3912,6 +3912,8 @@ canvas.tool-draw {
   transition: all 0.18s ease;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+  min-height: 140px;
 }
 
 .chart-template-card:hover {
@@ -3922,6 +3924,8 @@ canvas.tool-draw {
 
 .chart-template-preview {
   height: 90px;
+  min-height: 90px;
+  flex-shrink: 0;
   background: #090a0f;
   display: flex;
   align-items: center;
@@ -3929,6 +3933,17 @@ canvas.tool-draw {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   padding: 8px;
   position: relative;
+}
+
+.charts-templates-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .chart-template-meta {
@@ -7533,8 +7548,11 @@ body.tool-slide-active {
 
 .studio-main-player-hud {
   bottom: 46px;
-  max-width: 95%;
+  right: auto;
   left: 50%;
+  width: 100%;
+  max-width: 95%;
+  box-sizing: border-box;
   transform: translateX(-50%);
   border-radius: 0 0 8px 8px;
 }
@@ -7543,7 +7561,11 @@ body.tool-slide-active {
 .canvas-wrapper:-webkit-full-screen .studio-main-player-hud,
 .canvas-wrapper.is-immersive-fallback .studio-main-player-hud {
   bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
   max-width: 100% !important;
+  transform: none !important;
   border-radius: 0 !important;
   padding-bottom: 24px !important;
 }
@@ -17498,4 +17520,505 @@ body.tool-slide-active {
 #magnates-bp-stage:-webkit-full-screen::backdrop {
   background: #000000 !important;
 }
+
+/* ========================================================
+   CANVA-STYLE SCENE TRANSITIONS & MOTION CUTS PANEL STYLES
+   With Living Two-Layer Occlusion Demonstrations (Canva/Apple Grade)
+   ======================================================== */
+.canva-trans-card {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  min-height: 122px !important;
+  height: 122px !important;
+  flex-shrink: 0 !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  padding: 8px 6px !important;
+  position: relative !important;
+  overflow: hidden !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+}
+
+.canva-trans-card:hover {
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  background: rgba(59, 130, 246, 0.08) !important;
+  transform: translateY(-2px) !important;
+}
+
+.canva-trans-card.active {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.16) !important;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.35) !important;
+}
+
+.canva-trans-thumb {
+  width: 100% !important;
+  height: 74px !important;
+  min-height: 74px !important;
+  flex-shrink: 0 !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  background: #070913 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+.canva-trans-preview-stage {
+  position: absolute !important;
+  inset: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+.canva-trans-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #cbd5e1 !important;
+  margin-top: 6px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  width: 100% !important;
+}
+
+.canva-trans-card.active .canva-trans-label {
+  color: #93c5fd !important;
+  font-weight: 700 !important;
+}
+
+.canva-trans-badge {
+  position: absolute !important;
+  top: 4px !important;
+  right: 4px !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  padding: 1px 4px !important;
+  border-radius: 3px !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(59, 130, 246, 0.5) !important;
+  letter-spacing: 0.3px !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+.trans-dir-btn.active {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+}
+
+/* Two-Layer Plates Architecture */
+.tp-plate {
+  position: absolute;
+  inset: 5px;
+  border-radius: 3px;
+  background-size: cover;
+  background-position: center;
+  box-sizing: border-box;
+}
+
+.tp-plate-a {
+  background-image: url('/paper_tear_stock_archival_news.jpg');
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.tp-plate-b {
+  background-image: url('/paper_tear_revealed_city.jpg');
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* --- Living Two-Layer Occlusion Keyframes --- */
+
+/* 1. 3D Fly-Through */
+.trans-preview-fly-through .tp-plate-a {
+  z-index: 2;
+  animation: animTransFlyOut 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.trans-preview-fly-through .tp-plate-b {
+  z-index: 1;
+  animation: animTransFlyIn 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransFlyOut {
+  0%, 20% { transform: scale(1); opacity: 1; filter: blur(0px); }
+  50%, 80% { transform: scale(2.8); opacity: 0; filter: blur(6px); }
+  100% { transform: scale(1); opacity: 1; filter: blur(0px); }
+}
+@keyframes animTransFlyIn {
+  0%, 20% { transform: scale(0.25); opacity: 0; }
+  50%, 80% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.25); opacity: 0; }
+}
+
+/* 2. Directional Push / Underneath Layer Occlusion */
+.trans-preview-push .tp-plate-a {
+  z-index: 2;
+  box-shadow: 6px 0 16px rgba(0, 0, 0, 0.85);
+  animation: animTransPushOut 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.trans-preview-push .tp-plate-b {
+  z-index: 1;
+  animation: animTransPushIn 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransPushOut {
+  0%, 20% { transform: translateX(0); opacity: 1; }
+  55%, 80% { transform: translateX(110%); opacity: 0.95; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+@keyframes animTransPushIn {
+  0%, 20% { transform: translateX(-35%); opacity: 0.5; }
+  55%, 80% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-35%); opacity: 0.5; }
+}
+
+/* 3. Morph Cut */
+.trans-preview-morph .tp-plate-a {
+  z-index: 2;
+  animation: animTransMorphOut 2.2s ease-in-out infinite;
+}
+.trans-preview-morph .tp-plate-b {
+  z-index: 1;
+  animation: animTransMorphIn 2.2s ease-in-out infinite;
+}
+@keyframes animTransMorphOut {
+  0%, 20% { opacity: 1; filter: blur(0px); transform: scale(1); }
+  50%, 80% { opacity: 0; filter: blur(5px); transform: scale(1.08); }
+  100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+}
+@keyframes animTransMorphIn {
+  0%, 20% { opacity: 0; filter: blur(5px); transform: scale(0.92); }
+  50%, 80% { opacity: 1; filter: blur(0px); transform: scale(1); }
+  100% { opacity: 0; filter: blur(5px); transform: scale(0.92); }
+}
+
+/* 4. Mask Reveal (Split Laser Seam Occlusion) */
+.trans-preview-reveal .tp-plate-a {
+  z-index: 1;
+}
+.trans-preview-reveal .tp-plate-b {
+  z-index: 2;
+  border-right: 2px solid #00f0ff;
+  box-shadow: 4px 0 12px rgba(0, 240, 255, 0.4);
+  animation: animTransMaskWipe 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransMaskWipe {
+  0%, 20% { clip-path: inset(0 100% 0 0); }
+  55%, 80% { clip-path: inset(0 0% 0 0); }
+  100% { clip-path: inset(0 100% 0 0); }
+}
+
+/* 5. Fade */
+.trans-preview-fade .tp-plate-a {
+  z-index: 2;
+  animation: animTransFadeOut 2s ease infinite;
+}
+.trans-preview-fade .tp-plate-b {
+  z-index: 1;
+  animation: animTransFadeIn 2s ease infinite;
+}
+@keyframes animTransFadeOut {
+  0%, 25% { opacity: 1; }
+  50%, 75% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes animTransFadeIn {
+  0%, 25% { opacity: 0; }
+  50%, 75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 6. Slide Left */
+.trans-preview-slide-left .tp-plate-a {
+  z-index: 2;
+  box-shadow: -6px 0 16px rgba(0,0,0,0.85);
+  animation: animTransSlideLeftOut 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.trans-preview-slide-left .tp-plate-b {
+  z-index: 1;
+  animation: animTransSlideLeftIn 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransSlideLeftOut {
+  0%, 20% { transform: translateX(0); }
+  50%, 80% { transform: translateX(-105%); }
+  100% { transform: translateX(0); }
+}
+@keyframes animTransSlideLeftIn {
+  0%, 20% { transform: translateX(105%); }
+  50%, 80% { transform: translateX(0); }
+  100% { transform: translateX(105%); }
+}
+
+/* 7. Slide Right */
+.trans-preview-slide-right .tp-plate-a {
+  z-index: 2;
+  box-shadow: 6px 0 16px rgba(0,0,0,0.85);
+  animation: animTransSlideRightOut 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.trans-preview-slide-right .tp-plate-b {
+  z-index: 1;
+  animation: animTransSlideRightIn 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransSlideRightOut {
+  0%, 20% { transform: translateX(0); }
+  50%, 80% { transform: translateX(105%); }
+  100% { transform: translateX(0); }
+}
+@keyframes animTransSlideRightIn {
+  0%, 20% { transform: translateX(-105%); }
+  50%, 80% { transform: translateX(0); }
+  100% { transform: translateX(-105%); }
+}
+
+/* 8. Zoom In */
+.trans-preview-zoom-in .tp-plate-a {
+  z-index: 2;
+  animation: animTransZoomInOut 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.trans-preview-zoom-in .tp-plate-b {
+  z-index: 1;
+  animation: animTransZoomInIn 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransZoomInOut {
+  0%, 20% { transform: scale(1); opacity: 1; }
+  50%, 80% { transform: scale(2.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes animTransZoomInIn {
+  0%, 20% { transform: scale(0.3); opacity: 0; }
+  50%, 80% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.3); opacity: 0; }
+}
+
+/* 9. Zoom Out */
+.trans-preview-zoom-out .tp-plate-a {
+  z-index: 2;
+  animation: animTransZoomOutOut 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.trans-preview-zoom-out .tp-plate-b {
+  z-index: 1;
+  animation: animTransZoomOutIn 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransZoomOutOut {
+  0%, 20% { transform: scale(1); opacity: 1; }
+  50%, 80% { transform: scale(0.35); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes animTransZoomOutIn {
+  0%, 20% { transform: scale(1.9); opacity: 0; }
+  50%, 80% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+/* 10. Wipe Left */
+.trans-preview-wipe .tp-plate-a {
+  z-index: 1;
+}
+.trans-preview-wipe .tp-plate-b {
+  z-index: 2;
+  animation: animTransWipeIn 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransWipeIn {
+  0%, 20% { clip-path: inset(0 0 0 100%); }
+  50%, 80% { clip-path: inset(0 0 0 0%); }
+  100% { clip-path: inset(0 0 0 100%); }
+}
+
+/* 11. Dissolve */
+.trans-preview-dissolve .tp-plate-a {
+  z-index: 2;
+  animation: animTransDissolveOut 2.2s ease infinite;
+}
+.trans-preview-dissolve .tp-plate-b {
+  z-index: 1;
+  animation: animTransDissolveIn 2.2s ease infinite;
+}
+@keyframes animTransDissolveOut {
+  0%, 20% { opacity: 1; }
+  50%, 80% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes animTransDissolveIn {
+  0%, 20% { opacity: 0; }
+  50%, 80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* 12. Flash Cut */
+.trans-preview-flash .tp-plate-a {
+  z-index: 1;
+}
+.trans-preview-flash .tp-plate-b {
+  z-index: 2;
+  animation: animTransFlashIn 1.8s ease infinite;
+}
+.trans-preview-flash .tp-strobe {
+  position: absolute;
+  inset: 5px;
+  background: #ffffff;
+  border-radius: 3px;
+  z-index: 3;
+  animation: animTransStrobe 1.8s ease infinite;
+}
+@keyframes animTransFlashIn {
+  0%, 35% { opacity: 0; }
+  45%, 90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes animTransStrobe {
+  0%, 30% { opacity: 0; }
+  35%, 45% { opacity: 0.95; }
+  55%, 100% { opacity: 0; }
+}
+
+/* 13. Dip to Black */
+.trans-preview-dip .tp-plate-a {
+  z-index: 1;
+}
+.trans-preview-dip .tp-plate-b {
+  z-index: 2;
+  animation: animTransDipIn 2s ease infinite;
+}
+.trans-preview-dip .tp-blackout {
+  position: absolute;
+  inset: 5px;
+  background: #000000;
+  border-radius: 3px;
+  z-index: 3;
+  animation: animTransDipBlack 2s ease infinite;
+}
+@keyframes animTransDipIn {
+  0%, 45% { opacity: 0; }
+  55%, 90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes animTransDipBlack {
+  0%, 20% { opacity: 0; }
+  45%, 55% { opacity: 1; }
+  80%, 100% { opacity: 0; }
+}
+
+/* 14. Paper Drop (Physical Torn Sheet Dropping Over Plate A) */
+.trans-preview-paper-drop .tp-plate-a {
+  z-index: 1;
+}
+.trans-preview-paper-drop .tp-sheet {
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 5px;
+  height: 60px;
+  background-image: url('/paper_tear_stock_vintage_map.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 2px 2px 0 0;
+  border-bottom: 2px dashed #94a3b8;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.9);
+  z-index: 2;
+  animation: animTransPaperDrop 2.2s cubic-bezier(0.18, 0.89, 0.32, 1.28) infinite;
+}
+@keyframes animTransPaperDrop {
+  0%, 15% { transform: translateY(-75px); }
+  50%, 80% { transform: translateY(0px); }
+  100% { transform: translateY(-75px); }
+}
+
+/* 15. Paper Tear (Top Sheet Rips in Two Revealing Plate B Underneath) */
+.trans-preview-paper-tear .tp-plate-b {
+  z-index: 1;
+}
+.trans-preview-paper-tear .tp-tear-left {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: calc(50% - 5px);
+  background-image: url('/paper_tear_left_flap.png'), url('/paper_tear_stock_archival_news.jpg');
+  background-size: cover;
+  background-position: left center;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.7);
+  z-index: 2;
+  animation: animTransTearLeft 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.trans-preview-paper-tear .tp-tear-right {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  bottom: 5px;
+  width: calc(50% - 5px);
+  background-image: url('/paper_tear_right_flap.png'), url('/paper_tear_stock_archival_news.jpg');
+  background-size: cover;
+  background-position: right center;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.7);
+  z-index: 2;
+  animation: animTransTearRight 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes animTransTearLeft {
+  0%, 20% { transform: translateX(0); }
+  55%, 80% { transform: translateX(-110%); }
+  100% { transform: translateX(0); }
+}
+@keyframes animTransTearRight {
+  0%, 20% { transform: translateX(0); }
+  55%, 80% { transform: translateX(110%); }
+  100% { transform: translateX(0); }
+}
+
+/* 16 & 17. J-Cut / L-Cut Audio Pacing */
+.trans-preview-jcut .tp-plate-a {
+  z-index: 2;
+  animation: animTransJCutCut 2.4s steps(1) infinite;
+}
+.trans-preview-jcut .tp-plate-b {
+  z-index: 1;
+}
+.trans-preview-jcut .tp-wave {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 8px;
+  height: 14px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.trans-preview-jcut .tp-wave span {
+  flex: 1;
+  background: #38bdf8;
+  border-radius: 1px;
+  animation: animTransWave 0.8s ease-in-out infinite alternate;
+}
+.trans-preview-jcut .tp-wave span:nth-child(2) { animation-delay: 0.15s; }
+.trans-preview-jcut .tp-wave span:nth-child(3) { animation-delay: 0.35s; }
+.trans-preview-jcut .tp-wave span:nth-child(4) { animation-delay: 0.1s; }
+.trans-preview-jcut .tp-wave span:nth-child(5) { animation-delay: 0.25s; }
+@keyframes animTransWave {
+  0% { height: 3px; }
+  100% { height: 14px; }
+}
+@keyframes animTransJCutCut {
+  0%, 45% { opacity: 1; }
+  46%, 100% { opacity: 0; }
+}
+@keyframes animTransWave {
+  0% { height: 3px; }
+  100% { height: 12px; }
+}
+
 

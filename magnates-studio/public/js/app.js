@@ -7033,6 +7033,7 @@ function switchMediaCategory(targetCategory) {
     pill.classList.toggle('active', pill.dataset.pill === targetCategory);
   });
 
+  const mediaPanelContentEl = document.getElementById('media-library-panel-content');
   const mediaListEl = document.getElementById('media-list');
   const layersPanelEl = document.getElementById('layers-panel-container');
   const chartsPanelEl = document.getElementById('charts-panel-container');
@@ -7040,80 +7041,67 @@ function switchMediaCategory(targetCategory) {
   const projectsPanelEl = document.getElementById('projects-panel-container');
   const templatesPanelEl = document.getElementById('templates-panel-container');
   const animatePanelEl = document.getElementById('animate-panel-container');
+  const transitionsPanelEl = document.getElementById('transitions-panel-container');
 
   if (projectsPanelEl) projectsPanelEl.style.display = 'none';
   if (templatesPanelEl) templatesPanelEl.style.display = 'none';
   if (animatePanelEl) animatePanelEl.style.display = 'none';
+  if (transitionsPanelEl) transitionsPanelEl.style.display = 'none';
+  if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+  if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+  if (layersPanelEl) layersPanelEl.style.display = 'none';
 
-  if (currentFilter === 'animate') {
+  if (currentFilter === 'transitions') {
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'none';
     if (mediaListEl) mediaListEl.style.display = 'none';
-    if (layersPanelEl) layersPanelEl.style.display = 'none';
-    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-    if (projectsPanelEl) projectsPanelEl.style.display = 'none';
-    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+    if (transitionsPanelEl) {
+      transitionsPanelEl.style.display = 'flex';
+      if (typeof renderTransitionsPanel === 'function') renderTransitionsPanel();
+    }
+  } else if (currentFilter === 'animate') {
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'none';
+    if (mediaListEl) mediaListEl.style.display = 'none';
     if (animatePanelEl) {
       animatePanelEl.style.display = 'flex';
       if (typeof renderAnimatePanel === 'function') renderAnimatePanel();
     }
   } else if (currentFilter === 'templates') {
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'none';
     if (mediaListEl) mediaListEl.style.display = 'none';
-    if (layersPanelEl) layersPanelEl.style.display = 'none';
-    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-    if (projectsPanelEl) projectsPanelEl.style.display = 'none';
-    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (templatesPanelEl) {
       templatesPanelEl.style.display = 'flex';
       renderTemplatesHub();
     }
   } else if (currentFilter === 'projects') {
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'none';
     if (mediaListEl) mediaListEl.style.display = 'none';
-    if (layersPanelEl) layersPanelEl.style.display = 'none';
-    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
-    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (projectsPanelEl) {
       projectsPanelEl.style.display = 'flex';
       renderProjectsPanel();
     }
   } else if (currentFilter === 'charts') {
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'none';
     if (mediaListEl) mediaListEl.style.display = 'none';
-    if (layersPanelEl) layersPanelEl.style.display = 'none';
-    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
-    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (chartsPanelEl) {
       chartsPanelEl.style.display = 'flex';
       renderChartsTemplatesPanel();
     }
   } else if (currentFilter === 'icons') {
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'none';
     if (mediaListEl) mediaListEl.style.display = 'none';
-    if (layersPanelEl) layersPanelEl.style.display = 'none';
-    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
-    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (iconsPanelEl) {
       iconsPanelEl.style.display = 'flex';
       renderIconsLibraryPanel();
     }
   } else if (currentFilter === 'layers') {
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'none';
     if (mediaListEl) mediaListEl.style.display = 'none';
-    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
-    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (layersPanelEl) {
       layersPanelEl.style.display = 'flex';
       renderLayersPanel();
     }
   } else {
-    if (layersPanelEl) layersPanelEl.style.display = 'none';
-    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
-    if (animatePanelEl) animatePanelEl.style.display = 'none';
+    if (mediaPanelContentEl) mediaPanelContentEl.style.display = 'flex';
     if (mediaListEl) {
       mediaListEl.style.display = 'flex';
       renderMediaList(currentFilter);
@@ -7303,9 +7291,57 @@ if (studioScrubberWrap) {
 // Studio Canvas Wrapper Hover HUD Wake-up
 const studioCanvasWrapper = document.querySelector('.canvas-wrapper');
 const mainStudioHud = document.getElementById('studio-main-player-hud');
+
+function syncMainStudioHud() {
+  const cv = document.getElementById('previewCanvas');
+  const hud = document.getElementById('studio-main-player-hud');
+  if (!cv || !hud || !cv.parentElement) return;
+
+  // In fullscreen or fallback immersive mode, CSS handles 100% width
+  if (document.fullscreenElement || cv.parentElement.classList.contains('is-immersive-fallback')) {
+    hud.style.width = '';
+    hud.style.maxWidth = '';
+    hud.style.left = '';
+    hud.style.right = '';
+    hud.style.bottom = '';
+    hud.style.transform = '';
+    hud.style.borderRadius = '';
+    return;
+  }
+
+  const cvRect = cv.getBoundingClientRect();
+  const parentRect = cv.parentElement.getBoundingClientRect();
+
+  if (cvRect.width > 0) {
+    hud.style.width = Math.round(cvRect.width) + 'px';
+    hud.style.maxWidth = Math.round(cvRect.width) + 'px';
+    hud.style.left = Math.round(cvRect.left - parentRect.left) + 'px';
+    hud.style.right = 'auto';
+    hud.style.transform = 'none';
+    const bottomOffset = Math.max(0, Math.round(parentRect.bottom - cvRect.bottom));
+    hud.style.bottom = bottomOffset + 'px';
+    hud.style.borderRadius = '0 0 8px 8px';
+  }
+}
+
+if (typeof ResizeObserver !== 'undefined') {
+  const cvEl = document.getElementById('previewCanvas');
+  if (cvEl) {
+    new ResizeObserver(() => syncMainStudioHud()).observe(cvEl);
+  }
+  const wrapperEl = document.querySelector('.canvas-wrapper');
+  if (wrapperEl) {
+    new ResizeObserver(() => syncMainStudioHud()).observe(wrapperEl);
+  }
+}
+window.addEventListener('resize', syncMainStudioHud);
+document.addEventListener('DOMContentLoaded', syncMainStudioHud);
+setTimeout(syncMainStudioHud, 100);
+
 if (studioCanvasWrapper && mainStudioHud) {
   let studioHudFadeTimer = null;
   const showStudioHud = () => {
+    syncMainStudioHud();
     mainStudioHud.classList.add('active');
     if (studioHudFadeTimer) clearTimeout(studioHudFadeTimer);
     studioHudFadeTimer = setTimeout(() => {
@@ -19897,7 +19933,8 @@ const TRANSITION_TYPES = {
   dissolve:         { label: 'Dissolve',                  duration: 0.6 },
   flash:            { label: 'Flash Cut',                 duration: 0.25 },
   dip_black:        { label: 'Dip to Black',              duration: 0.6 },
-  paper_drop:       { label: 'Paper Drop',                duration: 0.7, sfx: 'paper' }
+  paper_drop:       { label: 'Paper Drop',                duration: 0.7, sfx: 'paper' },
+  paper_tear:       { label: 'Paper Tear Reveal',         duration: 0.8, sfx: 'paper' }
 };
 
 let _transitionEditContext = null;
@@ -20907,6 +20944,70 @@ function applyTransitionEffect(ctx, w, h, transitionType, progress, nextClip) {
       ctx.stroke();
 
       ctx.restore();
+      break;
+    }
+    case 'zoom_in': {
+      const p = progress;
+      const easeOut = 1 - Math.pow(1 - p, 2.5);
+      const scaleA = 1.0 + easeOut * 1.2;
+      const scaleB = 0.5 + easeOut * 0.5;
+      const alphaA = Math.max(0, 1 - p * 1.5);
+      const alphaB = Math.min(1, p * 1.6);
+      if (prevClip) drawClipMedia(prevClip, scaleA, alphaA);
+      if (nextClip) drawClipMedia(nextClip, scaleB, alphaB);
+      break;
+    }
+    case 'zoom_out': {
+      const p = progress;
+      const easeOut = 1 - Math.pow(1 - p, 2.5);
+      const scaleA = Math.max(0.4, 1.0 - easeOut * 0.6);
+      const scaleB = 1.8 - easeOut * 0.8;
+      const alphaA = Math.max(0, 1 - p * 1.5);
+      const alphaB = Math.min(1, p * 1.6);
+      if (prevClip) drawClipMedia(prevClip, scaleA, alphaA);
+      if (nextClip) drawClipMedia(nextClip, scaleB, alphaB);
+      break;
+    }
+    case 'paper_tear': {
+      const p = 1 - Math.pow(1 - progress, 2.4);
+      const splitX = w / 2;
+      const pull = p * (w * 0.6);
+      if (nextClip) {
+        drawClipMedia(nextClip, 1, 1);
+      }
+      if (prevClip) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, 0, Math.max(0, splitX - pull), h);
+        ctx.clip();
+        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowBlur = 30;
+        ctx.shadowOffsetX = 8;
+        drawClipMedia(prevClip, 1, Math.max(0, 1 - p * 0.8), -pull * 0.5, 0);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(splitX - pull, 0);
+        ctx.lineTo(splitX - pull, h);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(splitX + pull, 0, Math.max(0, w - (splitX + pull)), h);
+        ctx.clip();
+        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowBlur = 30;
+        ctx.shadowOffsetX = -8;
+        drawClipMedia(prevClip, 1, Math.max(0, 1 - p * 0.8), pull * 0.5, 0);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(splitX + pull, 0);
+        ctx.lineTo(splitX + pull, h);
+        ctx.stroke();
+        ctx.restore();
+      }
       break;
     }
     default:
@@ -24472,6 +24573,47 @@ function renderTemplatesHub() {
   if (!container) return;
   container.innerHTML = '';
 
+  if (currentTemplateCategoryFilter === 'transitions') {
+    if (typeof REGAARDER_TRANSITIONS !== 'undefined') {
+      REGAARDER_TRANSITIONS.filter(t => t.id !== 'none').forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'template-card';
+        card.innerHTML = `
+          <div class="template-card-preview" style="background:#070913; height: 96px; min-height: 96px; overflow: hidden; position: relative;">
+            <span class="template-card-badge" style="background: rgba(59,130,246,0.85);">${t.badge}</span>
+            <span class="template-card-duration">${(t.duration || 0.7).toFixed(1)}s</span>
+            <div style="position: absolute; inset: 0; width: 100%; height: 100%;">
+              ${t.previewHtml}
+            </div>
+          </div>
+          <div>
+            <h4 class="template-card-title">${t.name}</h4>
+            <div class="template-card-desc">${t.desc}</div>
+          </div>
+          <div class="template-card-meta">
+            <div class="template-slots-badge">
+              <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z"/></svg>
+              <span>2 Scene Plates</span>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm tpl-use-btn" style="padding: 3px 8px; font-size: 10px; background: rgba(59,130,246,0.15); border-color:#3b82f6; color:#93c5fd; font-weight:700;">Apply Cut</button>
+          </div>
+        `;
+        card.querySelector('.tpl-use-btn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          activeSelectedTransId = t.id;
+          switchMediaCategory('transitions');
+          showTextTimingAlert(`Transition selected: ${t.name}`, 'success');
+        });
+        card.addEventListener('click', () => {
+          activeSelectedTransId = t.id;
+          switchMediaCategory('transitions');
+        });
+        container.appendChild(card);
+      });
+    }
+    return;
+  }
+
   const allTemplates = getAllAvailableTemplates();
   const filtered = currentTemplateCategoryFilter === 'all'
     ? allTemplates
@@ -24716,6 +24858,7 @@ function initRegaarderStudioControls() {
         templates: { title: 'Templates', sub: 'Pre-built structures & layouts' },
         charts: { title: 'Elements', sub: 'Animated charts & widgets' },
         animate: { title: 'Animate', sub: 'Camera zooms & visual effects' },
+        transitions: { title: 'Transitions', sub: 'Scene transitions & motion cuts' },
         text: { title: 'Kinetic Text', sub: 'Typography & titles' },
         icons: { title: 'Icons & Stickers', sub: 'Vector iconography' },
         layers: { title: 'Canvas Layers', sub: 'Stage backgrounds & overlays' },
@@ -24774,6 +24917,27 @@ function initRegaarderStudioControls() {
       }
       // 4. Switch category
       switchMediaCategory('animate');
+    });
+  }
+
+  // Top Canva Toolbar: "Transition" button opens Transitions Side Panel
+  const btnCbarTransition = document.getElementById('btn-cbar-transition');
+  if (btnCbarTransition) {
+    btnCbarTransition.addEventListener('click', () => {
+      document.querySelectorAll('.nav-rail .rail-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.railTab === 'transitions');
+      });
+      const heading = document.getElementById('sidebar-panel-heading');
+      const sub = document.getElementById('sidebar-panel-sub');
+      if (heading) heading.textContent = 'Transitions';
+      if (sub) sub.textContent = 'Scene transitions & motion cuts';
+      const workspace = document.querySelector('.workspace');
+      if (workspace && workspace.classList.contains('hide-left')) {
+        workspace.classList.remove('hide-left');
+        const toggleBtn = document.getElementById('btn-toggle-left-sidebar');
+        if (toggleBtn) toggleBtn.classList.add('active');
+      }
+      switchMediaCategory('transitions');
     });
   }
 
@@ -25160,6 +25324,510 @@ function renderAnimatePanel() {
       if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
     });
   });
+}
+
+// =========================================================
+// CANVA-STYLE SCENE TRANSITIONS & MOTION CUTS CONTROLLER
+// Aggregates all existing transitions + template cuts + live animated previews
+// Smart Asset Detection: reduces cognitive load by auto-linking clips or prompting to add media
+// =========================================================
+
+const REGAARDER_TRANSITIONS = [
+  {
+    id: 'none',
+    name: 'None (Cut)',
+    category: 'cinematic',
+    desc: 'Standard direct cut with zero transition delay.',
+    badge: 'Cut',
+    duration: 0,
+    previewHtml: '<div class="trans-preview-stage" style="background:#111827;"><span style="font-size:9.5px; color:#64748b; font-weight:800; letter-spacing:0.5px;">DIRECT CUT</span></div>'
+  },
+  {
+    id: 'fly_through',
+    name: '3D Fly-Through',
+    category: '3d',
+    desc: 'Magnates signature 3D camera fly-through zooming into the incoming scene.',
+    badge: '3D Signature',
+    duration: 0.7,
+    sfx: 'whoosh',
+    direction: 'center',
+    previewHtml: '<div class="trans-preview-stage trans-preview-fly-through"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'directional_push',
+    name: 'Directional Push',
+    category: '3d',
+    desc: 'Directional slide underneath with 3D drop shadow overlap.',
+    badge: 'Slide Under',
+    duration: 0.7,
+    sfx: 'whoosh',
+    direction: 'left',
+    previewHtml: '<div class="trans-preview-stage trans-preview-push"><div class="tp-plate tp-plate-b"></div><div class="tp-plate tp-plate-a"></div></div>'
+  },
+  {
+    id: 'morph_cut',
+    name: 'Morph Cut',
+    category: 'cinematic',
+    desc: 'Optical flow cross-blend with micro-directional warp for seamless interview jump cuts.',
+    badge: 'Seamless',
+    duration: 0.6,
+    sfx: 'whoosh',
+    previewHtml: '<div class="trans-preview-stage trans-preview-morph"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'mask_reveal',
+    name: 'Foreground Reveal',
+    category: 'reveal',
+    desc: 'Dynamic split wipe with cyan neon laser border and drop shadow.',
+    badge: 'Laser Wipe',
+    duration: 0.6,
+    sfx: 'whoosh',
+    direction: 'left',
+    previewHtml: '<div class="trans-preview-stage trans-preview-reveal"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'fade',
+    name: 'Film Fade',
+    category: 'cinematic',
+    desc: 'Classic film crossfade between scene frames.',
+    badge: 'Film',
+    duration: 0.5,
+    previewHtml: '<div class="trans-preview-stage trans-preview-fade"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'slide_left',
+    name: 'Slide Left',
+    category: '3d',
+    desc: 'Clean horizontal push sliding left with real drop shadow.',
+    badge: 'Motion',
+    duration: 0.5,
+    previewHtml: '<div class="trans-preview-stage trans-preview-slide-left"><div class="tp-plate tp-plate-b"></div><div class="tp-plate tp-plate-a"></div></div>'
+  },
+  {
+    id: 'slide_right',
+    name: 'Slide Right',
+    category: '3d',
+    desc: 'Clean horizontal push sliding right with real drop shadow.',
+    badge: 'Motion',
+    duration: 0.5,
+    previewHtml: '<div class="trans-preview-stage trans-preview-slide-right"><div class="tp-plate tp-plate-b"></div><div class="tp-plate tp-plate-a"></div></div>'
+  },
+  {
+    id: 'zoom_in',
+    name: 'Kinetic Zoom In',
+    category: '3d',
+    desc: 'High-speed punch zoom pulling the viewer forward into the next visual.',
+    badge: 'Punch',
+    duration: 0.5,
+    previewHtml: '<div class="trans-preview-stage trans-preview-zoom-in"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'zoom_out',
+    name: 'Kinetic Zoom Out',
+    category: '3d',
+    desc: 'Dramatic backward zoom pull revealing the wider context.',
+    badge: 'Pull Back',
+    duration: 0.5,
+    previewHtml: '<div class="trans-preview-stage trans-preview-zoom-out"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'wipe_left',
+    name: 'Hard Wipe Left',
+    category: 'reveal',
+    desc: 'Broadcast horizontal edge wipe.',
+    badge: 'Broadcast',
+    duration: 0.5,
+    previewHtml: '<div class="trans-preview-stage trans-preview-wipe"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'dissolve',
+    name: 'Dissolve',
+    category: 'cinematic',
+    desc: 'Luminance dissolve blending textures smoothly.',
+    badge: 'Soft',
+    duration: 0.6,
+    previewHtml: '<div class="trans-preview-stage trans-preview-dissolve"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div></div>'
+  },
+  {
+    id: 'flash',
+    name: 'Flash Cut',
+    category: 'cinematic',
+    desc: 'High-energy whiteout camera flash strobe transition.',
+    badge: 'Strobe',
+    duration: 0.25,
+    previewHtml: '<div class="trans-preview-stage trans-preview-flash"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div><div class="tp-strobe"></div></div>'
+  },
+  {
+    id: 'dip_black',
+    name: 'Dip to Black',
+    category: 'cinematic',
+    desc: 'Dramatic fade down into pitch black before opening next scene.',
+    badge: 'Reset',
+    duration: 0.6,
+    previewHtml: '<div class="trans-preview-stage trans-preview-dip"><div class="tp-plate tp-plate-a"></div><div class="tp-plate tp-plate-b"></div><div class="tp-blackout"></div></div>'
+  },
+  {
+    id: 'paper_drop',
+    name: 'Paper Drop',
+    category: 'reveal',
+    desc: 'Signature documentary jagged parchment poster drop with drop shadow.',
+    badge: 'Paper FX',
+    duration: 0.7,
+    sfx: 'paper',
+    previewHtml: '<div class="trans-preview-stage trans-preview-paper-drop"><div class="tp-plate tp-plate-a"></div><div class="tp-sheet"></div></div>'
+  },
+  {
+    id: 'paper_tear',
+    name: 'Paper Tear Reveal',
+    category: 'reveal',
+    desc: 'Signature dual torn paper flaps tearing outward to reveal the new frame.',
+    badge: 'Tear FX',
+    duration: 0.8,
+    sfx: 'paper',
+    previewHtml: '<div class="trans-preview-stage trans-preview-paper-tear"><div class="tp-plate tp-plate-b"></div><div class="tp-tear-left"></div><div class="tp-tear-right"></div></div>'
+  },
+  {
+    id: 'j-cut',
+    name: 'J-Cut (Audio Lead)',
+    category: 'pacing',
+    desc: 'Incoming dialogue or sound enters 0.8s before the visual scene cuts.',
+    badge: 'Audio Lead',
+    duration: 0.8,
+    isPacing: true,
+    previewHtml: '<div class="trans-preview-stage trans-preview-jcut"><div class="tp-plate tp-plate-b"></div><div class="tp-plate tp-plate-a"></div><div class="tp-wave"><span></span><span></span><span></span><span></span><span></span></div></div>'
+  },
+  {
+    id: 'l-cut',
+    name: 'L-Cut (Video Lead)',
+    category: 'pacing',
+    desc: 'Outgoing dialogue or sound lingers 0.8s after the new visual cuts in.',
+    badge: 'Video Lead',
+    duration: 0.8,
+    isPacing: true,
+    previewHtml: '<div class="trans-preview-stage trans-preview-jcut"><div class="tp-plate tp-plate-b"></div><div class="tp-plate tp-plate-a"></div><div class="tp-wave"><span style="background:#c084fc;"></span><span style="background:#c084fc;"></span><span style="background:#c084fc;"></span><span style="background:#c084fc;"></span><span style="background:#c084fc;"></span></div></div>'
+  }
+];
+
+let activeTransCategoryFilter = 'all';
+let activeSelectedTransId = 'fly_through';
+
+function renderTransitionsPanel() {
+  const grid = document.getElementById('transitions-cards-grid');
+  const tabsContainer = document.getElementById('transitions-category-tabs');
+  const drawer = document.getElementById('transitions-controls-drawer');
+  const durationSlider = document.getElementById('trans-duration-slider');
+  const activeNameEl = document.getElementById('trans-active-name');
+  const activeDurEl = document.getElementById('trans-active-dur');
+  const sfxSelect = document.getElementById('trans-sfx-select');
+  const directionRow = document.getElementById('trans-direction-row');
+  const dirButtons = document.querySelectorAll('.trans-dir-btn');
+  const smartAssetBox = document.getElementById('trans-smart-asset-box');
+  const btnApplyAll = document.getElementById('btn-apply-trans-all');
+  const btnRemove = document.getElementById('btn-remove-active-transition');
+
+  if (!grid) return;
+
+  // 1. Initialize sub-category filter tabs
+  if (tabsContainer && !tabsContainer.dataset.initialized) {
+    tabsContainer.dataset.initialized = 'true';
+    tabsContainer.querySelectorAll('button').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        tabsContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        activeTransCategoryFilter = e.currentTarget.dataset.transCat || 'all';
+        renderTransitionsPanel();
+      });
+    });
+  }
+
+  // 2. Identify active clip & active transition
+  const visualClips = [
+    ...(timelineClips.video || []).map(c => ({ ...c, trackType: 'video' })),
+    ...(timelineClips.image || []).map(c => ({ ...c, trackType: 'image' })),
+    ...(timelineClips.chart || []).map(c => ({ ...c, trackType: 'chart' })),
+    ...(timelineClips.quote || []).map(c => ({ ...c, trackType: 'quote' }))
+  ].sort((a, b) => a.start - b.start);
+
+  let targetClip = selectedClip?.clip;
+  if (!targetClip && visualClips.length > 0) {
+    targetClip = visualClips.find(c => c.start >= currentTime) || visualClips[visualClips.length - 1];
+  }
+
+  if (targetClip) {
+    if (targetClip.transition && targetClip.transition !== 'none') {
+      activeSelectedTransId = targetClip.transition;
+    } else if (targetClip.cutPacingMode && targetClip.cutPacingMode !== 'sync') {
+      activeSelectedTransId = targetClip.cutPacingMode;
+    }
+  }
+
+  // 3. Render Cards
+  const filtered = REGAARDER_TRANSITIONS.filter(t => {
+    return activeTransCategoryFilter === 'all' || t.category === activeTransCategoryFilter;
+  });
+
+  grid.innerHTML = filtered.map(t => {
+    const isActive = t.id === activeSelectedTransId;
+    return `
+      <div class="canva-trans-card ${isActive ? 'active' : ''}" data-trans-id="${t.id}" title="${t.desc}">
+        <span class="canva-trans-badge">${t.badge}</span>
+        <div class="canva-trans-thumb">
+          ${t.previewHtml}
+        </div>
+        <div class="canva-trans-label">${t.name}</div>
+      </div>
+    `;
+  }).join('');
+
+  // 4. Update Drawer & Smart Asset State
+  if (drawer) {
+    drawer.style.display = 'flex';
+    const activeObj = REGAARDER_TRANSITIONS.find(t => t.id === activeSelectedTransId) || REGAARDER_TRANSITIONS[1];
+
+    if (activeNameEl) activeNameEl.textContent = activeObj.name;
+    const curDur = (targetClip && targetClip.transitionDuration) || activeObj.duration || 0.7;
+    if (activeDurEl) activeDurEl.textContent = `${curDur.toFixed(1)}s`;
+    if (durationSlider) {
+      durationSlider.value = Math.round(curDur * 10);
+    }
+
+    if (directionRow) {
+      directionRow.style.display = (activeObj.category === '3d' || activeObj.id === 'directional_push' || activeObj.id === 'mask_reveal') ? 'flex' : 'none';
+      const curDir = (targetClip && targetClip.transitionDirection) || activeObj.direction || 'center';
+      dirButtons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.dir === curDir);
+      });
+    }
+
+    if (sfxSelect) {
+      sfxSelect.value = (targetClip && targetClip.transitionSfx) || activeObj.sfx || 'none';
+    }
+
+    // Smart Asset Detection state
+    if (smartAssetBox) {
+      if (visualClips.length >= 2) {
+        smartAssetBox.innerHTML = `
+          <div style="color: #4ade80; background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.28); border-radius: 6px; padding: 6px 10px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; flex-shrink: 0;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span>Active between scene clips &bull; Live preview ready</span>
+          </div>
+        `;
+      } else {
+        smartAssetBox.innerHTML = `
+          <div style="color: #fde047; background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.28); border-radius: 6px; padding: 8px 10px;">
+            <div style="font-weight: 700; margin-bottom: 3px; display: flex; align-items: center; gap: 5px;">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <span>No secondary image detected</span>
+            </div>
+            <div style="font-size: 10px; color: #cbd5e1; margin-bottom: 7px; line-height: 1.35;">Transitions connect two scene clips or images. Add a second image or use an auto studio matte.</div>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" id="btn-trans-prompt-add-img" style="flex: 1; padding: 5px 8px; background: #3b82f6; border: none; border-radius: 4px; color: #fff; font-size: 10px; font-weight: 600; cursor: pointer;">+ Add Image</button>
+              <button type="button" id="btn-trans-prompt-add-matte" style="flex: 1; padding: 5px 8px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; color: #e2e8f0; font-size: 10px; font-weight: 600; cursor: pointer;">Use Studio Matte</button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('btn-trans-prompt-add-img')?.addEventListener('click', () => {
+          document.querySelectorAll('.nav-rail .rail-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.railTab === 'all');
+          });
+          switchMediaCategory('all');
+        });
+
+        document.getElementById('btn-trans-prompt-add-matte')?.addEventListener('click', () => {
+          const existingImages = timelineClips.image || [];
+          const startPos = existingImages.length > 0 ? (existingImages[existingImages.length - 1].start + existingImages[existingImages.length - 1].duration) : 0;
+          const newClip = {
+            id: 'clip_matte_' + Date.now(),
+            file: '/paper_tear_revealed_city.jpg',
+            start: startPos,
+            duration: 4.0,
+            transition: activeSelectedTransId,
+            transitionDuration: 0.7,
+            transitionSfx: 'whoosh'
+          };
+          if (!timelineClips.image) timelineClips.image = [];
+          timelineClips.image.push(newClip);
+          showTextTimingAlert('Added companion scene matte with transition applied!', 'success');
+          setTimeout(() => showTextTimingAlert(''), 2500);
+          renderTransitionsPanel();
+          if (typeof renderCanvas === 'function') renderCanvas();
+          if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+          if (typeof injectTransitionChips === 'function') injectTransitionChips();
+        });
+      }
+    }
+  }
+
+  // 5. Card click: tap to apply transition & animate
+  grid.querySelectorAll('.canva-trans-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const transId = card.dataset.transId;
+      activeSelectedTransId = transId;
+      const transObj = REGAARDER_TRANSITIONS.find(t => t.id === transId);
+      if (!transObj) return;
+
+      grid.querySelectorAll('.canva-trans-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+
+      const clips = [
+        ...(timelineClips.video || []).map(c => ({ ...c, trackType: 'video' })),
+        ...(timelineClips.image || []).map(c => ({ ...c, trackType: 'image' }))
+      ].sort((a, b) => a.start - b.start);
+
+      let appliedToClip = selectedClip?.clip;
+      if (!appliedToClip && clips.length >= 2) {
+        appliedToClip = clips.find(c => c.start >= currentTime) || clips[1];
+      } else if (!appliedToClip && clips.length === 1) {
+        appliedToClip = clips[0];
+      }
+
+      if (appliedToClip) {
+        if (transObj.isPacing) {
+          appliedToClip.cutPacingMode = transObj.id;
+          appliedToClip.cutPacingOffset = 0.8;
+          delete appliedToClip.transition;
+        } else {
+          appliedToClip.transition = transObj.id;
+          appliedToClip.transitionDuration = transObj.duration || 0.7;
+          appliedToClip.transitionSfx = transObj.sfx || 'none';
+          appliedToClip.transitionDirection = transObj.direction || 'center';
+          delete appliedToClip.cutPacingMode;
+        }
+
+        if (transObj.sfx && typeof playTransitionSfx === 'function') {
+          playTransitionSfx(transObj.sfx);
+        } else {
+          playSFX('snap_zoom');
+        }
+
+        if (appliedToClip.start > 0) {
+          seekToTime(appliedToClip.start);
+        }
+      }
+
+      showTextTimingAlert(`Transition set: ${transObj.name}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2200);
+
+      renderTransitionsPanel();
+      if (typeof renderCanvas === 'function') renderCanvas();
+      if (typeof injectTransitionChips === 'function') injectTransitionChips();
+      if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    });
+  });
+
+  // 6. Bind Slider, Direction, SFX, Apply-All, Remove once
+  if (durationSlider && !durationSlider.dataset.listening) {
+    durationSlider.dataset.listening = 'true';
+    durationSlider.addEventListener('input', (e) => {
+      const val = parseFloat((e.target.value / 10).toFixed(1));
+      if (activeDurEl) activeDurEl.textContent = `${val.toFixed(1)}s`;
+      const clips = [
+        ...(timelineClips.video || []),
+        ...(timelineClips.image || [])
+      ];
+      const cur = selectedClip?.clip || clips.find(c => c.transition === activeSelectedTransId);
+      if (cur) {
+        cur.transitionDuration = val;
+      }
+      if (typeof renderCanvas === 'function') renderCanvas();
+      if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    });
+  }
+
+  dirButtons.forEach(btn => {
+    if (!btn.dataset.listening) {
+      btn.dataset.listening = 'true';
+      btn.addEventListener('click', (e) => {
+        dirButtons.forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        const dir = e.currentTarget.dataset.dir;
+        const clips = [
+          ...(timelineClips.video || []),
+          ...(timelineClips.image || [])
+        ];
+        const cur = selectedClip?.clip || clips.find(c => c.transition === activeSelectedTransId);
+        if (cur) {
+          cur.transitionDirection = dir;
+        }
+        if (typeof renderCanvas === 'function') renderCanvas();
+      });
+    }
+  });
+
+  if (sfxSelect && !sfxSelect.dataset.listening) {
+    sfxSelect.dataset.listening = 'true';
+    sfxSelect.addEventListener('change', (e) => {
+      const sfx = e.target.value;
+      const clips = [
+        ...(timelineClips.video || []),
+        ...(timelineClips.image || [])
+      ];
+      const cur = selectedClip?.clip || clips.find(c => c.transition === activeSelectedTransId);
+      if (cur) {
+        cur.transitionSfx = sfx;
+      }
+      if (sfx !== 'none' && typeof playTransitionSfx === 'function') {
+        playTransitionSfx(sfx);
+      }
+    });
+  }
+
+  if (btnApplyAll && !btnApplyAll.dataset.listening) {
+    btnApplyAll.dataset.listening = 'true';
+    btnApplyAll.addEventListener('click', () => {
+      const transObj = REGAARDER_TRANSITIONS.find(t => t.id === activeSelectedTransId) || REGAARDER_TRANSITIONS[1];
+      const allClips = [
+        ...(timelineClips.video || []),
+        ...(timelineClips.image || [])
+      ];
+      allClips.forEach((c, idx) => {
+        if (idx === 0) return;
+        if (transObj.isPacing) {
+          c.cutPacingMode = transObj.id;
+          c.cutPacingOffset = 0.8;
+          delete c.transition;
+        } else {
+          c.transition = transObj.id;
+          c.transitionDuration = transObj.duration || 0.7;
+          c.transitionSfx = transObj.sfx || 'none';
+          c.transitionDirection = transObj.direction || 'center';
+          delete c.cutPacingMode;
+        }
+      });
+      showTextTimingAlert(`Applied ${transObj.name} to all scene cuts!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+      if (typeof renderCanvas === 'function') renderCanvas();
+      if (typeof injectTransitionChips === 'function') injectTransitionChips();
+      if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    });
+  }
+
+  if (btnRemove && !btnRemove.dataset.listening) {
+    btnRemove.dataset.listening = 'true';
+    btnRemove.addEventListener('click', () => {
+      const allClips = [
+        ...(timelineClips.video || []),
+        ...(timelineClips.image || [])
+      ];
+      const cur = selectedClip?.clip || allClips.find(c => c.transition === activeSelectedTransId);
+      if (cur) {
+        delete cur.transition;
+        delete cur.transitionDuration;
+        delete cur.transitionSfx;
+        delete cur.transitionDirection;
+        delete cur.cutPacingMode;
+      }
+      activeSelectedTransId = 'none';
+      playSFX('trash');
+      showTextTimingAlert('Transition removed', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+      renderTransitionsPanel();
+      if (typeof renderCanvas === 'function') renderCanvas();
+      if (typeof injectTransitionChips === 'function') injectTransitionChips();
+      if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    });
+  }
 }
 
 if (document.readyState === 'loading') {

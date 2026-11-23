@@ -47,29 +47,35 @@
           </button>
         </div>
 
-        <!-- Quick Start New Video action button on templates page -->
-        <button type="button" id="btn-templates-open-editor" onclick="switchStudioView('editor')" class="btn-templates-quick-action" style="padding: 6px 14px; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(139, 92, 246, 0.15); color: #e9d5ff; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-          <span>New Project</span>
-        </button>
+        <!-- Create Menu for Templates page (Image 2 design) -->
+        <details class="rm-create-menu" id="rm-create-menu">
+          <summary>Create <span aria-hidden="true">＋</span></summary>
+          <div class="rm-create-items">
+            <!-- Quick Start New Video action button on templates page -->
+            <button type="button" id="btn-templates-open-editor" onclick="switchStudioView('editor')" class="btn-templates-quick-action">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              <span>New Project</span>
+            </button>
 
-        <!-- Blank Composition Studio trigger -->
-        <button type="button" id="btn-top-blank-comp" onclick="window.RegaarderBlankComposition && window.RegaarderBlankComposition.open()" title="Open Blank Composition Studio (Build multi-layer sequences from scratch)" style="padding: 6px 12px; font-size: 11.5px; font-weight: 600; border-radius: 8px; border: 1px solid rgba(130, 60, 240, 0.35); background: rgba(130, 60, 240, 0.12); color: #d8b4fe; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg>
-          <span>Blank Comp</span>
-        </button>
+            <!-- Blank Composition Studio trigger -->
+            <button type="button" id="btn-top-blank-comp" onclick="window.RegaarderBlankComposition && window.RegaarderBlankComposition.open()" title="Open Blank Composition Studio (Build multi-layer sequences from scratch)">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg>
+              <span>Blank Comp</span>
+            </button>
 
-        <!-- Story & Prompts Studio trigger -->
-        <button type="button" id="btn-top-story-prompts" onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()" title="Open Story Context & Generative AI Prompts Studio" style="padding: 6px 12px; font-size: 11.5px; font-weight: 500; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.04); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          <span>Story & Prompts</span>
-        </button>
+            <!-- Story & Prompts Studio trigger -->
+            <button type="button" id="btn-top-story-prompts" onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()" title="Open Story Context & Generative AI Prompts Studio">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              <span>Story &amp; Prompts</span>
+            </button>
 
-        <!-- Assets & Tools Workbench trigger -->
-        <button type="button" id="btn-top-assets-tools" onclick="window.RegaarderAssetWorkbench && window.RegaarderAssetWorkbench.open()" title="Open Assets & Tools Workbench (Media Registry, 3D Image Animator, Cutout Studio)" style="padding: 6px 12px; font-size: 11.5px; font-weight: 500; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.1); color: #7dd3fc; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
-          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-          <span>Assets & Tools</span>
-        </button>
+            <!-- Assets & Tools Workbench trigger -->
+            <button type="button" id="btn-top-assets-tools" onclick="window.RegaarderAssetWorkbench && window.RegaarderAssetWorkbench.open()" title="Open Assets & Tools Workbench (Media Registry, 3D Image Animator, Cutout Studio)">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Assets &amp; Tools</span>
+            </button>
+          </div>
+        </details>
         <!-- Contextual secondary tools (Editor Mode only) -->
         <div class="actions-contextual-group editor-only-nav" id="top-contextual-actions" style="display: none;"></div>
 
@@ -120,11 +126,11 @@
     <div class="app-body-container" id="app-body-container" style="display: flex; flex: 1; height: calc(100vh - 46px); min-height: 0; min-width: 0; overflow: hidden; width: 100vw;">
       <!-- Left Vertical Navigation Rail (Persistent across Home and Editor) -->
       <nav class="nav-rail" id="main-nav-rail" aria-label="Editor Tools Navigation Rail" style="flex-shrink: 0;">
-        <button type="button" class="rail-btn" data-rail-tab="templates" title="Video Templates & Structures">
+        <button type="button" class="rail-btn active" data-rail-tab="templates" title="Video Templates & Structures">
           <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
           <span class="rail-label">Templates</span>
         </button>
-        <button type="button" class="rail-btn active" data-rail-tab="all" title="Media Library & Uploads">
+        <button type="button" class="rail-btn" data-rail-tab="all" title="Media Library & Uploads">
           <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
           <span class="rail-label">Uploads</span>
         </button>
@@ -135,6 +141,10 @@
         <button type="button" class="rail-btn" data-rail-tab="animate" title="Animations & Motion Effects">
           <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           <span class="rail-label">Animate</span>
+        </button>
+        <button type="button" class="rail-btn" data-rail-tab="transitions" title="Transitions & Motion Cuts">
+          <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z"/></svg>
+          <span class="rail-label">Transitions</span>
         </button>
         <button type="button" class="rail-btn" data-rail-tab="text" title="Kinetic Typography & Titles">
           <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
@@ -270,9 +280,10 @@
           <!-- Template Category filter tabs -->
           <div style="display: flex; gap: 4px; padding: 8px 10px; overflow-x: auto; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05);" id="templates-category-tabs">
             <button type="button" class="template-filter-tab active" data-cat="all">All</button>
+            <button type="button" class="template-filter-tab" data-cat="transitions" style="color: #60a5fa; border-color: rgba(96,165,250,0.3);">Transitions &amp; Cuts</button>
             <button type="button" class="template-filter-tab" data-cat="custom">My Custom</button>
             <button type="button" class="template-filter-tab" data-cat="tiktok_reels">TikTok / Reels</button>
-            <button type="button" class="template-filter-tab" data-cat="vlog">Vlog & Story</button>
+            <button type="button" class="template-filter-tab" data-cat="vlog">Vlog &amp; Story</button>
             <button type="button" class="template-filter-tab" data-cat="promo">Product Promo</button>
             <button type="button" class="template-filter-tab" data-cat="kinetic">Kinetic Quote</button>
           </div>
@@ -315,6 +326,78 @@
             <button type="button" id="btn-remove-active-animation" style="width: 100%; padding: 7px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; color: #f87171; font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.15s;">
               Remove animation
             </button>
+          </div>
+        </div>
+
+        <!-- Dedicated Transitions & Motion Cuts Library Panel (Canva Style) -->
+        <div id="transitions-panel-container" style="display: none; flex: 1; min-height: 0; flex-direction: column; overflow: hidden;">
+          <div class="layers-header-row" style="padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(59,130,246,0.05); flex-shrink: 0;">
+            <div class="layers-header-title" style="display:flex; align-items:center; gap:6px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:14px; height:14px; fill:#60a5fa;"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z"/></svg>
+              <span style="font-weight:700; font-size:12px; color:#fff; letter-spacing:0.3px;">Scene Transitions &amp; Motion Cuts</span>
+            </div>
+          </div>
+          <!-- Transitions sub-category filter tabs -->
+          <div style="display: flex; gap: 4px; padding: 8px 10px; overflow-x: auto; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;" id="transitions-category-tabs">
+            <button type="button" class="template-filter-tab active" data-trans-cat="all">All</button>
+            <button type="button" class="template-filter-tab" data-trans-cat="3d">3D &amp; Push</button>
+            <button type="button" class="template-filter-tab" data-trans-cat="cinematic">Cinematic</button>
+            <button type="button" class="template-filter-tab" data-trans-cat="reveal">Wipe &amp; Reveal</button>
+            <button type="button" class="template-filter-tab" data-trans-cat="pacing">Audio (J/L)</button>
+          </div>
+          <!-- Transitions Visual Cards Grid (Live Animated Previews) -->
+          <div id="transitions-cards-grid" style="flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-content: start;">
+            <!-- Rendered by JS -->
+          </div>
+          <!-- Selected Transition Controls Drawer (Duration / Direction / SFX / Smart Asset Prompt) -->
+          <div id="transitions-controls-drawer" style="display: none; padding: 12px; background: rgba(15,16,24,0.98); border-top: 1px solid rgba(255,255,255,0.1); flex-direction: column; gap: 10px; flex-shrink: 0; max-height: 240px; overflow-y: auto;">
+            <!-- Smart Asset Detector Box -->
+            <div id="trans-smart-asset-box" style="font-size: 11px; padding: 8px 10px; border-radius: 6px; line-height: 1.35;"></div>
+            <!-- Active name & duration readout -->
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="trans-active-name" style="font-size: 11.5px; font-weight: 700; color: #e2e8f0;">3D Fly-Through</span>
+              <span id="trans-active-dur" style="font-size: 11.5px; color: #60a5fa; font-weight: 600;">0.7s</span>
+            </div>
+            <!-- Duration slider -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-muted);">
+                <span>Transition Duration</span>
+              </div>
+              <input type="range" id="trans-duration-slider" min="2" max="25" value="7" style="width: 100%; accent-color: #3b82f6; cursor: pointer;">
+            </div>
+            <!-- Direction Selector (for push/slide/fly) -->
+            <div id="trans-direction-row" style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="font-size: 10.5px; color: var(--text-muted);">Motion Direction &amp; Depth</div>
+              <div style="display: flex; gap: 4px;" id="trans-dir-buttons">
+                <button type="button" class="btn-tool-icon trans-dir-btn active" data-dir="center" title="Center Fly / Zoom" style="flex:1; font-size:10px; padding:4px;">Center</button>
+                <button type="button" class="btn-tool-icon trans-dir-btn" data-dir="left" title="Left Slide" style="flex:1; font-size:10px; padding:4px;">Left</button>
+                <button type="button" class="btn-tool-icon trans-dir-btn" data-dir="right" title="Right Slide" style="flex:1; font-size:10px; padding:4px;">Right</button>
+                <button type="button" class="btn-tool-icon trans-dir-btn" data-dir="up" title="Up Push" style="flex:1; font-size:10px; padding:4px;">Up</button>
+                <button type="button" class="btn-tool-icon trans-dir-btn" data-dir="down" title="Down Push" style="flex:1; font-size:10px; padding:4px;">Down</button>
+              </div>
+            </div>
+            <!-- Sound FX Selector -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-muted);">
+                <span>Sound Effect (SFX)</span>
+              </div>
+              <select id="trans-sfx-select" style="width: 100%; padding: 5px 8px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #fff; font-size: 11px;">
+                <option value="none">None (Silent)</option>
+                <option value="whoosh">Whoosh / Air Swipe</option>
+                <option value="paper">Paper Slam / Tear</option>
+                <option value="subbass">Sub-bass Bloom</option>
+                <option value="camera">Vintage Camera Shutter</option>
+              </select>
+            </div>
+            <!-- Action buttons: Remove transition & Apply to All -->
+            <div style="display: flex; gap: 6px;">
+              <button type="button" id="btn-apply-trans-all" style="flex: 1; padding: 7px; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 6px; color: #93c5fd; font-size: 11px; font-weight: 600; cursor: pointer;">
+                Apply to All Cuts
+              </button>
+              <button type="button" id="btn-remove-active-transition" style="flex: 1; padding: 7px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; color: #f87171; font-size: 11px; font-weight: 600; cursor: pointer;">
+                Remove
+              </button>
+            </div>
           </div>
         </div>
 
@@ -437,6 +520,12 @@
             <button type="button" class="canva-bar-btn" id="btn-cbar-animate" title="Animations & Motion Effects" style="background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(168, 85, 247, 0.35); color: #d8b4fe; font-weight: 600; padding: 4px 10px; border-radius: 8px; white-space: nowrap;">
               <svg class="ui-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #c084fc;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               <span>Animate</span>
+            </button>
+
+            <!-- Canva-Style Transition Button -->
+            <button type="button" class="canva-bar-btn" id="btn-cbar-transition" title="Scene Transitions & Motion Cuts" style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.35); color: #93c5fd; font-weight: 600; padding: 4px 10px; border-radius: 8px; white-space: nowrap;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #60a5fa;"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z"/></svg>
+              <span>Transition</span>
             </button>
 
             <!-- Draw Button -->
@@ -3378,68 +3467,53 @@
          ========================================================= -->
     <main id="home-templates-discovery" class="home-templates-view" style="display: block; flex: 1; overflow-y: auto; background: #0C0D12; padding: 32px 24px 60px; color: #f8fafc;">
       
-      <div style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 10px;">
+      <div class="rm-library-hero" style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 10px;">
         <!-- Clean Mature Subtitle Badge -->
-        <div style="display: inline-flex; align-items: center; padding: 5px 16px; border-radius: 9999px; background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(168, 85, 247, 0.28); color: #c084fc; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-          <span>Effortless Visual Effects &bull; Pro Storytelling</span>
+        <div class="rm-library-eyebrow" style="display: inline-flex; align-items: center; padding: 5px 16px; border-radius: 9999px; background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(168, 85, 247, 0.28); color: #c084fc; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+          <span>REGAARDER CINEMATIC LIBRARY</span>
         </div>
         
         <!-- Single-line balanced headline -->
         <h2 style="font-size: clamp(26px, 3.8vw, 44px); font-weight: 800; letter-spacing: -0.025em; color: #ffffff; line-height: 1.2; margin: 0; white-space: nowrap;">
-          Intuitive Editing, 
-          <span style="background: linear-gradient(100deg, #c084fc 0%, #e879f9 50%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            Endless Creativity
-          </span>
+          Your next story <span>starts here.</span>
         </h2>
+        <p class="rm-library-tagline">Explore cinematic motion. Replace the assets. Make every scene yours.</p>
 
         <!-- Central Search Bar -->
-        <div style="position: relative; width: 100%; max-width: 680px; margin: 8px auto 0;">
+        <div class="rm-library-search" style="position: relative; width: 100%; max-width: 680px; margin: 8px auto 0;">
           <div style="display: flex; align-items: center; background: #171823; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 16px; padding: 6px 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: border-color 0.2s;">
             <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #94a3b8; stroke-width: 2; margin-left: 8px; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input
               type="text"
               id="home-template-search-input"
-              placeholder="Search background removal cutout, paper rip, gold frame..."
+              placeholder="Search templates, scenes, motion or ideas…"
+              aria-label="Search templates"
               style="width: 100%; background: transparent; border: none; outline: none; padding: 8px 12px; font-size: 13.5px; color: #f1f5f9;"
             />
             <button id="home-template-search-clear" style="display: none; background: transparent; border: none; color: #64748b; cursor: pointer; padding: 4px; font-size: 16px; margin-right: 4px;">&times;</button>
           </div>
         </div>
 
-        <!-- Category Pills -->
-        <div id="home-category-pills" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
-          <!-- Populated dynamically via JS -->
+        <!-- Quick Workflows: Hidden directly so it never flashes -->
+        <div style="display: none !important; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 900px; margin-top: 14px;" hidden>
+          <div onclick="window.RegaarderBlankComposition && window.RegaarderBlankComposition.open()" role="button" tabindex="0"></div>
+          <div onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()" role="button" tabindex="0"></div>
+          <div onclick="window.RegaarderAssetWorkbench && window.RegaarderAssetWorkbench.open()" role="button" tabindex="0"></div>
         </div>
+      </div>
 
-        <!-- Quick Workflows: Blank Composition, Story & Prompts, Assets & Tools -->
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 900px; margin-top: 14px;">
-          <!-- Blank Comp Card -->
-          <div onclick="window.RegaarderBlankComposition && window.RegaarderBlankComposition.open()" role="button" tabindex="0" style="background: rgba(130, 60, 240, 0.08); border: 1px solid rgba(130, 60, 240, 0.35); border-radius: 12px; padding: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 16px;">✨</span>
-              <strong style="font-size: 13px; color: #fff;">Blank Composition</strong>
-            </div>
-            <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.4;">Build from scratch with multi-layer timing, 3D planes & shaders.</p>
-          </div>
-
-          <!-- Story & Prompts Card -->
-          <div onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()" role="button" tabindex="0" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 16px;">📖</span>
-              <strong style="font-size: 13px; color: #fff;">Story & Prompts</strong>
-            </div>
-            <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.4;">Voiceover transcript, scene narrative intent & AI prompt records.</p>
-          </div>
-
-          <!-- Assets & Tools Card -->
-          <div onclick="window.RegaarderAssetWorkbench && window.RegaarderAssetWorkbench.open()" role="button" tabindex="0" style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-              <span style="font-size: 16px;">🛠️</span>
-              <strong style="font-size: 13px; color: #fff;">Assets & Tools</strong>
-            </div>
-            <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.4;">3D Image Animator, Manual Cutout Studio & media bin.</p>
-          </div>
+      <!-- Controls: Tabs + Filter Menu -->
+      <div class="rm-library-controls">
+        <div class="rm-library-types" role="tablist" aria-label="Template types">
+          <button type="button" role="tab" data-library-kind="all" id="rm-library-tab-all" aria-controls="home-templates-grid" aria-selected="true" tabindex="0">All Templates</button>
+          <button type="button" role="tab" data-library-kind="full" id="rm-library-tab-full" aria-controls="home-templates-grid" aria-selected="false" tabindex="-1">Full Videos</button>
+          <button type="button" role="tab" data-library-kind="scene" id="rm-library-tab-scene" aria-controls="home-templates-grid" aria-selected="false" tabindex="-1">Scenes</button>
+          <button type="button" role="tab" data-library-kind="effect" id="rm-library-tab-effect" aria-controls="home-templates-grid" aria-selected="false" tabindex="-1">Effects &amp; Layers</button>
         </div>
+        <details class="rm-filter-menu">
+          <summary>Filters <span aria-hidden="true">⌄</span></summary>
+          <div id="home-category-pills" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;"></div>
+        </details>
       </div>
 
       <!-- Template Cards Grid -->
@@ -3448,8 +3522,8 @@
           <div style="display: flex; align-items: center; gap: 9px;">
             <!-- Sleek Minimalist 4-Point Geometric Vector Star -->
             <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: #c084fc; flex-shrink: 0;"><path d="M12 2L14.6 9.4L22 12L14.6 14.6L12 22L9.4 14.6L2 12L9.4 9.4L12 2Z"/></svg>
-            <h3 id="home-templates-heading" style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: -0.01em;">Inspired By Your Creative Workflow</h3>
-            <span id="home-templates-count" style="font-size: 11px; font-weight: 700; color: #94a3b8; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); padding: 2px 7px; border-radius: 9999px; font-family: monospace;">42</span>
+            <h3 id="home-templates-heading" style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: -0.01em;">All Templates</h3>
+            <span id="home-templates-count" style="font-size: 11px; font-weight: 700; color: #94a3b8; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); padding: 2px 7px; border-radius: 9999px; font-family: monospace;">113</span>
           </div>
         </div>
 
