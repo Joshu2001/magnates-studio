@@ -4737,11 +4737,18 @@
       // Position the glowing selection frame around the selected object (unless it is the full stage backdrop)
       const isStageBackdrop = targetEl === stageEl || state.objectKey === 'backdrop' || state.objectKey === 'bg';
       if (selectionFrameEl) {
-        if (!isStageBackdrop && targetRect.width > 12 && targetRect.height > 12) {
-          selectionFrameEl.style.left = `${Math.round(targetRect.left)}px`;
-          selectionFrameEl.style.top = `${Math.round(targetRect.top)}px`;
-          selectionFrameEl.style.width = `${Math.round(targetRect.width)}px`;
-          selectionFrameEl.style.height = `${Math.round(targetRect.height)}px`;
+        const clampedLeft = Math.max(stageRect.left, targetRect.left);
+        const clampedTop = Math.max(stageRect.top, targetRect.top);
+        const clampedRight = Math.min(stageRect.right, targetRect.right);
+        const clampedBottom = Math.min(stageRect.bottom, targetRect.bottom);
+        const clampedW = Math.max(0, clampedRight - clampedLeft);
+        const clampedH = Math.max(0, clampedBottom - clampedTop);
+        const isOversized = clampedW >= stageRect.width * 0.96 && clampedH >= stageRect.height * 0.96;
+        if (!isStageBackdrop && !isOversized && clampedW > 12 && clampedH > 12) {
+          selectionFrameEl.style.left = `${Math.round(clampedLeft)}px`;
+          selectionFrameEl.style.top = `${Math.round(clampedTop)}px`;
+          selectionFrameEl.style.width = `${Math.round(clampedW)}px`;
+          selectionFrameEl.style.height = `${Math.round(clampedH)}px`;
           selectionFrameEl.classList.toggle('is-lasso', state.selectionStyle === 'lasso');
           selectionFrameEl.classList.add('is-visible');
         } else {

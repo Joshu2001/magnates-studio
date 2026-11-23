@@ -662,7 +662,7 @@
     return `
       <div id="regaarder-chapter-viewport-${suffix}" class="rg-chapter-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#04060a;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;">
         <canvas id="regaarder-chapter-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
-        ${templateId === 'regaarder-full-documentary' && !isHover ? '<iframe data-documentary-source title="Documentary sequence" src="/regaarder-documentary-v4/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:1"></iframe>' : ''}
+        ${templateId === 'regaarder-full-documentary' && !isHover ? '<iframe data-documentary-source title="Documentary sequence" src="/regaarder-documentary/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:1"></iframe>' : ''}
         ${interactiveOverlayHtml}
       </div>
     `;

@@ -105,7 +105,7 @@ function captureStudioLayers(){
 window.RegaarderDocumentaryBridge={
  layers:()=>studioDrawnLayers,
  setLayers(layers){studioLayerEdits=layers||{};const key=JSON.stringify(studioLayerEdits);if(key!==studioEditKey){studioEditKey=key;base._renderKey='';}},
- ready:()=>!!window.motionFinalReady,
+ ready:()=>true,
  controls(){return [...document.querySelectorAll('.inspector input,.inspector select,.inspector textarea,.inspector button')].map((el,index)=>({index,type:el.tagName==='BUTTON'?'button':el.tagName==='SELECT'?'select':el.type||'text',label:el.labels?.[0]?.textContent?.trim()||el.closest('label')?.textContent?.trim()||el.title||el.textContent?.trim()||el.id||'Setting',value:el.type==='checkbox'?el.checked:el.value,min:el.min,max:el.max,step:el.step,options:el.options?[...el.options].map(o=>({label:o.text,value:o.value})):[]}));},
  control(index,value){const el=document.querySelectorAll('.inspector input,.inspector select,.inspector textarea,.inspector button')[index];if(!el)return;if(el.tagName==='BUTTON')el.click();else{if(el.type==='checkbox')el.checked=!!value;else el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}base._renderKey='';frame(base,t);},
  seek(seconds){
