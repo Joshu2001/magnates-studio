@@ -4,13 +4,6 @@
  const home=document.getElementById('home-templates-discovery'),topbar=document.getElementById('top-nav-bar');
  if(!home||!topbar)return;
  const hero=home.firstElementChild;if(hero)hero.classList.add('rm-library-hero');
- const badge=hero?.querySelector('.rm-library-eyebrow')||hero?.firstElementChild;
- if(badge){badge.classList.add('rm-library-eyebrow');badge.textContent='Effortless Visual Effects \u2022 Pro Storytelling';}
- const headline=hero?.querySelector('h2');
- if(headline)headline.innerHTML='Intuitive Editing, <span>Endless Creativity</span>';
- if(!hero?.querySelector('.rm-library-tagline')&&headline){
-   const tagline=document.createElement('p');tagline.className='rm-library-tagline';tagline.textContent='Explore cinematic motion. Replace the assets. Make every scene yours.';headline.after(tagline);
- }
  const search=document.getElementById('home-template-search-input');
  if(search){
    search.placeholder='Search templates, scenes, motion or ideas…';search.setAttribute('aria-label','Search templates');
@@ -103,7 +96,7 @@
          <span>REGAARDER <em>MOTION</em></span>
        </div>
        <h3 class="rm-auth-title" id="rm-auth-heading">Welcome back</h3>
-       <p class="rm-auth-sub" data-auth-sub>Log in to save templates, sync scenes, and export in 4K.</p>
+       <p class="rm-auth-sub" data-auth-sub>Intuitive Editing, Endless Creativity — save templates, sync scenes, and export in 4K.</p>
        <div class="rm-auth-tabs" role="tablist">
          <button type="button" class="rm-auth-tab" data-auth-tab="signup">Sign up</button>
          <button type="button" class="rm-auth-tab is-active" data-auth-tab="login">Log in</button>
@@ -147,8 +140,8 @@
      const isSignup = authMode === 'signup';
      authModal.querySelector('#rm-auth-heading').textContent = isSignup ? 'Create your account' : 'Welcome back';
      authModal.querySelector('[data-auth-sub]').textContent = isSignup
-       ? 'Start building cinematic motion scenes and save your work.'
-       : 'Log in to save templates, sync scenes, and export in 4K.';
+       ? 'Intuitive Editing, Endless Creativity — start building cinematic motion scenes.'
+       : 'Intuitive Editing, Endless Creativity — save templates, sync scenes, and export in 4K.';
      authModal.querySelector('[data-auth-name-wrap]').hidden = !isSignup;
      authModal.querySelector('[data-auth-submit]').textContent = isSignup ? 'Create account' : 'Log in';
      authModal.querySelector('[data-auth-switch-text]').textContent = isSignup ? 'Already have an account?' : 'New to Regaarder Motion?';

@@ -24,8 +24,8 @@
 .rm-auth-backdrop.is-open{opacity:1;pointer-events:auto}
 .rm-auth-card{position:relative;width:min(420px,94vw);background:linear-gradient(180deg,#161724 0%,#0f1018 100%);border:1px solid rgba(168,85,247,.32);border-radius:18px;padding:26px 26px 22px;box-shadow:0 28px 70px rgba(0,0,0,.78),0 0 40px rgba(139,92,246,.18),inset 0 1px 0 rgba(255,255,255,.08);color:#f8fafc;transform:translateY(8px) scale(.98);transition:transform .2s cubic-bezier(.16,1,.3,1)}
 .rm-auth-backdrop.is-open .rm-auth-card{transform:translateY(0) scale(1)}
-.rm-auth-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#94a3b8;font-size:18px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.rm-auth-close:hover{background:rgba(255,255,255,.1);color:#fff}
+.rm-auth-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border:0;background:transparent;color:#94a3b8;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rm-auth-close:hover{color:#fff}
 .rm-auth-brand{display:flex;align-items:center;gap:9px;margin-bottom:14px}
 .rm-auth-brand span{font-size:12px;font-weight:800;letter-spacing:.06em;color:#e2e8f0}
 .rm-auth-brand em{font-style:normal;color:#c084fc}
@@ -35,20 +35,34 @@
 .rm-auth-tab{height:34px;border:0;border-radius:8px;background:transparent;color:#94a3b8;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s ease}
 .rm-auth-tab.is-active{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.35)}
 .rm-auth-oauth{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-.rm-auth-oauth-btn{height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#f1f5f9;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s ease,border-color .15s ease}
-.rm-auth-oauth-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(192,132,252,.45)}
+.rm-auth-oauth-btn{height:38px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;color:#0f1018;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:background .15s ease}
+.rm-auth-oauth-btn:hover{background:#e2e8f0}
 .rm-auth-divider{display:flex;align-items:center;gap:10px;margin:12px 0;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
 .rm-auth-divider::before,.rm-auth-divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.09)}
 .rm-auth-field{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.rm-auth-field[hidden]{display:none!important}
 .rm-auth-field label{font-size:11.5px;font-weight:600;color:#cbd5e1}
 .rm-auth-input-wrap{position:relative;display:flex;align-items:center}
 .rm-auth-field input{width:100%;height:38px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.13);background:#0b0c12;color:#f8fafc;font-family:inherit;font-size:13px;outline:none;transition:border-color .15s ease,box-shadow .15s ease}
 .rm-auth-field input:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.18)}
 .rm-auth-eye{position:absolute;right:10px;background:none;border:0;color:#94a3b8;font-size:11px;font-weight:600;cursor:pointer;padding:4px}
-.rm-auth-submit{width:100%;height:40px;margin-top:4px;border:0;border-radius:10px;background:linear-gradient(135deg,#8b5cf6 0%,#a855f7 60%,#ec4899 100%);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 8px 22px rgba(139,92,246,.36);transition:filter .15s ease,transform .12s ease}
-.rm-auth-submit:hover{filter:brightness(1.08)}
+.rm-auth-submit{width:100%;height:40px;margin-top:4px;border:0;border-radius:10px;background:#823CF0;color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(130,60,240,.32);transition:background .15s ease,transform .12s ease}
+.rm-auth-submit:hover{background:#9353F5}
 .rm-auth-submit:active{transform:scale(.99)}
 .rm-auth-msg{margin-top:10px;font-size:12px;text-align:center;min-height:16px;color:#fda4af}
 .rm-auth-msg.is-ok{color:#86efac}
 .rm-auth-footer{margin-top:12px;text-align:center;font-size:11.5px;color:#94a3b8}
 .rm-auth-footer button{background:none;border:0;color:#c084fc;font-weight:600;cursor:pointer;padding:0;font-family:inherit;font-size:11.5px}
+
+/* Template Card Like + Three-Dots Menu */
+.home-tpl-desc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-tpl-like-btn{display:inline-flex;align-items:center;gap:4px;background:transparent;border:0;color:#94a3b8;font-size:11.5px;font-weight:600;cursor:pointer;padding:4px 6px;border-radius:6px;transition:color .15s ease}
+.home-tpl-like-btn:hover,.home-tpl-like-btn.is-liked{color:#f43f5e}
+.home-tpl-like-btn.is-liked svg{fill:currentColor}
+.home-tpl-dots-wrap{position:relative;display:inline-flex;align-items:center}
+.home-tpl-dots-btn{background:transparent;border:0;color:#94a3b8;cursor:pointer;padding:4px 6px;border-radius:6px;display:inline-flex;align-items:center}
+.home-tpl-dots-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+.home-tpl-dots-menu{position:absolute;right:0;bottom:calc(100% + 6px);min-width:130px;background:#161724;border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:4px;box-shadow:0 12px 28px rgba(0,0,0,.6);z-index:40;display:none;flex-direction:column;gap:2px}
+.home-tpl-dots-menu.is-open{display:flex}
+.home-tpl-dots-item{background:transparent;border:0;color:#e2e8f0;font-size:12px;font-weight:600;padding:7px 10px;border-radius:6px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:7px}
+.home-tpl-dots-item:hover{background:rgba(130,60,240,.2);color:#fff}

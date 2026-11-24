@@ -63,6 +63,12 @@
               <span>Blank Comp</span>
             </button>
 
+            <!-- Storyboard Sketch Studio trigger -->
+            <button type="button" id="btn-top-storyboard-sketch" onclick="window.RegaarderStoryboardSketch && window.RegaarderStoryboardSketch.open()" title="Sketch scenes with paint/fill or batch import images before generating">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+              <span>Storyboard Sketch</span>
+            </button>
+
             <!-- Story & Prompts Studio trigger -->
             <button type="button" id="btn-top-story-prompts" onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()" title="Open Story Context & Generative AI Prompts Studio">
               <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
@@ -76,9 +82,8 @@
             </button>
           </div>
         </details>
-        <!-- Auth Actions (Canva-inspired Sign up & Log in) -->
+        <!-- Auth Actions (Single Log in button; Sign up inside modal) -->
         <div class="rm-auth-actions" id="rm-auth-actions">
-          <button type="button" class="rm-auth-btn rm-auth-signup" id="btn-auth-signup">Sign up</button>
           <button type="button" class="rm-auth-btn rm-auth-login" id="btn-auth-login">Log in</button>
           <button type="button" class="rm-auth-user" id="btn-auth-user" hidden title="Account">
             <span class="rm-auth-avatar" id="rm-auth-avatar">RM</span>
@@ -3476,21 +3481,7 @@
          ========================================================= -->
     <main id="home-templates-discovery" class="home-templates-view" style="display: block; flex: 1; overflow-y: auto; background: #0C0D12; padding: 32px 24px 60px; color: #f8fafc;">
       
-      <div class="rm-library-hero" style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 10px;">
-        <!-- Clean Mature Subtitle Badge -->
-        <div class="rm-library-eyebrow" style="display: inline-flex; align-items: center; padding: 5px 16px; border-radius: 9999px; background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(168, 85, 247, 0.28); color: #c084fc; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-          <span>Effortless Visual Effects &bull; Pro Storytelling</span>
-        </div>
-        
-        <!-- Single-line balanced headline -->
-        <h2 style="font-size: clamp(26px, 3.8vw, 44px); font-weight: 800; letter-spacing: -0.025em; color: #ffffff; line-height: 1.2; margin: 0; white-space: nowrap;">
-          Intuitive Editing, 
-          <span style="background: linear-gradient(100deg, #c084fc 0%, #e879f9 50%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-            Endless Creativity
-          </span>
-        </h2>
-        <p class="rm-library-tagline" hidden style="display:none;"></p>
-
+      <div class="rm-library-hero" style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 4px;">
         <!-- Central Search Bar -->
         <div class="rm-library-search" style="position: relative; width: 100%; max-width: 680px; margin: 8px auto 0;">
           <div style="display: flex; align-items: center; background: #171823; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 16px; padding: 6px 10px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transition: border-color 0.2s;">
@@ -13706,6 +13697,7 @@
   <script src="js/regaarder-chapters-engine.js?v=renderer-v4"></script>
   <script src="js/regaarder-native3d-engine.js?v=renderer-v4"></script>
   <script src="js/regaarder-blank-composition.js?v=1"></script>
+  <script src="js/regaarder-storyboard-sketch.js?v=1"></script>
   <script src="js/regaarder-story-prompts.js?v=1"></script>
   <script src="js/regaarder-assets-tools.js?v=1"></script>
   <script src="js/tpl-contextual-inspector.js?v=25"></script>

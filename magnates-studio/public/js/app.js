@@ -28486,8 +28486,14 @@ function renderHomepageTemplates() {
     return;
   }
 
+  let likesMap = {};
+  try { likesMap = JSON.parse(localStorage.getItem('rg-tpl-likes-v1') || '{}'); } catch (e) { likesMap = {}; }
+
   grid.innerHTML = filtered.map(t => {
     const is3D = !!t.is3D || t.category === '3D Spatial' || t.origCategory === '3D Spatial' || t.id === 'empire-timeline' || t.id === 'map' || (typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(t.id));
+    const liked = !!likesMap[t.id];
+    const baseLikes = typeof t.likes === 'number' ? t.likes : (t.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 48) + 12;
+    const likeCount = baseLikes + (liked ? 1 : 0);
     return `
       <div class="home-tpl-card" data-template-id="${t.id}">
         <div class="home-tpl-media" id="media-wrap-${t.id}">
@@ -28514,23 +28520,25 @@ function renderHomepageTemplates() {
         </div>
 
         <div class="home-tpl-content">
-          <div>
-            <h4 class="home-tpl-title">${formatConciseTemplateTitle(t.title).short}</h4>
-            <p class="home-tpl-desc">${formatBeginnerDescription(t.description)}</p>
-          </div>
-
-          <div class="home-tpl-footer">
-            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-              ${(Array.isArray(t.tags) ? t.tags : []).slice(0, 2).map(tag => `<span class="home-tpl-tag">#${tag}</span>`).join('')}
+          <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:10px;">
+            <div style="min-width:0; flex:1;">
+              <h4 class="home-tpl-title">${formatConciseTemplateTitle(t.title).short}</h4>
+              <p class="home-tpl-desc">${formatBeginnerDescription(t.description)}</p>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button type="button" class="home-tpl-share-btn" data-share-tpl-id="${t.id}" title="Share template preset">
-                <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+            <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
+              <button type="button" class="home-tpl-like-btn ${liked ? 'is-liked' : ''}" data-like-tpl-id="${t.id}" title="Like template">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                <span class="home-tpl-like-count">${likeCount}</span>
               </button>
-              <span class="home-tpl-btn-use">
-                Use This
-                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-              </span>
+              <div class="home-tpl-dots-wrap">
+                <button type="button" class="home-tpl-dots-btn" data-dots-tpl-id="${t.id}" title="More actions">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+                </button>
+                <div class="home-tpl-dots-menu" data-dots-menu="${t.id}">
+                  <button type="button" class="home-tpl-dots-item home-tpl-btn-use">Use This</button>
+                  <button type="button" class="home-tpl-dots-item home-tpl-share-btn" data-share-tpl-id="${t.id}">Share</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -28538,16 +28546,43 @@ function renderHomepageTemplates() {
     `;
   }).join('');
 
-  // Attach hover video effect listeners, share button handler, and click handler to each card
+  // Attach hover video effect listeners, like/dots/share handlers, and click handler to each card
   grid.querySelectorAll('.home-tpl-card').forEach(card => {
     const tplId = card.dataset.templateId;
     const tpl = allTemplates.find(item => item.id === tplId);
+
+    // Like button click handler
+    const likeBtn = card.querySelector('.home-tpl-like-btn');
+    if (likeBtn) {
+      likeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isNowLiked = !likesMap[tplId];
+        if (isNowLiked) likesMap[tplId] = true; else delete likesMap[tplId];
+        try { localStorage.setItem('rg-tpl-likes-v1', JSON.stringify(likesMap)); } catch (err) {}
+        likeBtn.classList.toggle('is-liked', isNowLiked);
+        const cntEl = likeBtn.querySelector('.home-tpl-like-count');
+        if (cntEl) cntEl.textContent = String(parseInt(cntEl.textContent || '0', 10) + (isNowLiked ? 1 : -1));
+      });
+    }
+
+    // Three-dots menu toggle
+    const dotsBtn = card.querySelector('.home-tpl-dots-btn');
+    const dotsMenu = card.querySelector('.home-tpl-dots-menu');
+    if (dotsBtn && dotsMenu) {
+      dotsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wasOpen = dotsMenu.classList.contains('is-open');
+        grid.querySelectorAll('.home-tpl-dots-menu.is-open').forEach(m => m.classList.remove('is-open'));
+        if (!wasOpen) dotsMenu.classList.add('is-open');
+      });
+    }
 
     // Share button click handler
     const shareBtn = card.querySelector('.home-tpl-share-btn');
     if (shareBtn) {
       shareBtn.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (dotsMenu) dotsMenu.classList.remove('is-open');
         openTemplateShareModal(tplId);
       });
     }
@@ -29382,8 +29417,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (defaultImg) defaultImg.style.opacity = '0';
   if (centerLabel) centerLabel.style.opacity = '0';
   if (badgeEl) {
-    badgeEl.textContent = 'LIVE PREVIEW';
-    badgeEl.style.background = '#ef4444';
+    badgeEl.textContent = 'PREVIEW';
+    badgeEl.style.background = '#823CF0';
     badgeEl.classList.add('pulse-preview-badge');
   }
 
