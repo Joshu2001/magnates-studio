@@ -28712,7 +28712,13 @@ function renderHomepageTemplates() {
           <!-- Container for dynamic Live Hover Video FX -->
           <div class="home-tpl-fx-container" id="fx-container-${t.id}" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; display: none;"></div>
 
-          <div class="home-tpl-badge" id="badge-${t.id}">${t.category || t.origCategory || 'Template'}</div>
+          <div class="home-tpl-badge" id="badge-${t.id}">${(() => {
+            const raw = String(t.category || t.origCategory || 'Template').trim();
+            if (/^REGAARDER\s+NATIVE\s+3D/i.test(raw)) return '3D Spatial';
+            if (/^REGAARDER\s+MOTION/i.test(raw)) return 'Motion Scene';
+            if (/^MASTER\s+DOCUMENTARY/i.test(raw)) return 'Documentary';
+            return raw;
+          })()}</div>
           <div class="home-tpl-time">${t.timeToApply || '6s'}</div>
 
           <div class="home-tpl-play-hover" id="play-hover-${t.id}">
