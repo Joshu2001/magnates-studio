@@ -28129,6 +28129,189 @@ if (!window.__rgLayersRailWired) {
   }, true);
 }
 
+
+window.RegaarderDimensionTransform = (function () {
+  const DEFAULTS = { mode: '2d', x: 0, y: 0, depth: 45, scale: 1, rotX: 0, rotY: 0, rotZ: 0, opacity: 1, autoOrbit: false, src: '' };
+  let state = { ...DEFAULTS };
+  let rafId = null;
+
+  function getSelectedLayerImage() {
+    const tplId = window.topCustomizerState?.currentTpl?.id || '';
+    const rt = window.REGAARDER_CHAPTER_RUNTIME?.[tplId];
+    const lid = rt?.selectedLayer;
+    if (rt && lid) {
+      const layer = rt.config?.layers?.[lid];
+      if (layer?.customImageSrc) return layer.customImageSrc;
+      const mediaEl = rt.media?.[lid];
+      if (mediaEl) {
+        if (typeof mediaEl.src === 'string' && mediaEl.src) return mediaEl.src;
+        if (mediaEl.img?.src) return mediaEl.img.src;
+        if (typeof mediaEl.toDataURL === 'function' && mediaEl.width > 0) {
+          try { return mediaEl.toDataURL('image/png'); } catch (_) {}
+        }
+      }
+    }
+    const stage = document.getElementById('tpl-modal-preview-stage');
+    const im = stage?.querySelector('img');
+    if (im?.src) return im.src;
+    const cv = stage?.querySelector('canvas');
+    if (cv && cv.width > 0) {
+      try { return cv.toDataURL('image/png'); } catch (_) {}
+    }
+    return '';
+  }
+
+  function destroyOverlay() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    document.getElementById('rg-dim-transform-stage')?.remove();
+  }
+
+  function open(mode, explicitSrc) {
+    const stage = document.getElementById('tpl-modal-preview-stage');
+    if (!stage) return;
+    if (window.topCustomizerState) window.topCustomizerState.isPlaying = false;
+
+    const prevSrc = explicitSrc || getSelectedLayerImage() || window.topCustomizerState?.primaryUrl || '/assets/regaarder-motion/portrait.png';
+    state = { ...DEFAULTS, mode: mode || '2.5d', src: prevSrc };
+    destroyOverlay();
+
+    const controlsHtml = state.mode === '2d'
+      ? `
+        <label style="display:inline-flex;align-items:center;gap:4px;">X <input type="range" data-rg-dim="x" min="-200" max="200" value="0" style="width:52px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Y <input type="range" data-rg-dim="y" min="-150" max="150" value="0" style="width:52px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Scale <input type="range" data-rg-dim="scale" min="0.3" max="2.5" step="0.05" value="1" style="width:52px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Rotate <input type="range" data-rg-dim="rotZ" min="-180" max="180" value="0" style="width:52px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Opacity <input type="range" data-rg-dim="opacity" min="0.1" max="1" step="0.05" value="1" style="width:48px;"></label>
+      `
+      : `
+        <label style="display:inline-flex;align-items:center;gap:4px;">${state.mode === '3d' ? 'Thickness' : 'Depth'} <input type="range" data-rg-dim="depth" min="0" max="100" value="45" style="width:58px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Scale <input type="range" data-rg-dim="scale" min="0.4" max="2.2" step="0.05" value="1" style="width:56px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Tilt X <input type="range" data-rg-dim="rotX" min="-180" max="180" value="0" style="width:54px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Tilt Y <input type="range" data-rg-dim="rotY" min="-180" max="180" value="0" style="width:54px;"></label>
+      `;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'rg-dim-transform-stage';
+    wrap.style.cssText = 'position:absolute;inset:0;z-index:85;background:#07080f;display:flex;flex-direction:column;overflow:hidden;';
+    wrap.innerHTML = `
+      <div data-rg-dim-view style="position:relative;flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;perspective:1100px;cursor:${state.mode === '3d' ? 'grab' : 'default'};"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px;background:rgba(15,17,28,0.92);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:#cbd5e1;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-weight:700;color:#d8b4fe;text-transform:uppercase;">${state.mode}</span>
+          ${controlsHtml}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${state.mode === '3d' ? `<button type="button" data-rg-dim-orbit style="padding:3px 9px;border-radius:6px;border:1px solid rgba(168,85,247,0.45);background:rgba(139,92,246,0.18);color:#e9d5ff;font-size:10.5px;font-weight:600;cursor:pointer;">Auto-Orbit</button>` : ''}
+          <button type="button" data-rg-dim-reset style="padding:3px 9px;border-radius:6px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.06);color:#cbd5e1;font-size:10.5px;font-weight:600;cursor:pointer;">Reset</button>
+          <button type="button" data-rg-dim-exit style="padding:3px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.1);color:#fff;font-size:10.5px;font-weight:600;cursor:pointer;">Exit</button>
+        </div>
+      </div>
+    `;
+    stage.appendChild(wrap);
+
+    const view = wrap.querySelector('[data-rg-dim-view]');
+    wrap.querySelector('[data-rg-dim-exit]')?.addEventListener('click', destroyOverlay);
+    wrap.querySelector('[data-rg-dim-reset]')?.addEventListener('click', () => {
+      const m = state.mode;
+      const s = state.src;
+      state = { ...DEFAULTS, mode: m, src: s };
+      wrap.querySelectorAll('[data-rg-dim]').forEach((inp) => {
+        inp.value = state[inp.getAttribute('data-rg-dim')];
+      });
+      if (wrap._syncDim) wrap._syncDim();
+    });
+
+    if (state.mode === '3d') {
+      import('/vendor/three.module.js').then((THREE) => {
+        if (!wrap.isConnected) return;
+        const w = view.clientWidth || 640;
+        const h = view.clientHeight || 360;
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(w, h);
+        view.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+        const cam = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
+        cam.position.z = 2.6;
+        scene.add(new THREE.AmbientLight(0xffffff, 0.95));
+        const dir = new THREE.DirectionalLight(0xffffff, 0.7);
+        dir.position.set(2, 3, 4);
+        scene.add(dir);
+
+        const tex = new THREE.TextureLoader().load(state.src);
+        const sideMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.35 });
+        const faceMat = new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.5, metalness: 0.08 });
+        const geo = new THREE.BoxGeometry(2.0, 1.15, 0.12);
+        const mesh = new THREE.Mesh(geo, [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat]);
+        scene.add(mesh);
+
+        let dragging = false, lx = 0, ly = 0;
+        view.addEventListener('pointerdown', (e) => { dragging = true; lx = e.clientX; ly = e.clientY; view.style.cursor = 'grabbing'; });
+        window.addEventListener('pointermove', (e) => {
+          if (!dragging) return;
+          state.rotY += (e.clientX - lx) * 0.5;
+          state.rotX += (e.clientY - ly) * 0.5;
+          lx = e.clientX; ly = e.clientY;
+        });
+        window.addEventListener('pointerup', () => { dragging = false; view.style.cursor = 'grab'; });
+
+        const render3D = () => {
+          if (!wrap.isConnected) { renderer.dispose(); return; }
+          if (state.autoOrbit && !dragging) state.rotY = (state.rotY + 0.6) % 360;
+          mesh.scale.set(state.scale, state.scale, Math.max(0.2, state.depth / 30));
+          mesh.rotation.x = (state.rotX * Math.PI) / 180;
+          mesh.rotation.y = (state.rotY * Math.PI) / 180;
+          renderer.render(scene, cam);
+          rafId = requestAnimationFrame(render3D);
+        };
+        render3D();
+      }).catch(() => {
+        view.innerHTML = `<img src="${state.src}" style="max-width:92%;max-height:92%;object-fit:contain;">`;
+      });
+      wrap.querySelector('[data-rg-dim-orbit]')?.addEventListener('click', () => { state.autoOrbit = !state.autoOrbit; });
+    } else {
+      const bg = document.createElement('img');
+      bg.src = state.src;
+      bg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.1s ease;';
+      const fg = document.createElement('img');
+      fg.src = state.src;
+      fg.style.cssText = 'position:relative;max-width:86%;max-height:86%;object-fit:contain;border-radius:8px;transition:transform 0.1s ease;';
+      if (state.mode === '2.5d') {
+        view.appendChild(bg);
+      }
+      view.appendChild(fg);
+
+      const sync2D = (mx = 0, my = 0) => {
+        if (state.mode === '2d') {
+          fg.style.opacity = String(state.opacity);
+          fg.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale}) rotate(${state.rotZ}deg)`;
+        } else {
+          const d = state.depth * 0.6;
+          bg.style.filter = `blur(${Math.round(state.depth * 0.08)}px) brightness(0.62)`;
+          bg.style.transform = `scale(${state.scale * 1.12}) rotateX(${state.rotX + my}deg) rotateY(${state.rotY + mx}deg)`;
+          fg.style.transform = `translateZ(${d}px) scale(${state.scale}) rotateX(${state.rotX + my * 1.4}deg) rotateY(${state.rotY + mx * 1.4}deg)`;
+        }
+      };
+      sync2D();
+      view.addEventListener('pointermove', (e) => {
+        if (state.mode !== '2.5d') return;
+        const r = view.getBoundingClientRect();
+        sync2D(((e.clientX - r.left) / r.width - 0.5) * 14, ((e.clientY - r.top) / r.height - 0.5) * -10);
+      });
+      wrap._syncDim = () => sync2D();
+    }
+
+    wrap.querySelectorAll('[data-rg-dim]').forEach((inp) => {
+      inp.addEventListener('input', () => {
+        state[inp.getAttribute('data-rg-dim')] = parseFloat(inp.value);
+        if (wrap._syncDim) wrap._syncDim();
+      });
+    });
+  }
+
+  return { open, destroy: destroyOverlay, getMode: () => state.mode };
+})();
+
 if (!window.__rgContextMenuWired) {
   window.__rgContextMenuWired = true;
   (function initStageContextMenu() {
@@ -28168,6 +28351,15 @@ if (!window.__rgContextMenuWired) {
           <span>${copied ? `Paste "${pasteName}"` : 'Paste Effect / Overlay'}</span>
           <span style="font-size:10px;color:#94a3b8;">Ctrl+V</span>
         </button>
+        <div style="height:1px;background:rgba(255,255,255,0.08);margin:4px 0;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;padding:4px 6px;">
+          <span style="font-size:10.5px;color:#94a3b8;font-weight:600;">Transform</span>
+          <div style="display:flex;gap:4px;">
+            <button type="button" data-rg-dim-btn="2d" style="padding:3px 7px;border-radius:5px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:10.5px;font-weight:700;cursor:pointer;">2D</button>
+            <button type="button" data-rg-dim-btn="2.5d" style="padding:3px 7px;border-radius:5px;border:1px solid rgba(168,85,247,0.5);background:rgba(139,92,246,0.22);color:#e9d5ff;font-size:10.5px;font-weight:700;cursor:pointer;">2.5D</button>
+            <button type="button" data-rg-dim-btn="3d" style="padding:3px 7px;border-radius:5px;border:1px solid rgba(56,189,248,0.5);background:rgba(14,165,233,0.2);color:#bae6fd;font-size:10.5px;font-weight:700;cursor:pointer;">3D</button>
+          </div>
+        </div>
       `;
 
       menu.querySelectorAll('button:not([disabled])').forEach((btn) => {
@@ -28194,10 +28386,19 @@ if (!window.__rgContextMenuWired) {
         });
       }
 
+      menu.querySelectorAll('[data-rg-dim-btn]').forEach((db) => {
+        db.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          const mode = db.getAttribute('data-rg-dim-btn');
+          const src = targetTpl?.defaultImage || '';
+          window.RegaarderDimensionTransform?.open(mode, src);
+          hideMenu();
+        });
+      });
       menu.style.left = Math.min(e.clientX, window.innerWidth - 230) + 'px';
-      menu.style.top = Math.min(e.clientY, window.innerHeight - 100) + 'px';
+      menu.style.top = Math.min(e.clientY, window.innerHeight - 140) + 'px';
       menu.style.display = 'block';
-    });
+    }, true);
   })();
 }
 

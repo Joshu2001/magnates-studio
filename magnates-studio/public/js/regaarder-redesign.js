@@ -5276,6 +5276,15 @@
                 <span class="rg-ctx-menu-kbd">⌥⌘V</span>
               </button>
               <div class="rg-ctx-menu-sep"></div>
+              <div class="rg-ctx-menu-sep"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 10px;">
+                <span style="font-size:11px;color:#94a3b8;font-weight:600;">Transform</span>
+                <div style="display:flex;gap:4px;">
+                  <button type="button" data-ctx-dim="2d" style="padding:2px 7px;border-radius:5px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:10.5px;font-weight:700;cursor:pointer;">2D</button>
+                  <button type="button" data-ctx-dim="2.5d" style="padding:2px 7px;border-radius:5px;border:1px solid rgba(168,85,247,0.5);background:rgba(139,92,246,0.22);color:#e9d5ff;font-size:10.5px;font-weight:700;cursor:pointer;">2.5D</button>
+                  <button type="button" data-ctx-dim="3d" style="padding:2px 7px;border-radius:5px;border:1px solid rgba(56,189,248,0.5);background:rgba(14,165,233,0.2);color:#bae6fd;font-size:10.5px;font-weight:700;cursor:pointer;">3D</button>
+                </div>
+              </div>
               <button type="button" class="rg-ctx-menu-item is-destructive" data-ctx-cmd="delete">
                 <span class="rg-ctx-menu-item-left">
                   ${LUCIDE_ICONS.trash}
@@ -5990,3 +5999,97 @@
     setTimeout(initRegaarderRedesign, 60);
   }
 })();
+
+document.addEventListener('click', (e) => {
+  const db = e.target.closest('[data-ctx-dim]');
+  if (!db) return;
+  e.stopPropagation();
+  window.RegaarderDimensionTransform?.open(db.getAttribute('data-ctx-dim'));
+});
+
+
+function upgradeGenericMediaSlotsToVisualGrid(panel) {
+  if (!panel || panel.querySelector('.rg-layer-visual-grid')) return;
+  const slots = Array.from(panel.querySelectorAll('.rg-media-card, .rg-media-slot'));
+  if (!slots.length) return;
+
+  const section = document.createElement('div');
+  section.className = 'rg-inspector-section';
+  section.innerHTML = `
+    <div class="rg-section-header"><span class="rg-section-title">Scene Layers (${slots.length})</span></div>
+    <div class="rg-section-body">
+      <div class="rg-layer-actions-row">
+        <button type="button" class="rg-layer-hdr-btn is-primary" data-rg-uni-add-layer style="width:100%;">+ Add Layer</button>
+      </div>
+      <div class="rg-layer-visual-grid"></div>
+    </div>
+  `;
+  const grid = section.querySelector('.rg-layer-visual-grid');
+
+  slots.forEach((slot, idx) => {
+    const labelEl = slot.querySelector('.rg-media-title, .rg-ctrl-label, strong, span');
+    const label = (labelEl?.textContent || `Layer ${idx + 1}`).replace(/Scene media asset/i, '').trim() || `Layer ${idx + 1}`;
+    const imgEl = slot.querySelector('img');
+    const src = imgEl?.src || window.topCustomizerState?.primaryUrl || '';
+    const fileInp = slot.querySelector('input[type="file"]');
+
+    const card = document.createElement('div');
+    card.className = 'rg-layer-card' + (idx === 0 ? ' is-active' : '');
+    card.innerHTML = `
+      <div class="rg-layer-card-thumb">
+        ${src ? `<img src="${src}" alt="${label}">` : `<span class="rg-layer-card-empty">${label}</span>`}
+        <button type="button" class="rg-layer-cutout-btn" title="Cutout ${label}">Cutout</button>
+        <button type="button" class="rg-layer-replace-btn" title="Replace ${label}">Replace</button>
+      </div>
+      <div class="rg-layer-card-name">${label}</div>
+    `;
+    card.querySelector('.rg-layer-replace-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (fileInp) fileInp.click();
+      else {
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = 'image/*';
+        inp.onchange = () => {
+          const f = inp.files?.[0];
+          if (!f) return;
+          const url = URL.createObjectURL(f);
+          if (window.topCustomizerState) window.topCustomizerState.primaryUrl = url;
+          if (typeof window.renderCustomizerFrameAtTime === 'function') window.renderCustomizerFrameAtTime(0);
+        };
+        inp.click();
+      }
+    });
+    card.querySelector('.rg-layer-cutout-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (typeof window.openInlineRadialLayerEditor === 'function' && src) {
+        window.openInlineRadialLayerEditor(src, label, null, (cutUrl) => {
+          if (window.topCustomizerState) window.topCustomizerState.primaryUrl = cutUrl;
+          if (typeof window.renderCustomizerFrameAtTime === 'function') window.renderCustomizerFrameAtTime(0);
+        });
+      }
+    });
+    grid.appendChild(card);
+    slot.style.display = 'none';
+  });
+
+  section.querySelector('[data-rg-uni-add-layer]')?.addEventListener('click', () => {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = () => {
+      const f = inp.files?.[0];
+      if (!f) return;
+      const url = URL.createObjectURL(f);
+      if (window.topCustomizerState) window.topCustomizerState.primaryUrl = url;
+      if (typeof window.renderCustomizerFrameAtTime === 'function') window.renderCustomizerFrameAtTime(0);
+    };
+    inp.click();
+  });
+
+  const host = panel.querySelector('#rg-inspector-pane-content') || panel;
+  host.prepend(section);
+}
+
+setInterval(() => {
+  const p = document.getElementById('tpl-modal-layers-panel');
+  if (p) upgradeGenericMediaSlotsToVisualGrid(p);
+}, 600);

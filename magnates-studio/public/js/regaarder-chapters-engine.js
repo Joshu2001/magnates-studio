@@ -589,6 +589,7 @@
       paintDocumentarySequence(ctx, t);
       return;
     }
+    if (rt.ready && !rt._beatsRefreshed) { rt._beatsRefreshed = true; setTimeout(() => refreshBeatThumbnails(templateId), 120); }
     if (rt.ready && rt.mod) {
       try {
         if (templateId === 'regaarder-pele-pact-chapter') {
@@ -629,7 +630,7 @@
       if(!object){object={id:owner+'_'+layerId,layerId,variant:layerId==='titles'?'text':'media',name:layerId.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]/g,' ').slice(0,24)};rt.stageObjects.push(object);}
       let box=[...host.children].find(el=>el.dataset.chapterObj===object.id);
       if(!box){box=document.createElement('div');box.className='rg-chapter-hit-box';box.dataset.chapterObj=object.id;box.style.cssText='position:absolute;border:1.5px solid transparent;cursor:grab;pointer-events:auto;box-sizing:border-box';host.appendChild(box);}
-      box.dataset.chapterLayer=layerId;box.dataset.chapterOwner=owner;box.title=object.name;box.style.display='block';box.style.left=actual.x/960*100+'%';box.style.top=actual.y/540*100+'%';box.style.width=actual.w/960*100+'%';box.style.height=actual.h/540*100+'%';box.style.transform='none';
+      box.dataset.chapterLayer=layerId;box.dataset.chapterOwner=owner;box.title=object.name;box.style.display='block';if(!box.querySelector('[data-ch-resize]')){['nw','n','ne','e','se','s','sw','w'].forEach(dir=>{const h=document.createElement('span');h.dataset.chResize=dir;h.className='rg-ch-resize-handle is-'+dir;box.appendChild(h);});}box.style.left=actual.x/960*100+'%';box.style.top=actual.y/540*100+'%';box.style.width=actual.w/960*100+'%';box.style.height=actual.h/540*100+'%';box.style.transform='none';
       if(box.classList.contains('is-selected'))window.RegaarderContextualToolbar?.updatePosition();
     }
     const selected=host.querySelector('.is-selected');if(selected?.style.display==='none')window.RegaarderContextualToolbar?.hide();
@@ -680,6 +681,7 @@
 
     let drag=null;
     viewport.addEventListener('pointerdown',e=>{
+      if(e.target.closest('[data-ch-resize]'))return;
       const box=e.target.closest('[data-chapter-owner]');if(!box)return;e.preventDefault();e.stopPropagation();
       const owner=box.dataset.chapterOwner,rt=chapterRuntime[owner],id=box.dataset.chapterLayer,layer=rt?.config.layers[id];if(!layer)return;
       viewport.querySelectorAll('.is-selected').forEach(el=>{el.classList.remove('is-selected');el.style.borderColor='transparent';});box.classList.add('is-selected');box.style.borderColor='#9B6BFF';rt.selectedLayer=id;
@@ -687,6 +689,30 @@
       window.RegaarderContextualToolbar?.showForObject({contextType:'template',objectKey:object.id,label:object.name,variant:object.variant,anchorElement:box});
       drag={box,layer,x:e.clientX,y:e.clientY,original:[layer.x||0,layer.y||0],matrix:rt.layerParents?.[id]||[1,0,0,1]};box.setPointerCapture(e.pointerId);
     });
+    let resizeDrag=null;
+    viewport.addEventListener('pointerdown',e=>{
+      const rh=e.target.closest('[data-ch-resize]');
+      if(rh){
+        e.stopPropagation();e.preventDefault();
+        const box=rh.closest('[data-chapter-layer]');
+        const lid=box?.dataset.chapterLayer;
+        const layer=lid&&rt.config?.layers?.[lid];
+        if(layer){resizeDrag={layer,startX:e.clientX,startY:e.clientY,startScale:Number(layer.scale??1)};}
+        return;
+      }
+      if(!e.target.closest('[data-chapter-layer]')&&!e.target.closest('#rg-contextual-toolbar')){
+        viewport.querySelectorAll('[data-chapter-layer].is-selected').forEach(b=>b.classList.remove('is-selected'));
+        window.RegaarderContextualToolbar?.hide?.();
+      }
+    });
+    window.addEventListener('pointermove',e=>{
+      if(!resizeDrag)return;
+      const dx=e.clientX-resizeDrag.startX;
+      resizeDrag.layer.scale=Math.max(0.15,Math.min(3,Number((resizeDrag.startScale+dx*0.005).toFixed(2))));
+      const cv=viewport.querySelector('canvas');
+      if(cv)paintChapterFrame(cv,templateId,window.topCustomizerState?.currentTime||0);
+    });
+    window.addEventListener('pointerup',()=>{resizeDrag=null;});
     viewport.addEventListener('pointermove',e=>{if(!drag)return;const rect=viewport.getBoundingClientRect(),x=(e.clientX-drag.x)*960/rect.width,y=(e.clientY-drag.y)*540/rect.height,[a,b,c,d]=drag.matrix,det=a*d-b*c;if(Math.abs(det)<1e-8)return;drag.layer.x=drag.original[0]+(d*x-c*y)/det;drag.layer.y=drag.original[1]+(-b*x+a*y)/det;const t=window.topCustomizerState?.currentTime||0;paintChapterFrame(canvas,templateId,t);syncChapterHitOverlay(container,templateId,t);});
     const end=()=>{drag=null;};viewport.addEventListener('pointerup',end);viewport.addEventListener('pointercancel',end);
   }
@@ -697,7 +723,7 @@
     container.innerHTML = buildChapterStageHTML(templateId, isHover);
     const canvas = container.querySelector('canvas');
     paintChapterFrame(canvas, templateId, window.topCustomizerState?.currentTime||0.5);
-    syncChapterHitOverlay(container,templateId,window.topCustomizerState?.currentTime||0.5);
+    syncChapterHitOverlay(container,templateId,window.topCustomizerState?.currentTime||0.5);setTimeout(()=>refreshBeatThumbnails(templateId),350);
     if (!isHover) {
       wireChapterStageInteractions(container, templateId);
     } else {
@@ -760,17 +786,48 @@
     pele: '/assets/regaarder-motion/outdoor.png',
     final: '/assets/regaarder-motion/fire.png'
   };
-  function buildVisualSceneCardsHtml(scenes, fallbackThumb) {
+  function refreshBeatThumbnails(templateId) {
+    const rt = chapterRuntime[templateId];
+    if (!rt || !rt.ready || !rt.mod) return;
+    const imgs = document.querySelectorAll(`img[data-ch-beat-tpl="${templateId}"]`);
+    if (!imgs.length) return;
+    const fullCv = document.createElement('canvas');
+    fullCv.width = 960; fullCv.height = 540;
+    const thumbCv = document.createElement('canvas');
+    thumbCv.width = 240; thumbCv.height = 135;
+    const tCtx = thumbCv.getContext('2d');
+    imgs.forEach((imgEl) => {
+      const startSec = parseFloat(imgEl.getAttribute('data-ch-beat-start')) || 0;
+      try {
+        paintChapterFrame(fullCv, templateId, startSec + 0.15);
+        tCtx.clearRect(0, 0, 240, 135);
+        tCtx.drawImage(fullCv, 0, 0, 240, 135);
+        const url = thumbCv.toDataURL('image/jpeg', 0.72);
+        if (url && url.length > 200) imgEl.src = url;
+      } catch (_) {}
+    });
+  }
+
+  function buildVisualSceneCardsHtml(scenes, fallbackThumb, rt, cfg, templateId) {
     const curT = Number(window.topCustomizerState?.currentTime || 0);
     return `<div class="rg-scene-visual-grid">${(scenes || []).map((scene, idx) => {
-      const thumb = SCENE_THUMB_MAP[scene.id] || fallbackThumb || '/assets/regaarder-motion/portrait.png';
+      let thumb = SCENE_THUMB_MAP[scene.id] || '';
+      if (!thumb && rt?.ready && rt?.mod && typeof document !== 'undefined') {
+        try {
+          const off = document.createElement('canvas');
+          off.width = 240; off.height = 135;
+          paintChapterFrame(off, templateId, Number(scene.start || 0) + 0.15);
+          thumb = off.toDataURL('image/jpeg', 0.72);
+        } catch (_) {}
+      }
+      if (!thumb) thumb = fallbackThumb || '/assets/regaarder-motion/portrait.png';
       const isActive = curT >= scene.start && curT < (scene.end || scene.start + 999);
       const cleanTitle = String(scene.label || '').replace(/^\d+\s*·\s*\d+:\d+\s*/, '').trim();
       const mins = Math.floor((scene.start || 0) / 60);
       const secs = Math.floor((scene.start || 0) % 60).toString().padStart(2, '0');
       return `<button type="button" class="rg-scene-card${isActive ? ' is-active' : ''}" data-ch-jump-sec="${scene.start}" title="${scene.label}">
         <div class="rg-scene-card-thumb">
-          <img src="${thumb}" alt="${cleanTitle}" loading="lazy">
+          <img src="${thumb}" data-ch-beat-tpl="${templateId || ''}" data-ch-beat-start="${scene.start}" alt="${cleanTitle}" loading="lazy">
           <span class="rg-scene-card-time">${mins}:${secs}</span>
         </div>
         <div class="rg-scene-card-title">${String(idx + 1).padStart(2, '0')} · ${cleanTitle}</div>
@@ -838,7 +895,8 @@
     img.src = src;
   }
 
-  function openInlineRadialLayerEditor(src, label, layerObj, onApply) {
+  window.openInlineRadialLayerEditor = openInlineRadialLayerEditor;
+  function openInlineRadialLayerEditor(src, label, layerObj, onApply, onExtractLayer) {
     const stage = document.getElementById('tpl-modal-preview-stage');
     if (!stage) return;
     if (window.topCustomizerState) window.topCustomizerState.isPlaying = false;
@@ -866,6 +924,7 @@
         <button type="button" class="rg-radial-node" data-rle-eye style="left:19px;top:42px;" title="Toggle Visibility"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
       </div>
       <div style="position:absolute;bottom:12px;right:12px;display:flex;gap:8px;z-index:90;">
+        <button type="button" data-rle-lasso-mode class="rg-layer-hdr-btn" title="Toggle Keep Inside / Cut Inside">Lasso: Keep</button>
         <button type="button" data-rle-undo class="rg-layer-hdr-btn">Undo</button>
         <button type="button" data-rle-cancel class="rg-layer-hdr-btn">Cancel</button>
         <button type="button" data-rle-done class="rg-layer-hdr-btn is-primary">Done</button>
@@ -886,8 +945,13 @@
       if (history.length > 15) history.shift();
     };
     let tool = 'brush';
+    let lassoCutInside = false;
     let drawing = false;
     let pts = [];
+    wrap.querySelector('[data-rle-lasso-mode]')?.addEventListener('click', (e) => {
+      lassoCutInside = !lassoCutInside;
+      e.currentTarget.textContent = lassoCutInside ? 'Lasso: Cut' : 'Lasso: Keep';
+    });
 
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -955,15 +1019,36 @@
         const tmp = document.createElement('canvas');
         tmp.width = cv.width; tmp.height = cv.height;
         tmp.getContext('2d').putImageData(snap, 0, 0);
-        ctx.clearRect(0, 0, cv.width, cv.height);
         ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(tmp, 0, 0);
+        if (lassoCutInside) {
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          ctx.clearRect(0, 0, cv.width, cv.height);
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(tmp, 0, 0);
+        }
         ctx.restore();
+        if (typeof onExtractLayer === 'function' && !lassoCutInside) {
+          const ext = document.createElement('canvas');
+          ext.width = cv.width; ext.height = cv.height;
+          const ectx = ext.getContext('2d');
+          ectx.beginPath();
+          ectx.moveTo(pts[0].x, pts[0].y);
+          pts.slice(1).forEach((pt) => ectx.lineTo(pt.x, pt.y));
+          ectx.closePath();
+          ectx.clip();
+          ectx.drawImage(tmp, 0, 0);
+          onExtractLayer(ext.toDataURL('image/png'));
+        }
         pts = [];
       }
     });
@@ -1099,14 +1184,23 @@
         const tmp = document.createElement('canvas');
         tmp.width = cv.width; tmp.height = cv.height;
         tmp.getContext('2d').putImageData(snap, 0, 0);
-        ctx.clearRect(0, 0, cv.width, cv.height);
         ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(tmp, 0, 0);
+        if (lassoCutInside) {
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          ctx.clearRect(0, 0, cv.width, cv.height);
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(tmp, 0, 0);
+        }
         ctx.restore();
         pts = [];
       }
@@ -1166,7 +1260,7 @@
     if(templateId === 'regaarder-full-documentary') {
       return {
         content: `<div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Jump to scene</span></div><div class="rg-section-body">
-          ${buildVisualSceneCardsHtml(rt.scenes, '/assets/regaarder-motion/portrait.png')}
+          ${buildVisualSceneCardsHtml(rt.scenes, '/assets/regaarder-motion/portrait.png', rt, cfg, templateId)}
         </div></div>`,
         motion:'',look:'',effects:'',advanced:'<div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Original scene settings</span></div><div class="rg-section-body"><button type="button" class="rg-btn-secondary" data-ch-all-controls>Load current scene controls</button><div data-ch-all-settings></div></div></div>' 
       };
@@ -1214,7 +1308,7 @@
       <div class="rg-inspector-section">
         <div class="rg-section-header"><span class="rg-section-title">Jump to Scene Beat</span></div>
         <div class="rg-section-body">
-          ${buildVisualSceneCardsHtml(rt.scenes, '/assets/regaarder-motion/portrait.png')}
+          ${buildVisualSceneCardsHtml(rt.scenes, '/assets/regaarder-motion/portrait.png', rt, cfg, templateId)}
         </div>
       </div>
 
@@ -1226,14 +1320,12 @@
       </div>
 
       <div class="rg-inspector-section">
-        <div class="rg-section-header" style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-          <span class="rg-section-title">Scene Layers (${getActiveLayerIdsForTime(rt, layerIds, window.topCustomizerState?.currentTime || 0).length})</span>
-          <div style="display:flex;align-items:center;gap:5px;">
-            <button type="button" class="rg-layer-hdr-btn" data-ch-toggle-all-layers>${showAllSceneLayers ? 'Current' : `All (${layerIds.length})`}</button>
+        <div class="rg-section-header"><span class="rg-section-title">Scene Layers (${getActiveLayerIdsForTime(rt, layerIds, window.topCustomizerState?.currentTime || 0).length})</span></div>
+        <div class="rg-section-body">
+          <div class="rg-layer-actions-row">
+            <button type="button" class="rg-layer-hdr-btn" data-ch-toggle-all-layers>${showAllSceneLayers ? 'Current Frame' : `Show All (${layerIds.length})`}</button>
             <button type="button" class="rg-layer-hdr-btn is-primary" data-ch-add-layer>+ Add Layer</button>
           </div>
-        </div>
-        <div class="rg-section-body">
           ${buildVisualLayerCardsHtml(rt, cfg, getActiveLayerIdsForTime(rt, layerIds, window.topCustomizerState?.currentTime || 0), curLayerId)}
         </div>
       </div>
@@ -1642,6 +1734,15 @@
           if (cfg.layers && cfg.layers[lid]) cfg.layers[lid].customImageSrc = cutUrl;
           refreshStage();
           if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        }, (extractedUrl) => {
+          const newId = 'cutout_' + Date.now();
+          if (!cfg.layers) cfg.layers = {};
+          cfg.layers[newId] = { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1.25, visible: true, customImageSrc: extractedUrl };
+          if (Array.isArray(rt.stageObjects)) {
+            rt.stageObjects.push({ id: 'obj_' + newId, layerId: newId, name: lid + ' Cutout', variant: 'media', x: 50, y: 50, w: 40, h: 45 });
+          }
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+          if (typeof window.showTextTimingAlert === 'function') window.showTextTimingAlert('Extracted new cutout layer', 'success');
         });
       });
     });
@@ -1763,3 +1864,44 @@
     }
   };
 })();
+
+
+if (!window.__rgChapterGlobalResizeAndDeselect) {
+  window.__rgChapterGlobalResizeAndDeselect = true;
+  let activeResize = null;
+  document.addEventListener('pointerdown', (e) => {
+    const rh = e.target.closest('[data-ch-resize]');
+    if (rh) {
+      e.stopPropagation();
+      e.preventDefault();
+      const box = rh.closest('[data-chapter-layer]');
+      const lid = box?.dataset.chapterLayer;
+      const owner = box?.dataset.chapterOwner || window.topCustomizerState?.currentTpl?.id;
+      const rt = owner && window.REGAARDER_CHAPTER_RUNTIME?.[owner];
+      const layer = lid && rt?.config?.layers?.[lid];
+      if (layer) {
+        activeResize = { layer, owner, dir: rh.getAttribute('data-ch-resize'), sx: e.clientX, sy: e.clientY, startScale: Number(layer.scale ?? 1) };
+      }
+      return;
+    }
+    const inStage = e.target.closest('#tpl-modal-preview-stage');
+    if (inStage && !e.target.closest('[data-chapter-layer]') && !e.target.closest('#rg-contextual-toolbar') && !e.target.closest('#rg-inline-layer-editor') && !e.target.closest('#rg-dim-transform-stage')) {
+      document.querySelectorAll('[data-chapter-layer].is-selected').forEach((b) => b.classList.remove('is-selected'));
+      if (window.RegaarderContextualToolbar?.hide) window.RegaarderContextualToolbar.hide();
+    }
+  }, true);
+
+  window.addEventListener('pointermove', (e) => {
+    if (!activeResize) return;
+    const dx = e.clientX - activeResize.sx;
+    const dy = e.clientY - activeResize.sy;
+    const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    activeResize.layer.scale = Math.max(0.15, Math.min(3, Number((activeResize.startScale + delta * 0.006).toFixed(2))));
+    if (typeof window.stepRegaarderChapterAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) window.stepRegaarderChapterAnimation(stage, activeResize.owner, window.topCustomizerState?.currentTime || 0);
+    }
+  });
+
+  window.addEventListener('pointerup', () => { activeResize = null; });
+}
