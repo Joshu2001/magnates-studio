@@ -119,6 +119,14 @@
     } else {
       const img = new Image();
       img.crossOrigin = 'anonymous';
+      img.onerror = () => {
+        if (img.crossOrigin) {
+          img.crossOrigin = null;
+          img.src = url;
+        } else {
+          img._rgFailed = true;
+        }
+      };
       img.src = url;
       assetMedia.set(id, img);
       return img;
@@ -131,12 +139,39 @@
     return media.complete && media.naturalWidth > 0;
   }
 
+  function ensureWorkbenchStyles() {
+    if (document.getElementById('rg-workbench-theme')) return;
+    const st = document.createElement('style');
+    st.id = 'rg-workbench-theme';
+    st.textContent = `
+      #modal-regaarder-assets-tools, #modal-regaarder-assets-tools * { box-sizing: border-box; }
+      #modal-regaarder-assets-tools .vector-modal-box { background: #07080f !important; color: #f1f5f9; }
+      #modal-regaarder-assets-tools .rg-global-topbar { background: #0a0b12 !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+      #modal-regaarder-assets-tools #workbench-tab-content { background: #07080f !important; }
+      #modal-regaarder-assets-tools aside { background: #0a0b12 !important; border-left: 1px solid rgba(255,255,255,0.08) !important; }
+      #modal-regaarder-assets-tools .rg-control-row { display: flex; flex-direction: column; gap: 5px; width: 100%; min-width: 0; }
+      #modal-regaarder-assets-tools .rg-control-label { font-size: 11px; font-weight: 600; color: #9ca3b8; }
+      #modal-regaarder-assets-tools .rg-input-text,
+      #modal-regaarder-assets-tools .rg-select {
+        width: 100%; min-width: 0; height: 32px; padding: 0 10px;
+        border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);
+        background: #141622; color: #f1f5f9; font-family: inherit; font-size: 12px; outline: none;
+      }
+      #modal-regaarder-assets-tools .rg-input-text:focus,
+      #modal-regaarder-assets-tools .rg-select:focus { border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139,92,246,0.2); }
+      #modal-regaarder-assets-tools .rg-slider { width: 100%; accent-color: #8b5cf6; cursor: pointer; }
+      #modal-regaarder-assets-tools #btn-close-assets-studio { white-space: nowrap; flex-shrink: 0; }
+    `;
+    document.head.appendChild(st);
+  }
+
   // 2. MAIN WORKBENCH MODAL
   let activeTab = 'registry'; // 'registry' | 'animator' | 'cutout'
   let currentSearchQuery = '';
   let currentReviewFilter = 'all';
 
   function openAssetsToolsStudio(initialTab = 'registry', targetAssetId = null) {
+    ensureWorkbenchStyles();
     activeTab = initialTab;
     let modal = document.getElementById('modal-regaarder-assets-tools');
     if (!modal) {
@@ -177,9 +212,7 @@
             <button type="button" class="btn btn-primary" id="btn-workbench-upload" style="font-size: 11.5px; padding: 5px 12px;">+ Upload Media</button>
             <input type="file" id="file-workbench-upload" accept="image/*,video/mp4,video/webm" style="display: none;">
             <button type="button" class="btn btn-secondary" id="btn-export-recipe-json" style="font-size: 11.5px; padding: 5px 12px;">Export Recipe JSON</button>
-            <button type="button" class="btn-sidebar-collapse" id="btn-close-assets-studio" title="Done" style="background: rgba(255,255,255,0.06); border: 1px solid var(--rg-border-subtle); border-radius: 6px; padding: 5px 12px; color: #fff; font-size: 12px; cursor: pointer;">
-              Done ✕
-            </button>
+            <button type="button" id="btn-close-assets-studio" title="Close (Esc)" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 0; color: #cbd5e1; font-size: 16px; line-height: 1; cursor: pointer; flex-shrink: 0;">&times;</button>
           </div>
         </header>
 
@@ -447,23 +480,23 @@
             </div>
             <div class="rg-control-row">
               <label class="rg-control-label">Camera Tilt (°)</label>
-              <div style="display: flex; gap: 6px;">
-                <input type="number" class="rg-input-text" id="ctl-anim-start-tilt" value="${imageMotion.cityStartElevation}" title="Start Tilt" style="flex: 1;">
-                <input type="number" class="rg-input-text" id="ctl-anim-end-tilt" value="${imageMotion.cityEndElevation}" title="End Tilt" style="flex: 1;">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; width: 100%;">
+                <input type="number" class="rg-input-text" id="ctl-anim-start-tilt" value="${imageMotion.cityStartElevation}" title="Start Tilt">
+                <input type="number" class="rg-input-text" id="ctl-anim-end-tilt" value="${imageMotion.cityEndElevation}" title="End Tilt">
               </div>
             </div>
             <div class="rg-control-row">
               <label class="rg-control-label">Camera Roll (°)</label>
-              <div style="display: flex; gap: 6px;">
-                <input type="number" class="rg-input-text" id="ctl-anim-start-roll" value="${imageMotion.cityRoll}" title="Start Roll" style="flex: 1;">
-                <input type="number" class="rg-input-text" id="ctl-anim-end-roll" value="${imageMotion.cityEndRoll}" title="End Roll" style="flex: 1;">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; width: 100%;">
+                <input type="number" class="rg-input-text" id="ctl-anim-start-roll" value="${imageMotion.cityRoll}" title="Start Roll">
+                <input type="number" class="rg-input-text" id="ctl-anim-end-roll" value="${imageMotion.cityEndRoll}" title="End Roll">
               </div>
             </div>
             <div class="rg-control-row">
               <label class="rg-control-label">Heading & Turns</label>
-              <div style="display: flex; gap: 6px;">
-                <input type="number" class="rg-input-text" id="ctl-anim-heading" value="${imageMotion.cityHeading}" title="Heading °" style="flex: 1;">
-                <input type="number" class="rg-input-text" id="ctl-anim-turns" step="0.05" value="${imageMotion.cityTurns}" title="Turns" style="flex: 1;">
+              <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px; width: 100%;">
+                <input type="number" class="rg-input-text" id="ctl-anim-heading" value="${imageMotion.cityHeading}" title="Heading °">
+                <input type="number" class="rg-input-text" id="ctl-anim-turns" step="0.05" value="${imageMotion.cityTurns}" title="Turns">
               </div>
             </div>
             <div class="rg-control-row">
@@ -613,15 +646,22 @@
     const w = canvas.width;
     const h = canvas.height;
 
-    ctx.fillStyle = '#08131c';
+    ctx.fillStyle = '#07080f';
     ctx.fillRect(0, 0, w, h);
 
-    const media = getMediaElement(animatorAssetId);
+    let media = getMediaElement(animatorAssetId);
+    if (!media || media._rgFailed) {
+      const fallbackAsset = getAllAssets().find((a) => a.kind === 'image' && a.id !== animatorAssetId);
+      const fallbackMedia = fallbackAsset ? getMediaElement(fallbackAsset.id) : null;
+      if (fallbackMedia && isMediaReady(fallbackMedia)) {
+        media = fallbackMedia;
+      }
+    }
     if (!media || !isMediaReady(media)) {
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 15px Inter, sans-serif';
+      ctx.fillStyle = '#9ca3b8';
+      ctx.font = '600 14px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Loading media for 3D projection...', w / 2, h / 2);
+      ctx.fillText(media?._rgFailed ? 'Select or upload an image to preview in 3D' : 'Loading media for 3D projection...', w / 2, h / 2);
       return;
     }
 

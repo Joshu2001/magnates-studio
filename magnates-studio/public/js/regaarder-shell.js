@@ -96,7 +96,7 @@
          <span>REGAARDER <em>MOTION</em></span>
        </div>
        <h3 class="rm-auth-title" id="rm-auth-heading">Welcome back</h3>
-       <p class="rm-auth-sub" data-auth-sub>Intuitive Editing, Endless Creativity — save templates, sync scenes, and export in 4K.</p>
+       <p class="rm-auth-sub" data-auth-sub>Save templates, sync scenes, and export in 4K.</p>
        <div class="rm-auth-tabs" role="tablist">
          <button type="button" class="rm-auth-tab" data-auth-tab="signup">Sign up</button>
          <button type="button" class="rm-auth-tab is-active" data-auth-tab="login">Log in</button>
@@ -140,8 +140,8 @@
      const isSignup = authMode === 'signup';
      authModal.querySelector('#rm-auth-heading').textContent = isSignup ? 'Create your account' : 'Welcome back';
      authModal.querySelector('[data-auth-sub]').textContent = isSignup
-       ? 'Intuitive Editing, Endless Creativity — start building cinematic motion scenes.'
-       : 'Intuitive Editing, Endless Creativity — save templates, sync scenes, and export in 4K.';
+       ? 'Start building cinematic motion scenes.'
+       : 'Save templates, sync scenes, and export in 4K.';
      authModal.querySelector('[data-auth-name-wrap]').hidden = !isSignup;
      authModal.querySelector('[data-auth-submit]').textContent = isSignup ? 'Create account' : 'Log in';
      authModal.querySelector('[data-auth-switch-text]').textContent = isSignup ? 'Already have an account?' : 'New to Regaarder Motion?';

@@ -390,6 +390,16 @@ app.post('/api/proxy/generate', (req, res) => {
   });
 });
 
+// AI Agent Harness API (Manifest, Single Execute, Batch Pipeline, Client Bridge)
+const { createAIHarnessRouter } = require('./ai-harness');
+const aiDataDir = process.env.AI_HARNESS_DATA_DIR || __dirname;
+app.use('/api/ai', createAIHarnessRouter({
+  templatesFile: path.join(aiDataDir, 'templates_state.json'),
+  projectFile: path.join(aiDataDir, 'project_state.json'),
+  uploadsDir,
+  userDownloads,
+}));
+
 function startServer(port) {
   const server = app.listen(port, '0.0.0.0');
   
