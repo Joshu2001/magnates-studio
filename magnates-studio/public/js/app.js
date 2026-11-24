@@ -28005,17 +28005,23 @@ function formatConciseTemplateTitle(rawTitle) {
 function formatBeginnerDescription(rawDesc) {
   let d = String(rawDesc || '').trim();
   d = d.replace(/\b(James\s+Jani|Magnates\s*Media|Magnates|Spooner|Vox|Alex\s+Hormozi|Hormozi|Regaarder)\b[:\s\-'’s]*/gi, '');
-  d = d.replace(/\bdual[- ]layer transition\b/gi, 'two-part scene switch')
+  d = d.replace(/^scene\s+effects:\s*/i, '')
+       .replace(/^all\s+\d+\s+documentary\s+scenes\s+in\s+one\s+timeline:\s*/i, '')
+       .replace(/\brestaurant\s+cut[- ]?out\s+subjects?\b/gi, 'layered entrance')
+       .replace(/\bcut[- ]?out\s+subjects?\b/gi, 'layered entrance')
+       .replace(/\barchival\s+crowd\s+passage\b/gi, 'foreground reveal')
+       .replace(/\bdual[- ]layer transition\b/gi, 'two-part scene switch')
        .replace(/\banamorphic\s+CRT\b/gi, 'wide glowing screen')
        .replace(/\banamorphic\b/gi, 'wide cinema')
-       .replace(/\bcalibratable\s+depth[- ]of[- ]field\b/gi, 'adjustable background')
-       .replace(/\bdepth[- ]of[- ]field\b/gi, 'background')
+       .replace(/\bcalibratable\s+depth[- ]of[- ]field\b/gi, 'adjustable background blur')
+       .replace(/\bdepth[- ]of[- ]field\b/gi, 'background blur')
        .replace(/\bkinetic\b/gi, 'animated')
        .replace(/\bparallax\b/gi, '3D depth')
        .replace(/\bstrobes?\b/gi, 'flashes')
        .replace(/\s{2,}/g, ' ').trim();
-  if (d.length > 115) d = d.slice(0, 112).replace(/\s+\S*$/, '') + '.';
-  return d || 'Adds a clean visual effect to your scene.';
+  if (d) d = d[0].toUpperCase() + d.slice(1);
+  if (d.length > 90) d = d.slice(0, 87).replace(/\s+\S*$/, '') + '...';
+  return d || 'Layered entrance & smooth camera motion';
 }
 
 window.isOverlayTemplate = isOverlayTemplate;
@@ -28492,8 +28498,6 @@ function renderHomepageTemplates() {
   grid.innerHTML = filtered.map(t => {
     const is3D = !!t.is3D || t.category === '3D Spatial' || t.origCategory === '3D Spatial' || t.id === 'empire-timeline' || t.id === 'map' || (typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(t.id));
     const liked = !!likesMap[t.id];
-    const baseLikes = typeof t.likes === 'number' ? t.likes : (t.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 48) + 12;
-    const likeCount = baseLikes + (liked ? 1 : 0);
     return `
       <div class="home-tpl-card" data-template-id="${t.id}">
         <div class="home-tpl-media" id="media-wrap-${t.id}">
@@ -28528,7 +28532,6 @@ function renderHomepageTemplates() {
             <div style="display:flex; align-items:center; gap:2px; flex-shrink:0;">
               <button type="button" class="home-tpl-like-btn ${liked ? 'is-liked' : ''}" data-like-tpl-id="${t.id}" title="Like template">
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-                <span class="home-tpl-like-count">${likeCount}</span>
               </button>
               <div class="home-tpl-dots-wrap">
                 <button type="button" class="home-tpl-dots-btn" data-dots-tpl-id="${t.id}" title="More actions">
@@ -28560,8 +28563,6 @@ function renderHomepageTemplates() {
         if (isNowLiked) likesMap[tplId] = true; else delete likesMap[tplId];
         try { localStorage.setItem('rg-tpl-likes-v1', JSON.stringify(likesMap)); } catch (err) {}
         likeBtn.classList.toggle('is-liked', isNowLiked);
-        const cntEl = likeBtn.querySelector('.home-tpl-like-count');
-        if (cntEl) cntEl.textContent = String(parseInt(cntEl.textContent || '0', 10) + (isNowLiked ? 1 : -1));
       });
     }
 
@@ -28624,7 +28625,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['zoom-blur', 'regaarder-origins-slow-reveal', 'regaarder-pele-pact-chapter', 'regaarder-minute16-chapter', 'regaarder-minute17-chapter', 'regaarder-final-chapter', 'regaarder-native3d-surface-builder', 'jani-spin-flash-glitch-reveal', 'jani-flash-quad-sequence', 'wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-printer-glitch-card','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['zoom-blur', 'regaarder-origins-slow-reveal', 'regaarder-pele-pact-chapter', 'regaarder-minute16-chapter', 'regaarder-minute17-chapter', 'regaarder-final-chapter', 'regaarder-native3d-surface-builder', 'jani-spin-flash-glitch-reveal', 'jani-flash-quad-sequence', 'wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-printer-glitch-card','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-product-price-unfurl','magnates-media-article-capitol-zoom','magnates-media-globe-wavy-nothing','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','investigate-globe','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -31935,6 +31936,26 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           : (window.JANI_PUZZLE_CONFIG || {});
         fxContainer.innerHTML = window.buildPuzzleStageHtml(tplId, pzConfig);
       }
+    } else if (tplId === 'nonlinear-time-flash') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #07050c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img id="fx-flash-bg-${tplId}" src="${tpl.secondaryImage || tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.72; filter: contrast(135%) saturate(0.55) sepia(0.25); transform: scale(1.06);" />
+          <!-- 45-deg Motion Blur Sweep Streak -->
+          <div id="fx-flash-sweep-${tplId}" style="position: absolute; inset: -40%; pointer-events: none; background: linear-gradient(135deg, transparent 36%, rgba(255,255,255,0.22) 48%, rgba(251,191,36,0.45) 50%, rgba(255,255,255,0.22) 52%, transparent 64%); transform: translate(-35%, -35%); mix-blend-mode: screen;"></div>
+          <!-- High-Contrast Exposure White Flash Overlay -->
+          <div id="fx-flash-strobe-${tplId}" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; pointer-events: none; mix-blend-mode: screen;"></div>
+          <!-- Temporal Jump Card -->
+          <div id="fx-flash-card-${tplId}" style="position: relative; z-index: 10; padding: 12px 22px; border-radius: 8px; background: rgba(10, 8, 18, 0.86); border: 1px solid rgba(168, 85, 247, 0.55); box-shadow: 0 12px 32px rgba(0,0,0,0.85), 0 0 24px rgba(168,85,247,0.25); text-align: center; backdrop-filter: blur(6px);">
+            <div id="fx-flash-kicker-${tplId}" style="font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 800; color: #fbbf24; letter-spacing: 2px; margin-bottom: 4px;">FLASHBACK: 15 YEARS PRIOR</div>
+            <div id="fx-flash-title-${tplId}" style="font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 16px; font-weight: 900; color: #ffffff; letter-spacing: 1.2px;">THE 2008 CRASH</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 7px; font-weight: 700; color: #cbd5e1; letter-spacing: 1.5px; margin-top: 4px;">WHITE FLASH // 45\u00b0 MOTION SWEEP</div>
+          </div>
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #a855f7); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
+            \u26a1 TEMPORAL JUMP
+          </div>
+        </div>
+      `;
     } else if (tplId === 'puzzle-piece-reveal') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #05060a; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 12px;">
@@ -33218,6 +33239,33 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           : (window.JANI_PUZZLE_CONFIG || {});
         window.stepJaniPuzzleAnimation(fxContainer, tplId, t, pzData);
       }
+    } else if (tplId === 'nonlinear-time-flash') {
+      const cycle = t % 2.4;
+      const isFlashPeak = cycle < 0.22;
+      const flashAlpha = isFlashPeak ? (1 - cycle / 0.22) * 0.92 : 0;
+      const sweepPos = -45 + (cycle / 2.4) * 90;
+      const isForward = Math.floor(t / 2.4) % 2 === 1;
+      const bgEl = fxContainer?.querySelector(`#fx-flash-bg-${tplId}`);
+      const sweepEl = fxContainer?.querySelector(`#fx-flash-sweep-${tplId}`);
+      const strobeEl = fxContainer?.querySelector(`#fx-flash-strobe-${tplId}`);
+      const cardEl = fxContainer?.querySelector(`#fx-flash-card-${tplId}`);
+      const kickerEl = fxContainer?.querySelector(`#fx-flash-kicker-${tplId}`);
+      const titleEl = fxContainer?.querySelector(`#fx-flash-title-${tplId}`);
+      if (strobeEl) strobeEl.style.opacity = flashAlpha.toFixed(3);
+      if (sweepEl) sweepEl.style.transform = `translate(${sweepPos}%, ${sweepPos}%)`;
+      if (bgEl) {
+        const sc = 1.04 + Math.sin(t * 2.2) * 0.04;
+        bgEl.style.transform = `scale(${sc.toFixed(3)})`;
+        bgEl.style.filter = isForward
+          ? 'contrast(145%) saturate(1.1) hue-rotate(15deg)'
+          : 'contrast(135%) saturate(0.5) sepia(0.32)';
+      }
+      if (cardEl) {
+        const jx = isFlashPeak ? (Math.sin(t * 90) * 4) : 0;
+        cardEl.style.transform = `translateX(${jx.toFixed(1)}px) scale(${isFlashPeak ? 1.04 : 1})`;
+      }
+      if (kickerEl) kickerEl.textContent = isForward ? 'FLASHFORWARD: +12 MONTHS' : 'FLASHBACK: 15 YEARS PRIOR';
+      if (titleEl) titleEl.textContent = isForward ? 'THE COLLAPSE' : 'THE 2008 CRASH';
     } else if (tplId === 'puzzle-piece-reveal') {
       // 4-Piece progressive lock-in simulation along story arc
       const cycle = (t * 1.5) % 3.6;
@@ -34071,43 +34119,9 @@ function applySelectedHomepageTemplate(templateId) {
   }
   if (!tpl) return;
 
-  // Dedicated interactive full suites launch their dedicated suite preview modals
-  const dedicatedSuiteMap = {
-
-    'og-parallax-depth-engine': openOGParallaxSuite,
-    'jani-puzzle-narrative-suite': openJaniSuite,
-    'nonlinear-time-flash': openFlashbackSuite,
-    'puzzle-piece-reveal': openPuzzleRevealSuite,
-    'light-rays-lens-leaks': openLightRaysSuite,
-    'monochromatic-crushed-grading': openMonochromeSuite,
-    'heavy-elliptical-vignette': openHeavyVignetteSuite,
-    'text-reveal-modifiers': openTextRevealSuite,
-    'glow-drop-shadows': openGlowShadowsSuite,
-    '3d-camera-move-rotation': openCamera3DMoveSuite,
-    'audio-visual-jl-cuts': openJLCutsSuite,
-    'subbass-drops-risers': openSubbassSuite,
-    'magnates-media-3d-projection': openMagnates3DProjectionSuite,
-    'magnates-media-cc-vignette-dof': openMagnatesCCVignetteSuite,
-    'magnates-media-brightness-glow': openMagnatesBrightnessGlowSuite,
-    'magnates-media-multi-drop-shadows': openMagnatesDropShadowsSuite,
-    'magnates-media-shadowization': openMagnatesShadowizationSuite,
-    'magnates-media-blend-modes': openMagnatesBlendModesSuite,
-    'magnates-media-printer-glitch-card': () => openMagnatesPaperBlueprintSuite('printer_glitch_card'),
-    'magnates-media-paper-blueprint': () => openMagnatesPaperBlueprintSuite('full_story_flow'),
-    'magnates-media-brand-wavy-hook': () => openMagnatesPaperBlueprintSuite('brand_wavy_intro'),
-    'magnates-media-product-price-unfurl': () => openMagnatesPaperBlueprintSuite('products_unfurl'),
-    'magnates-media-globe-wavy-nothing': () => openMagnatesPaperBlueprintSuite('globe_wavy_nothing'),
-    'magnates-media-dual-silhouettes': () => openMagnatesPaperBlueprintSuite('dual_silhouette'),
-    'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
-    'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
-  };
-
-  if (dedicatedSuiteMap[templateId]) {
-    dedicatedSuiteMap[templateId]();
-    return;
-  }
-
-  // All other templates open the unified sleek Customizer preview stage first
+  // Unified Studio Launch: route all templates through openTopTemplateCustomizer(tpl)
+  // so every template opens in the standard Regaarder Motion Studio (Video/3D toggle,
+  // standard playback controls, and 4-tab Inspector: Content / Motion / Look / Effects).
   openTopTemplateCustomizer(tpl);
   return;
 

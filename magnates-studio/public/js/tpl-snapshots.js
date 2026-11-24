@@ -332,23 +332,36 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
           <linearGradient id="bg-flash" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#000000"/>
+            <stop offset="0%" stop-color="#07050c"/>
             <stop offset="50%" stop-color="#1e102d"/>
-            <stop offset="100%" stop-color="#0a0512"/>
+            <stop offset="100%" stop-color="#090612"/>
           </linearGradient>
+          <linearGradient id="sweep-45" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="32%" stop-color="rgba(255,255,255,0)"/>
+            <stop offset="47%" stop-color="rgba(255,255,255,0.22)"/>
+            <stop offset="50%" stop-color="rgba(251,191,36,0.48)"/>
+            <stop offset="53%" stop-color="rgba(255,255,255,0.22)"/>
+            <stop offset="68%" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+          <radialGradient id="flash-burst" cx="22%" cy="22%" r="65%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.65)"/>
+            <stop offset="35%" stop-color="rgba(251,191,36,0.25)"/>
+            <stop offset="100%" stop-color="rgba(168,85,247,0)"/>
+          </radialGradient>
         </defs>
         <rect width="400" height="225" fill="url(#bg-flash)"/>
-        <!-- Film streaks -->
-        <line x1="0" y1="40" x2="400" y2="185" stroke="rgba(168,85,247,0.3)" stroke-width="1.5"/>
-        <line x1="40" y1="0" x2="360" y2="225" stroke="rgba(245,158,11,0.25)" stroke-width="2"/>
+        <rect width="400" height="225" fill="url(#flash-burst)"/>
+        <rect width="400" height="225" fill="url(#sweep-45)"/>
         <!-- Center Flashback Card -->
         <g transform="translate(80, 65)">
-          <rect width="240" height="95" rx="8" fill="rgba(12,13,18,0.92)" stroke="rgba(168,85,247,0.6)" stroke-width="1.8"/>
-          <text x="120" y="35" fill="#fbbf24" font-family="monospace" font-weight="800" font-size="9" letter-spacing="2" text-anchor="middle">FLASHBACK: 15 YEARS PRIOR</text>
-          <text x="120" y="62" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="900" font-size="18" letter-spacing="2" text-anchor="middle">THE 2008 CRASH</text>
-          <text x="120" y="80" fill="#a855f7" font-family="monospace" font-size="7.5" letter-spacing="1.5" text-anchor="middle">WHITE FLASH // 45\u00b0 MOTION SWEEP</text>
+          <rect width="240" height="95" rx="8" fill="rgba(10,8,18,0.88)" stroke="rgba(168,85,247,0.65)" stroke-width="1.6"/>
+          <text x="120" y="34" fill="#fbbf24" font-family="monospace" font-weight="800" font-size="9" letter-spacing="2" text-anchor="middle">FLASHBACK: 15 YEARS PRIOR</text>
+          <text x="120" y="61" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="900" font-size="18" letter-spacing="1.5" text-anchor="middle">THE 2008 CRASH</text>
+          <text x="120" y="80" fill="#cbd5e1" font-family="monospace" font-weight="700" font-size="7.5" letter-spacing="1.5" text-anchor="middle">WHITE FLASH // 45\u00b0 MOTION SWEEP</text>
         </g>
-        
+        <!-- Badge -->
+        <rect x="292" y="12" width="96" height="18" rx="5" fill="#9333ea"/>
+        <text x="340" y="24" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="8" text-anchor="middle">\u26a1 TEMPORAL JUMP</text>
       </svg>
     `)}`,
 
