@@ -379,16 +379,16 @@ body {
 }
 
 .rail-label {
-  font-size: 11px;
+  font-size: 9.5px;
   font-weight: 500;
-  letter-spacing: 0.1px;
+  letter-spacing: 0.2px;
   line-height: 1.2;
   text-align: center;
 }
 
 .rail-btn.active .rail-label {
   font-weight: 600;
-  color: #fff;
+  color: #e9d5ff;
 }
 
 /* Left Media & Contextual Workspace Panel */

@@ -28137,9 +28137,29 @@ if (!window.__rgLayersRailWired) {
 
 
 window.RegaarderDimensionTransform = (function () {
-  const DEFAULTS = { mode: '2d', x: 0, y: 0, depth: 45, scale: 1, rotX: 0, rotY: 0, rotZ: 0, opacity: 1, autoOrbit: false, src: '' };
+  const DEFAULTS = {
+    mode: '2d',
+    x: 0,
+    y: 0,
+    depth: 45,
+    scale: 1,
+    rotX: 0,
+    rotY: 0,
+    rotZ: 0,
+    opacity: 1,
+    roundness: 0.75,
+    centerline: 0,
+    vTaper: 0,
+    detailRelief: 0.35,
+    mirrorMode: 'symmetric',
+    shapePreset: 'auto',
+    sculptMode: 'orbit', // 'orbit' | 'pull' | 'push'
+    autoOrbit: false,
+    src: '',
+  };
   let state = { ...DEFAULTS };
   let rafId = null;
+  let cleanupListeners = null;
 
   function getSelectedLayerImage() {
     const tplId = window.topCustomizerState?.currentTpl?.id || '';
@@ -28169,7 +28189,20 @@ window.RegaarderDimensionTransform = (function () {
 
   function destroyOverlay() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (cleanupListeners) { cleanupListeners(); cleanupListeners = null; }
     document.getElementById('rg-dim-transform-stage')?.remove();
+  }
+
+  function toVolumeParams(s) {
+    return {
+      thickness: Math.max(0, (s.depth ?? 45) / 100),
+      roundness: s.roundness ?? 0.75,
+      centerline: s.centerline ?? 0,
+      vTaper: s.vTaper ?? 0,
+      detailRelief: s.detailRelief ?? 0.35,
+      mirrorMode: s.mode === '2.5d' && s.mirrorMode === 'symmetric' ? 'off' : (s.mirrorMode || 'symmetric'),
+      shapePreset: s.shapePreset || 'auto',
+    };
   }
 
   function open(mode, explicitSrc) {
@@ -28178,7 +28211,13 @@ window.RegaarderDimensionTransform = (function () {
     if (window.topCustomizerState) window.topCustomizerState.isPlaying = false;
 
     const prevSrc = explicitSrc || getSelectedLayerImage() || window.topCustomizerState?.primaryUrl || '/assets/regaarder-motion/portrait.png';
-    state = { ...DEFAULTS, mode: mode || '2.5d', src: prevSrc };
+    const nextMode = mode || '2.5d';
+    state = {
+      ...DEFAULTS,
+      mode: nextMode,
+      mirrorMode: nextMode === '2.5d' ? 'off' : 'symmetric',
+      src: prevSrc,
+    };
     destroyOverlay();
 
     const controlsHtml = state.mode === '2d'
@@ -28190,10 +28229,38 @@ window.RegaarderDimensionTransform = (function () {
         <label style="display:inline-flex;align-items:center;gap:4px;">Opacity <input type="range" data-rg-dim="opacity" min="0.1" max="1" step="0.05" value="1" style="width:48px;"></label>
       `
       : `
-        <label style="display:inline-flex;align-items:center;gap:4px;">${state.mode === '3d' ? 'Thickness' : 'Depth'} <input type="range" data-rg-dim="depth" min="0" max="100" value="45" style="width:58px;"></label>
-        <label style="display:inline-flex;align-items:center;gap:4px;">Scale <input type="range" data-rg-dim="scale" min="0.4" max="2.2" step="0.05" value="1" style="width:56px;"></label>
-        <label style="display:inline-flex;align-items:center;gap:4px;">Tilt X <input type="range" data-rg-dim="rotX" min="-180" max="180" value="0" style="width:54px;"></label>
-        <label style="display:inline-flex;align-items:center;gap:4px;">Tilt Y <input type="range" data-rg-dim="rotY" min="-180" max="180" value="0" style="width:54px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">${state.mode === '3d' ? 'Thickness' : 'Depth'} <input type="range" data-rg-dim="depth" min="0" max="100" value="${state.depth}" style="width:54px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Scale <input type="range" data-rg-dim="scale" min="0.4" max="2.2" step="0.05" value="${state.scale}" style="width:50px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Tilt X <input type="range" data-rg-dim="rotX" min="-180" max="180" value="${state.rotX}" style="width:48px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Tilt Y <input type="range" data-rg-dim="rotY" min="-180" max="180" value="${state.rotY}" style="width:48px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Roundness <input type="range" data-rg-dim="roundness" min="0" max="1" step="0.05" value="${state.roundness}" style="width:46px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Centerline <input type="range" data-rg-dim="centerline" min="-1" max="1" step="0.05" value="${state.centerline}" style="width:44px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">V-Taper <input type="range" data-rg-dim="vTaper" min="-1" max="1" step="0.05" value="${state.vTaper}" style="width:44px;"></label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Detail <input type="range" data-rg-dim="detailRelief" min="-1" max="1" step="0.05" value="${state.detailRelief}" style="width:44px;"></label>
+        ${state.mode === '3d' ? `
+        <label style="display:inline-flex;align-items:center;gap:4px;">Mirror
+          <select data-rg-dim="mirrorMode" style="background:rgba(30,41,59,0.9);color:#e2e8f0;border:1px solid rgba(255,255,255,0.16);border-radius:5px;padding:2px 5px;font-size:10.5px;">
+            <option value="symmetric" selected>Symmetric</option>
+            <option value="front_only">Front-Only</option>
+            <option value="off">Off (2.5D)</option>
+          </select>
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Shape
+          <select data-rg-dim="shapePreset" style="background:rgba(30,41,59,0.9);color:#e2e8f0;border:1px solid rgba(255,255,255,0.16);border-radius:5px;padding:2px 5px;font-size:10.5px;">
+            <option value="auto" selected>Auto</option>
+            <option value="shoe">Shoe / Footwear</option>
+            <option value="head">Head / Profile</option>
+            <option value="flat">Flat Card</option>
+          </select>
+        </label>
+        <label style="display:inline-flex;align-items:center;gap:4px;">Sculpt
+          <select data-rg-dim="sculptMode" style="background:rgba(30,41,59,0.9);color:#e2e8f0;border:1px solid rgba(255,255,255,0.16);border-radius:5px;padding:2px 5px;font-size:10.5px;">
+            <option value="orbit" selected>Orbit</option>
+            <option value="pull">Pull (+)</option>
+            <option value="push">Push (-)</option>
+          </select>
+          <button type="button" data-rg-dim-clear-sculpt style="padding:2px 6px;border-radius:5px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:#cbd5e1;font-size:10px;cursor:pointer;">Clear</button>
+        </label>` : ''}
       `;
 
     const wrap = document.createElement('div');
@@ -28220,62 +28287,18 @@ window.RegaarderDimensionTransform = (function () {
     wrap.querySelector('[data-rg-dim-reset]')?.addEventListener('click', () => {
       const m = state.mode;
       const s = state.src;
-      state = { ...DEFAULTS, mode: m, src: s };
+      state = { ...DEFAULTS, mode: m, mirrorMode: m === '2.5d' ? 'off' : 'symmetric', src: s };
       wrap.querySelectorAll('[data-rg-dim]').forEach((inp) => {
-        inp.value = state[inp.getAttribute('data-rg-dim')];
+        const key = inp.getAttribute('data-rg-dim');
+        if (key in state) inp.value = state[key];
       });
+      if (wrap._clearSculpt) wrap._clearSculpt();
       if (wrap._syncDim) wrap._syncDim();
     });
 
-    if (state.mode === '3d') {
-      import('/vendor/three.module.js').then((THREE) => {
-        if (!wrap.isConnected) return;
-        const w = view.clientWidth || 640;
-        const h = view.clientHeight || 360;
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(w, h);
-        view.appendChild(renderer.domElement);
-
-        const scene = new THREE.Scene();
-        const cam = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
-        cam.position.z = 2.6;
-        scene.add(new THREE.AmbientLight(0xffffff, 0.95));
-        const dir = new THREE.DirectionalLight(0xffffff, 0.7);
-        dir.position.set(2, 3, 4);
-        scene.add(dir);
-
-        const tex = new THREE.TextureLoader().load(state.src);
-        const sideMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.35 });
-        const faceMat = new THREE.MeshStandardMaterial({ map: tex, transparent: true, roughness: 0.5, metalness: 0.08 });
-        const geo = new THREE.BoxGeometry(2.0, 1.15, 0.12);
-        const mesh = new THREE.Mesh(geo, [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat]);
-        scene.add(mesh);
-
-        let dragging = false, lx = 0, ly = 0;
-        view.addEventListener('pointerdown', (e) => { dragging = true; lx = e.clientX; ly = e.clientY; view.style.cursor = 'grabbing'; });
-        window.addEventListener('pointermove', (e) => {
-          if (!dragging) return;
-          state.rotY += (e.clientX - lx) * 0.5;
-          state.rotX += (e.clientY - ly) * 0.5;
-          lx = e.clientX; ly = e.clientY;
-        });
-        window.addEventListener('pointerup', () => { dragging = false; view.style.cursor = 'grab'; });
-
-        const render3D = () => {
-          if (!wrap.isConnected) { renderer.dispose(); return; }
-          if (state.autoOrbit && !dragging) state.rotY = (state.rotY + 0.6) % 360;
-          mesh.scale.set(state.scale, state.scale, Math.max(0.2, state.depth / 30));
-          mesh.rotation.x = (state.rotX * Math.PI) / 180;
-          mesh.rotation.y = (state.rotY * Math.PI) / 180;
-          renderer.render(scene, cam);
-          rafId = requestAnimationFrame(render3D);
-        };
-        render3D();
-      }).catch(() => {
-        view.innerHTML = `<img src="${state.src}" style="max-width:92%;max-height:92%;object-fit:contain;">`;
-      });
-      wrap.querySelector('[data-rg-dim-orbit]')?.addEventListener('click', () => { state.autoOrbit = !state.autoOrbit; });
-    } else {
+    const mountFallback25D = () => {
+      if (!wrap.isConnected) return;
+      view.innerHTML = '';
       const bg = document.createElement('img');
       bg.src = state.src;
       bg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 0.1s ease;';
@@ -28305,11 +28328,187 @@ window.RegaarderDimensionTransform = (function () {
         sync2D(((e.clientX - r.left) / r.width - 0.5) * 14, ((e.clientY - r.top) / r.height - 0.5) * -10);
       });
       wrap._syncDim = () => sync2D();
+    };
+
+    if (state.mode === '3d' || state.mode === '2.5d') {
+      let bgParallax = null;
+      if (state.mode === '2.5d') {
+        bgParallax = document.createElement('img');
+        bgParallax.src = state.src;
+        bgParallax.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;transition:transform 0.1s ease;';
+        view.appendChild(bgParallax);
+      }
+
+      Promise.all([
+        import('/vendor/three.module.js'),
+        import('/js/regaarder-dim-volume.js'),
+      ]).then(([THREE, vol]) => {
+        if (!wrap.isConnected) return;
+        const w = view.clientWidth || 640;
+        const h = view.clientHeight || 360;
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(w, h);
+        renderer.domElement.style.cssText = 'position:relative;z-index:1;';
+        view.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+        const cam = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
+        cam.position.z = 2.6;
+        scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+        const keyLight = new THREE.DirectionalLight(0xffffff, 0.85);
+        keyLight.position.set(2, 3, 4);
+        scene.add(keyLight);
+        const rimLight = new THREE.DirectionalLight(0xd8b4fe, 0.45);
+        rimLight.position.set(-2.5, 1.5, -3);
+        scene.add(rimLight);
+
+        const sideMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4, metalness: 0.35 });
+        const faceMat = new THREE.MeshStandardMaterial({
+          transparent: true,
+          alphaTest: 0.08,
+          roughness: 0.55,
+          metalness: 0.05,
+          emissive: new THREE.Color(0xffffff),
+          emissiveIntensity: 0.25,
+          side: THREE.DoubleSide,
+        });
+        const placeholderGeo = new THREE.BoxGeometry(2.0, 1.15, 0.12);
+        const mesh = new THREE.Mesh(placeholderGeo, [sideMat, sideMat, sideMat, sideMat, faceMat, faceMat]);
+        scene.add(mesh);
+
+        let gridData = null;
+        let pointerParallaxX = 0;
+        let pointerParallaxY = 0;
+        const raycaster = new THREE.Raycaster();
+        const ndc = new THREE.Vector2();
+
+        const syncVolume = () => {
+          if (gridData && mesh.geometry !== placeholderGeo) {
+            vol.updateVolumeGeometry(mesh.geometry, gridData, toVolumeParams(state));
+          }
+          if (bgParallax) {
+            bgParallax.style.filter = `blur(${Math.round(state.depth * 0.08)}px) brightness(0.62)`;
+            bgParallax.style.transform = `scale(${state.scale * 1.12}) rotateX(${state.rotX + pointerParallaxY}deg) rotateY(${state.rotY + pointerParallaxX}deg)`;
+          }
+        };
+        wrap._syncDim = syncVolume;
+        wrap._clearSculpt = () => {
+          if (gridData) { vol.clearSculpt(gridData); syncVolume(); }
+        };
+
+        const applySculptAtPointer = (e) => {
+          if (!gridData || mesh.geometry === placeholderGeo) return;
+          if (state.sculptMode !== 'pull' && state.sculptMode !== 'push') return;
+          const rect = renderer.domElement.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0) return;
+          ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          raycaster.setFromCamera(ndc, cam);
+          const hits = raycaster.intersectObject(mesh, false);
+          if (hits.length > 0 && hits[0].uv) {
+            const sign = state.sculptMode === 'pull' ? 1 : -1;
+            vol.applySculptBrush(gridData, hits[0].uv.x, hits[0].uv.y, 0.14, sign * 0.055);
+            syncVolume();
+          }
+        };
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          if (!wrap.isConnected) return;
+          const tex = new THREE.Texture(img);
+          tex.needsUpdate = true;
+          faceMat.map = tex;
+          faceMat.emissiveMap = tex;
+          faceMat.needsUpdate = true;
+          try {
+            gridData = vol.sampleImageToGrid(img, 104);
+            const volGeo = vol.createVolumeGeometry(THREE, gridData, toVolumeParams(state), 2.0);
+            mesh.geometry.dispose();
+            mesh.geometry = volGeo;
+            mesh.material = faceMat;
+            syncVolume();
+          } catch (_) {
+            // Cross-origin fallback: keep texture on box geometry
+          }
+        };
+        img.src = state.src;
+
+        let dragging = false, lx = 0, ly = 0;
+        const onDown = (e) => {
+          if (state.mode !== '3d') return;
+          dragging = true; lx = e.clientX; ly = e.clientY;
+          if (state.sculptMode === 'pull' || state.sculptMode === 'push') {
+            view.style.cursor = 'crosshair';
+            applySculptAtPointer(e);
+          } else {
+            view.style.cursor = 'grabbing';
+          }
+        };
+        const onMove = (e) => {
+          if (state.mode === '2.5d') {
+            const r = view.getBoundingClientRect();
+            pointerParallaxX = ((e.clientX - r.left) / r.width - 0.5) * 14;
+            pointerParallaxY = ((e.clientY - r.top) / r.height - 0.5) * -10;
+            syncVolume();
+            return;
+          }
+          if (!dragging) return;
+          if (state.sculptMode === 'pull' || state.sculptMode === 'push') {
+            applySculptAtPointer(e);
+            return;
+          }
+          state.rotY += (e.clientX - lx) * 0.5;
+          state.rotX += (e.clientY - ly) * 0.5;
+          lx = e.clientX; ly = e.clientY;
+        };
+        const onUp = () => {
+          dragging = false;
+          if (state.mode === '3d') {
+            view.style.cursor = (state.sculptMode === 'pull' || state.sculptMode === 'push') ? 'crosshair' : 'grab';
+          }
+        };
+
+        view.addEventListener('pointerdown', onDown);
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+        cleanupListeners = () => {
+          view.removeEventListener('pointerdown', onDown);
+          window.removeEventListener('pointermove', onMove);
+          window.removeEventListener('pointerup', onUp);
+        };
+
+        const render3D = () => {
+          if (!wrap.isConnected) { renderer.dispose(); return; }
+          if (state.mode === '3d' && state.autoOrbit && !dragging) state.rotY = (state.rotY + 0.6) % 360;
+          const zScale = mesh.geometry === placeholderGeo ? Math.max(0.2, state.depth / 30) : state.scale;
+          mesh.scale.set(state.scale, state.scale, zScale);
+          const rx = state.rotX + (state.mode === '2.5d' ? pointerParallaxY * 0.9 : 0);
+          const ry = state.rotY + (state.mode === '2.5d' ? pointerParallaxX * 0.9 : 0);
+          mesh.rotation.x = (rx * Math.PI) / 180;
+          mesh.rotation.y = (ry * Math.PI) / 180;
+          renderer.render(scene, cam);
+          rafId = requestAnimationFrame(render3D);
+        };
+        render3D();
+      }).catch(mountFallback25D);
+
+      if (state.mode === '3d') {
+        wrap.querySelector('[data-rg-dim-orbit]')?.addEventListener('click', () => { state.autoOrbit = !state.autoOrbit; });
+        wrap.querySelector('[data-rg-dim-clear-sculpt]')?.addEventListener('click', () => { if (wrap._clearSculpt) wrap._clearSculpt(); });
+      }
+    } else {
+      mountFallback25D();
     }
 
     wrap.querySelectorAll('[data-rg-dim]').forEach((inp) => {
-      inp.addEventListener('input', () => {
-        state[inp.getAttribute('data-rg-dim')] = parseFloat(inp.value);
+      const eventName = inp.tagName === 'SELECT' ? 'change' : 'input';
+      inp.addEventListener(eventName, () => {
+        const key = inp.getAttribute('data-rg-dim');
+        state[key] = inp.tagName === 'SELECT' ? inp.value : parseFloat(inp.value);
+        if (key === 'sculptMode' && state.mode === '3d') {
+          view.style.cursor = (state.sculptMode === 'pull' || state.sculptMode === 'push') ? 'crosshair' : 'grab';
+        }
         if (wrap._syncDim) wrap._syncDim();
       });
     });
@@ -29417,11 +29616,6 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (playHover) playHover.style.display = 'none';
   if (defaultImg) defaultImg.style.opacity = '0';
   if (centerLabel) centerLabel.style.opacity = '0';
-  if (badgeEl) {
-    badgeEl.textContent = 'PREVIEW';
-    badgeEl.style.background = '#823CF0';
-    badgeEl.classList.add('pulse-preview-badge');
-  }
 
   if (fxContainer) {
     fxContainer.style.display = 'block';

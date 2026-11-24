@@ -4548,6 +4548,8 @@
       confirmMode: null, // 'crop' when requiring explicit Done/Cancel confirmation
       colorHex: '#9B6BFF',
       opacity: 100,
+      dragOffsetX: 0,
+      dragOffsetY: 0,
       locked: false,
       hidden: false,
       copiedStyle: null,
@@ -4784,6 +4786,12 @@
         top = Math.max(minTop, maxBottom - tbHeight);
       }
 
+      // Apply user drag offset, then clamp within stage/viewport bounds
+      left += state.dragOffsetX || 0;
+      top += state.dragOffsetY || 0;
+      if (top < minTop) top = minTop;
+      if (top + tbHeight > maxBottom) top = Math.max(minTop, maxBottom - tbHeight);
+
       // Collision awareness against left rail and right inspector sidebar
       const minLeft = Math.max(76, stageRect.left + 8);
       const maxRight = Math.min(window.innerWidth - 356, stageRect.right - 8);
@@ -4800,6 +4808,8 @@
       // Update pointer beak position so it points directly at the selected object's horizontal center
       const beakEl = toolbarEl.querySelector('.rg-ctx-pointer-beak');
       if (beakEl) {
+        const isDetached = Math.abs(state.dragOffsetX || 0) > 6 || Math.abs(state.dragOffsetY || 0) > 6;
+        beakEl.style.display = isDetached ? 'none' : '';
         const beakLeft = Math.max(24, Math.min(tbWidth - 24, objectCenterX - left));
         beakEl.style.left = `${Math.round(beakLeft)}px`;
         beakEl.classList.toggle('is-top', isFlippedBelow);
@@ -5429,6 +5439,10 @@
         icon: LUCIDE_ICONS.layers
       };
 
+      if (state.objectKey !== key) {
+        state.dragOffsetX = 0;
+        state.dragOffsetY = 0;
+      }
       state.visible = true;
       state.contextType = (opts && opts.contextType) || 'blueprint';
       state.objectKey = key;
@@ -5451,11 +5465,40 @@
     const hide = () => {
       state.visible = false;
       state.confirmMode = null;
+      state.dragOffsetX = 0;
+      state.dragOffsetY = 0;
       closeAllPopovers();
       document.body.classList.remove('rg-ctx-toolbar-active');
       toolbarEl.classList.remove('is-visible');
       if (selectionFrameEl) selectionFrameEl.classList.remove('is-visible');
     };
+
+    // Allow dragging the contextual toolbar anywhere on the stage by grabbing its surface
+    let tbDragging = false;
+    let tbStartX = 0, tbStartY = 0, tbBaseDx = 0, tbBaseDy = 0;
+    toolbarEl.style.cursor = 'grab';
+    toolbarEl.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      if (e.target && e.target.closest('button, input, select, .rg-ctx-popover')) return;
+      tbDragging = true;
+      tbStartX = e.clientX;
+      tbStartY = e.clientY;
+      tbBaseDx = state.dragOffsetX || 0;
+      tbBaseDy = state.dragOffsetY || 0;
+      toolbarEl.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!tbDragging) return;
+      state.dragOffsetX = tbBaseDx + (e.clientX - tbStartX);
+      state.dragOffsetY = tbBaseDy + (e.clientY - tbStartY);
+      updatePosition();
+    });
+    window.addEventListener('pointerup', () => {
+      if (!tbDragging) return;
+      tbDragging = false;
+      toolbarEl.style.cursor = 'grab';
+    });
 
     // Global dismissal via Escape or clicking outside the selected object & toolbar
     document.addEventListener('keydown', (e) => {
