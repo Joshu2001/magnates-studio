@@ -37564,6 +37564,16 @@ function renderTopTemplatePreviewStage() {
   const stage = document.getElementById('tpl-modal-preview-stage');
   if (!stage || !topCustomizerState.currentTpl) return;
   const tplId = topCustomizerState.currentTpl.id;
+  if (tplId !== 'import-video-analyzer') {
+    document.getElementById('vfa-inspector-panel')?.remove();
+  }
+  if (tplId === 'import-video-analyzer' && window.RegaarderVideoAnalyzer) {
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    window.RegaarderVideoAnalyzer.mountStage(stage);
+    return;
+  }
   if (window.tpl3DSync) window.tpl3DSync(tplId);
 
   // Regaarder Motion 001: Origins Slow Reveal, Eye Strip & Organic Paper Tears Engine

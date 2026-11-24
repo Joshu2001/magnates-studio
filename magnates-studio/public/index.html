@@ -80,6 +80,12 @@
               <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               <span>Assets &amp; Tools</span>
             </button>
+
+            <!-- Import Video Analyzer Studio trigger -->
+            <button type="button" id="btn-top-import-video" onclick="document.getElementById('rm-create-menu')?.removeAttribute('open'); window.openVideoAnalyzerStudio && window.openVideoAnalyzerStudio();" title="Import a reference video for frame-by-frame inspection, motion &amp; transition detection, and asset replacement">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              <span>Import Video</span>
+            </button>
           </div>
         </details>
         <!-- Auth Actions (Single Log in button; Sign up inside modal) -->
@@ -13702,6 +13708,7 @@
   <script src="js/regaarder-assets-tools.js?v=1"></script>
   <script src="js/tpl-contextual-inspector.js?v=25"></script>
   <script src="js/regaarder-redesign.js?v=shell-v1"></script>
+  <script src="js/video-frame-analyzer.js?v=1"></script>
   <script src="js/hp-documentary-engine.js?v=1"></script>
   <script>
     if (window.location.search.includes('open=countdown')) {
