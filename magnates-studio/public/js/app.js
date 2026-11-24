@@ -25843,14 +25843,14 @@ if (document.readyState === 'loading') {
 const EFFECT_TEMPLATES_DATA = [
   {
     id: 'regaarder-full-documentary',
-    title: 'Regaarder Documentary · Master Full Sequence (0:00–26:54)',
+    title: 'Full Documentary',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'MASTER DOCUMENTARY',
     difficulty: 'Pro Suite',
     timeToApply: '1614.6s',
     previewGradient: 'linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(6, 8, 12, 0.99))',
-    description: 'All 7 documentary scenes in one timeline: Origins map reveal, archival feud, 3D rig, warehouse & rain rivalry, Pelé Pact, and the burning-shoe finale.',
+    description: 'All 7 documentary scenes in one timeline: Origins map reveal, archival feud, 3D rig, warehouse & rain rivalry.',
     tags: ['Master Documentary', 'Full Movie', '26 Minutes', 'All Chapters', '3D Spatial', 'Cinematic Motion'],
     defaultImage: '/assets/regaarder-motion/portrait.png',
     secondaryImage: '/assets/final-chapter/wall.png',
@@ -25858,154 +25858,154 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'regaarder-pele-pact-chapter',
-    title: 'The Pelé Pact · Chapter 6 (18:50–20:14)',
+    title: 'The Pelé Pact',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'REGAARDER MOTION 002',
     difficulty: 'Pro Suite',
     timeToApply: '84.0 sec',
     previewGradient: 'linear-gradient(135deg, rgba(22, 55, 67, 0.96), rgba(8, 14, 20, 0.98))',
-    description: 'Scene effects: restaurant cutouts, descending handshake, burning cash bids, newspaper collage, crossed brand cards, and kick punch-in.',
+    description: 'Scene effects: restaurant cut-out subjects, descending handshake, burning cash bids, newspaper collage, crossed.',
     tags: ['Pelé Pact', 'Chapter 6', 'Handshake', 'Mexico 70', 'Newspaper Collage', 'Bicycle Kick', 'Documentary'],
     defaultImage: '/assets/regaarder-motion/outdoor.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
     id: 'regaarder-minute16-chapter',
-    title: 'Minute 16 · Cargo Ships, Pedestal & Warehouse (16:00–17:00)',
+    title: 'Cargo',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'REGAARDER MOTION 003',
     difficulty: 'Pro Suite',
     timeToApply: '60.0 sec',
     previewGradient: 'linear-gradient(135deg, rgba(11, 36, 48, 0.96), rgba(7, 9, 11, 0.98))',
-    description: 'Scene effects: archival crowd passage, 3D shoe pedestal with money stacks, ocean shipment water reflection, and warehouse boot reveal.',
+    description: 'Scene effects: archival crowd passage, 3D shoe pedestal with money stacks, ocean shipment water reflection, and.',
     tags: ['Minute 16', 'Cargo Ships', 'Water Reflection', 'Shoe Pedestal', 'Warehouse Accusations', 'Documentary'],
     defaultImage: '/assets/minute16/celebration-group-v123.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
     id: 'regaarder-minute17-chapter',
-    title: 'Minute 17 · Rain Rivalry, Next Gen & Split Flare (17:00–18:00)',
+    title: 'Rain Rivalry',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'REGAARDER MOTION 004',
     difficulty: 'Pro Suite',
     timeToApply: '60.0 sec',
     previewGradient: 'linear-gradient(135deg, rgba(36, 38, 75, 0.96), rgba(3, 4, 6, 0.98))',
-    description: 'Scene effects: rain-swept city portraits, heat-shimmer products, rising family panels, and cyan/crimson chromatic split flare.',
+    description: 'Scene effects: rain-swept city portraits, heat-shimmer products, rising family panels, and cyan/crimson.',
     tags: ['Minute 17', 'Seeded Rain', 'Next Generation', 'Family Panels', 'Photo Split', 'Optical Flare'],
     defaultImage: '/assets/minute17/confrontation-city-v120.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
     id: 'regaarder-final-chapter',
-    title: 'The Final Chapter · Legacy, Revival & Fire Overlays (23:29–26:54)',
+    title: 'The Final Chapter',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'REGAARDER MOTION 005',
     difficulty: 'Pro Suite',
     timeToApply: '205.6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(35, 14, 18, 0.96), rgba(5, 5, 8, 0.98))',
-    description: 'Scene effects: parlor pullback, burning sneaker flames, wave-deforming brand cards, gold vortex, and aerial headquarters pins.',
+    description: 'Scene effects: parlor pullback, burning sneaker flames, wave-deforming brand cards, gold vortex, and aerial.',
     tags: ['Final Chapter', 'Chapter 7', 'Burning Shoe', 'Video Flame Atlas', 'Nike Vortex', 'Predator', 'Headquarters Pins'],
     defaultImage: '/assets/regaarder-motion/fire.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
     id: 'regaarder-native3d-surface-builder',
-    title: 'Native 3D · Character Rig & V108 Surface Builder',
+    title: '3D Character Rig',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'REGAARDER NATIVE 3D',
     difficulty: 'Pro Suite',
     timeToApply: 'Interactive',
     previewGradient: 'linear-gradient(135deg, rgba(20, 24, 32, 0.96), rgba(11, 15, 21, 0.98))',
-    description: 'Interactive 3D character rig: sculpted surface subdivision, vertex paint, PBR shading, tailored wardrobe, and GLB export.',
+    description: 'Interactive 3D character rig: sculpted surface subdivision, vertex paint, PBR shading, tailored wardrobe, and.',
     tags: ['Native 3D', 'Surface Builder', 'Multiresolution', 'UV Unwrapping', 'Vertex Paint', 'PBR Shading', 'GLB Export'],
     defaultImage: '/assets/regaarder-motion/standing.png',
     secondaryImage: '/assets/regaarder-motion/outdoor.png'
   },
   {
     id: 'regaarder-origins-slow-reveal',
-    title: 'Origins: Herzogenaurach Slow Reveal, Eye Strip & Organic Paper Tears',
+    title: 'Origins Slow Reveal',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'REGAARDER MOTION 001',
     difficulty: 'Pro Suite',
     timeToApply: '13.6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(40, 61, 79, 0.96), rgba(16, 17, 19, 0.98))',
-    description: 'Scene effects: aerial town map, dual brand lockups, torn-paper eye strip, spreading paper tears, and living fire reveal.',
+    description: 'Scene effects: aerial town map, dual brand lockups, torn-paper eye strip, spreading paper tears, and living.',
     tags: ['Slow Reveal', 'Eye Strip', 'Organic Paper Tears', 'Herzogenaurach', 'Living Fire', 'Regaarder Motion'],
     defaultImage: '/assets/regaarder-motion/map.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
     id: 'jani-spin-flash-glitch-reveal',
-    title: 'Circular Spin, Falling Particles, 1+3 Flashlight Strobe & Glitch Reveal',
+    title: 'Circular Spin',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'NEW • FLASH GLITCH FX',
     difficulty: 'Pro Suite',
     timeToApply: '5.4 sec',
     previewGradient: 'linear-gradient(135deg, rgba(8, 25, 45, 0.96), rgba(4, 6, 12, 0.98))',
-    description: 'Clockwise left-to-right circular spin with falling dust particles, 1 slow flashlight bloom + 3 rapid-fire paparazzi strobes, optical slice glitch breakup, and moody cyan Subject 2 portrait reveal.',
+    description: 'Clockwise left-to-right circular spin with falling dust particles, 1 slow flashlight bloom + 3 rapid-fire.',
     tags: ['Circular Spin', 'Falling Particles', '1+3 Flashlight', 'Flashlight Color', 'Glitch Reveal', 'Dual Portrait', 'James Jani'],
     defaultImage: '/interview_cutin_cinematic.jpg',
     secondaryImage: '/cinematic_split_scene.jpg'
   },
   {
     id: 'jani-flash-quad-sequence',
-    title: '4-Beat Flash, Directional Slide & Sluggish Center Emergence',
+    title: '4-Beat Flash',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'NEW • PSYCHOLOGY FX',
     difficulty: 'Pro Suite',
     timeToApply: '6.4 sec',
     previewGradient: 'linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(4, 6, 11, 0.98))',
-    description: '4-stage documentary photo choreography: Beat 1 Camera Flash + Flashlight Cone & Shutter SFX, Beat 2 Left→Right entrance, Beat 3 Right→Left counter-slide, and Beat 4 Sluggish Center Fade-In Emergence with 5 Psychological Mood Presets.',
+    description: '4-stage documentary photo choreography: Beat 1 Camera Flash + Flashlight Cone & Shutter SFX, Beat 2 Left→Right.',
     tags: ['Camera Flash', 'Flashlight', 'Directional Slide', 'Sluggish Center', 'Mood Psychology', 'Shutter SFX', 'James Jani'],
     defaultImage: '/assets/aistudio/image_463745bd.png',
     secondaryImage: '/assets/aistudio/image_174cfa38.png'
   },
   {
     id: 'jani-cross-section-reveal',
-    title: 'James Jani Cross-Section: Dust Drift & Zoom-Rise Underworld Scroll',
+    title: 'Dust Drift',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'JANI FX',
     difficulty: 'Cinematic',
     timeToApply: '6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(16, 24, 20, 0.95), rgba(4, 6, 8, 0.95))',
-    description: 'Iconic James Jani dual-layer transition: ambient floating dust particles, slow suspense zoom-out, kinetic anticipation zoom-in & rise, and smooth downward tilt scroll into the underworld reality.',
+    description: 'Iconic two-part scene switch: ambient floating dust particles, slow suspense zoom-out, smooth build-up zoom-in.',
     tags: ['James Jani', 'Cross Section', 'Dust Particles', 'Scroll Transition', 'Anticipation Zoom', 'Dual Layer'],
     defaultImage: '/jani_cross_thumb.png',
     secondaryImage: '/jani_cross_bottom.png'
   },
   {
     id: 'jani-forbes-fraud-reveal',
-    title: 'James Jani Forbes 3D Cover: Paparazzi Flash & Anamorphic Beam',
+    title: 'Forbes 3D Cover',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'JANI 3D FX',
     difficulty: 'Pro 3D',
     timeToApply: '5 sec',
     previewGradient: 'linear-gradient(135deg, rgba(8, 14, 26, 0.95), rgba(2, 4, 8, 0.95))',
-    description: 'Signature James Jani Forbes 3D zoom-out camera dolly with rapid paparazzi flash strobes, horizontal anamorphic CRT beam streak, depth-of-field blur resolution, and 3D tilt controls.',
+    description: 'Signature Forbes 3D zoom-out camera with rapid bright camera flashes, horizontal wide glowing screen beam.',
     tags: ['James Jani', 'Forbes Cover', '3D Camera', 'Paparazzi Flash', 'Anamorphic Flare', 'Depth of Field', 'Tilt-Shift Blur'],
     defaultImage: '/jani_forbes_cover_thumb.svg',
     secondaryImage: '/portrait_cutout_clean.png'
   },
     {
     id: 'creator-cinematic-studio',
-    title: 'Cinematic Creator Studio: Calibratable DOF, Lighting & Face-Lock',
+    title: 'Creator Studio',
     category: 'Vlog & Story',
     origCategory: 'Vlog & Story',
     badge: 'NEW • CALIBRATABLE STUDIO',
     difficulty: '1-Click',
     timeToApply: '6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(8, 47, 73, 0.95), rgba(3, 28, 45, 0.95))',
-    description: 'Cinematic creator backdrop template with calibratable depth-of-field blur, lighting and color grading controls, virtual studio preset switching, edge-smoothing face tracking, and manual holdout protection brush.',
+    description: 'Cinematic creator backdrop template with adjustable background blur, lighting and color grading controls.',
     tags: ['Background Blur', 'Depth of Field', 'Lighting Calibration', 'Face Tracking', 'Studio Bokeh', 'Hold-out Brush'],
     defaultImage: '/creator_studio_bokeh_preset.png',
     cutoutImage: '',
@@ -26072,7 +26072,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'split',
-    title: 'Split Reveal (Before / After)',
+    title: 'Split Reveal',
     category: 'Transitions',
     origCategory: 'Transitions',
     badge: 'CLASSIC',
@@ -26085,7 +26085,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'zoom',
-    title: '3D Product Zoom & Spin',
+    title: '3D Product Zoom',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'PREMIUM',
@@ -26244,7 +26244,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(10, 20, 40, 0.96), rgba(4, 8, 18, 0.98))',
-    description: 'Frosted dark glass Google search card with glowing cyan-blue aurora backdrop, live typing cursor, auto-suggest capsules, and adaptive 65% documentary framing.',
+    description: 'Frosted dark glass Google search card with glowing cyan-blue aurora backdrop, live typing cursor, auto-suggest.',
     tags: ['Animations', 'Google Search Typing', 'James Jani', 'Motion Template'],
     defaultImage: '/assets/aistudio/image_e33ac0a6.png'
   },
@@ -26257,7 +26257,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Realistic iMessage conversation with typing bubbles. Perfect for Reddit stories, drama, and "text gone wrong" videos.',
+    description: 'Realistic iMessage conversation with typing bubbles. Perfect for Reddit stories, drama, and "text gone wrong".',
     tags: ['Animations', 'iMessage Thread', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-im" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5f5f7"/><stop offset="100%" stop-color="#e8e8ed"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-im)"/><text x="200" y="24" fill="#555" font-family="'Inter', sans-serif" font-weight="600" font-size="10" text-anchor="middle">iMessage Thread</text><g transform="translate(30, 42)"><rect width="180" height="32" rx="16" fill="#e9e9eb"/><text x="16" y="20" fill="#000" font-family="'Inter', sans-serif" font-size="11">hey, are you up?</text><g transform="translate(160, 40)"><rect width="180" height="32" rx="16" fill="#007aff"/><text x="16" y="20" fill="#fff" font-family="'Inter', sans-serif" font-size="11">yeah why</text></g><g transform="translate(0, 80)"><rect width="210" height="32" rx="16" fill="#e9e9eb"/><text x="16" y="20" fill="#000" font-family="'Inter', sans-serif" font-size="11">you need to see this rn</text></g><g transform="translate(150, 120)"><rect width="190" height="32" rx="16" fill="#007aff"/><text x="16" y="20" fill="#fff" font-family="'Inter', sans-serif" font-size="11">omg what happened</text></g></g></svg>`)}`
   },
@@ -26339,13 +26339,13 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Stacked phone notifications sliding in (Instagram, PayPal, Email). Great for "day in the life" and business content.',
+    description: 'Stacked phone notifications sliding in (Instagram, PayPal, Email). Great for "day in the life" and business.',
     tags: ['Animations', 'Phone Notification Stack', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-nf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-nf)"/><g transform="translate(45, 30)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="20">\ud83d\udcf8</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">New follower</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">@creator started following you</text></g><g transform="translate(45, 90)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><rect x="16" y="10" width="28" height="28" rx="6" fill="#003087"/><text x="30" y="29" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">P</text><text x="54" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Payment received</text><text x="54" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">$2,450.00 from Client</text></g><g transform="translate(45, 150)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="18">\u2709\ufe0f</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Partnership opportunity</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">Hey, loved your last video...</text></g></svg>`)}`
   },
   {
     id: 'hormozi',
-    title: 'Hormozi Captions',
+    title: 'Captions',
     category: 'Text & Titles',
     origCategory: 'Text & Titles',
     badge: '#1 REQUESTED',
@@ -26562,7 +26562,7 @@ id: 'map',
   },
   {
     id: 'quote',
-    title: 'Cinematic Quote Card',
+    title: 'Quote Card',
     category: 'Text & Titles',
     origCategory: 'Text & Titles',
     badge: 'MOTIVATION',
@@ -26609,21 +26609,21 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Vintage VHS tape look with scanlines, tracking, and REC indicator.',
+    description: 'Vintage VHS tape look with TV lines, tracking, and REC indicator.',
     tags: ['Color & Vibe', 'VHS Retro Overlay', 'Motion Template'],
     defaultImage: '/vhs_summer_1989_bg.jpg',
     secondaryImage: '/vhs_summer_1989_bg.jpg'
   },
   {
     id: 'progress',
-    title: 'Cinematic Progress HUD',
+    title: 'Progress HUD',
     category: 'Animations',
     origCategory: 'Animations',
     badge: 'DOC DATA HUD',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(12, 18, 34, 0.96), rgba(5, 8, 16, 0.98))',
-    description: 'High-end financial documentary progress visualization with restrained violet-to-cyan bar, endpoint-aligned callout badge, and 3 selectable editorial styles.',
+    description: 'High-end financial documentary progress visualization with restrained violet-to-cyan bar, endpoint-aligned.',
     tags: ['Animations', 'Cinematic Progress HUD', 'Project Funding', 'Documentary Data', 'Financial Storytelling'],
     defaultImage: '/assets/aistudio/image_fb1bacf4.png'
   },
@@ -26676,7 +26676,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(20, 24, 33, 0.98), rgba(8, 12, 20, 0.95))',
-    description: 'Photorealistic 3D paper artifact reveal engine: physical file clippings, masking tape, rubber ink stamp impressions, dramatic overhead spotlight, and depth-of-field optics.',
+    description: 'Photorealistic 3D paper artifact reveal engine: physical file clippings, masking tape, rubber ink stamp.',
     tags: ['Animations', 'Animated Checklist', '3D Spatial', 'Paper Artifact', 'James Jani'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cl)"/><g transform="translate(80, 40)"><g transform="translate(0, 0)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Research topic</text></g><g transform="translate(0, 35)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Write script</text></g><g transform="translate(0, 70)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Record audio</text></g><g transform="translate(0, 105)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Edit video</text></g></g></svg>`)}`
   },
@@ -26684,7 +26684,7 @@ id: 'map',
   {
     id: 'empire-timeline',
     hidden: true,
-    title: 'Empire Rise & Fall Timeline',
+    title: 'Empire Rise',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
     badge: '3D SIGNATURE',
@@ -26692,21 +26692,21 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(4, 7, 17, 0.98), rgba(14, 23, 42, 0.95))',
-    description: 'James Jani & Magnates Media style cinematic 3D milestone timeline tracing empire founding, peak valuation, and crash trajectory.',
+    description: '& tyle cinematic 3D milestone timeline tracing empire founding, peak valuation, and crash trajectory.',
     tags: ['Business Storytelling', 'Empire Rise & Fall Timeline', '3D Spatial', 'James Jani'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-et-jani" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#040711"/><stop offset="100%" stop-color="#090e1a"/></linearGradient><linearGradient id="curve-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/></linearGradient><linearGradient id="area-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/></linearGradient><filter id="glow-p" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#38bdf8" flood-opacity="0.75"/></filter></defs><rect width="400" height="225" fill="url(#bg-et-jani)"/><g opacity="0.15"><line x1="30" y1="50" x2="370" y2="50" stroke="#fff" stroke-width="0.5"/><line x1="30" y1="110" x2="370" y2="110" stroke="#fff" stroke-width="0.5"/><line x1="30" y1="170" x2="370" y2="170" stroke="#fff" stroke-width="0.5"/></g><text x="28" y="28" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="10" letter-spacing="1.2">THE RISE &amp; FALL // 1985 \u2014 2001</text><text x="28" y="40" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="7.5" opacity="0.9">VALUATION &amp; LIQUIDITY CRASH</text><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175 L 365 185 L 40 185 Z" fill="url(#area-grad)"/><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175" fill="none" stroke="#38bdf8" stroke-width="2.8" opacity="0.25" stroke-linecap="round"/><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175" fill="none" stroke="url(#curve-grad)" stroke-width="1.2" stroke-linecap="round" filter="url(#glow-p)"/><circle cx="40" cy="170" r="3.5" fill="#10b981" stroke="#ffffff" stroke-width="1"/><circle cx="210" cy="60" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2" filter="url(#glow-p)"/><circle cx="365" cy="175" r="3.5" fill="#ef4444" stroke="#ffffff" stroke-width="1"/><text x="40" y="196" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" text-anchor="middle">FOUNDED</text><rect x="175" y="32" width="70" height="15" rx="3" fill="rgba(8,12,20,0.85)" stroke="#f59e0b" stroke-width="0.8"/><text x="210" y="42.5" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="800" text-anchor="middle">$1.5B PEAK</text><text x="365" y="196" fill="#ef4444" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" text-anchor="middle">BANKRUPTCY</text></svg>`)}`
   },
   {
     id: 'founder-faceoff',
     hidden: true,
-    title: 'Founder Face-Off (Rival Split)',
+    title: 'Founder Face-Off',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
     badge: 'VIRAL',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Two rivals locked in a split-screen duel with VS crack, clashing brand colors, and stat columns. Built for "X vs Y: the war that changed an industry".',
+    description: 'Two rivals locked in a split-screen duel with VS crack, clashing brand colors, and stat columns. Built for "X.',
     tags: ['Business Storytelling', 'Founder Face-Off (Rival Split)', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="fo-l" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0b3a2a"/><stop offset="100%" stop-color="#06130e"/></linearGradient><linearGradient id="fo-r" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a0b14"/><stop offset="100%" stop-color="#130609"/></linearGradient></defs><rect width="200" height="225" fill="url(#fo-l)"/><rect x="200" width="200" height="225" fill="url(#fo-r)"/><circle cx="100" cy="85" r="38" fill="#111" stroke="#00d68f" stroke-width="3"/><circle cx="300" cy="85" r="38" fill="#111" stroke="#ff4757" stroke-width="3"/><text x="100" y="150" fill="#00d68f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="16" text-anchor="middle">BEZOS</text><text x="300" y="150" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="16" text-anchor="middle">MUSK</text><g transform="translate(200,112) rotate(-12)"><text y="8" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="30" text-anchor="middle" stroke="#000" stroke-width="6" paint-order="stroke">VS</text></g><text x="100" y="180" fill="rgba(255,255,255,0.75)" font-family="monospace" font-size="10" text-anchor="middle">NET WORTH $200B</text><text x="300" y="180" fill="rgba(255,255,255,0.75)" font-family="monospace" font-size="10" text-anchor="middle">NET WORTH $180B</text></svg>`)}`
   },
@@ -26720,7 +26720,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Runway gauge sweeping from green to red while a bank balance drains in real time. The "how they lit $2B on fire" visual.',
+    description: 'Runway gauge sweeping from green to red while a bank balance drains in real time. The "how they lit $2B on.',
     tags: ['Business Storytelling', 'Cash Burn Rate Meter', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a15"/><text x="200" y="30" fill="rgba(255,255,255,0.7)" font-family="monospace" font-weight="700" font-size="10" letter-spacing="2" text-anchor="middle">MONTHLY BURN RATE</text><g transform="translate(200, 130)"><path d="M -80 0 A 80 80 0 0 1 -56.6 -56.6" stroke="#00d68f" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M -56.6 -56.6 A 80 80 0 0 1 0 -80" stroke="#ffd23f" stroke-width="14" fill="none"/><path d="M 0 -80 A 80 80 0 0 1 56.6 -56.6" stroke="#ff8c42" stroke-width="14" fill="none"/><path d="M 56.6 -56.6 A 80 80 0 0 1 80 0" stroke="#ff4757" stroke-width="14" fill="none" stroke-linecap="round"/><line x1="0" y1="0" x2="52" y2="-46" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="0" cy="0" r="8" fill="#fff"/></g><text x="200" y="165" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="22" text-anchor="middle">-$412M / MO</text><text x="200" y="190" fill="rgba(255,255,255,0.6)" font-family="monospace" font-size="10" text-anchor="middle">RUNWAY: 3 MONTHS LEFT</text></svg>`)}`
   },
@@ -26733,7 +26733,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Term sheet clauses lighting up line by line, ending in an animated ink signature and deal stamp. For acquisitions, funding rounds, and hostile takeovers.',
+    description: 'Term sheet clauses lighting up line by line, ending in an animated ink signature and deal stamp. For.',
     tags: ['Business Storytelling', 'Deal Term Sheet Signing', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(70, 15)"><rect width="260" height="195" rx="3" fill="#fff" stroke="rgba(0,0,0,0.12)"/><text x="130" y="26" fill="#3a2418" font-family="monospace" font-weight="900" font-size="11" letter-spacing="1" text-anchor="middle">TERM SHEET \u00b7 SERIES A</text><line x1="20" y1="34" x2="240" y2="34" stroke="#3a2418" stroke-dasharray="3 2" stroke-width="0.8"/><g font-family="monospace" font-size="9" fill="#3a2418"><rect x="18" y="44" width="150" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="52">Valuation: $80M pre-money</text><rect x="18" y="64" width="140" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="72">Investment: $12M for 15%</text><text x="20" y="92">Board seats: 2 investor, 3 founder</text><text x="20" y="112">Liquidation pref: 1x non-participating</text></g><path d="M 40 160 C 70 140 90 175 120 152 S 170 165 195 148" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="172" x2="200" y2="172" stroke="#3a2418" stroke-width="1"/><text x="40" y="184" fill="rgba(0,0,0,0.5)" font-family="monospace" font-size="7">CEO SIGNATURE</text></g></svg>`)}`
   },
@@ -26746,7 +26746,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Classified memo with black redaction bars slamming over names and amounts, CONFIDENTIAL stamp, and one highlighted sentence. Made for fraud, SEC, and scandal stories.',
+    description: 'Classified memo with black redaction bars slamming over names and amounts, CONFIDENTIAL stamp, and one.',
     tags: ['Business Storytelling', 'Fraud Dossier Redaction', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#e9e2d0"/><g transform="translate(70, 12)"><rect width="260" height="200" rx="2" fill="#fbf8ef" stroke="rgba(0,0,0,0.15)"/><text x="130" y="24" fill="#3a2418" font-family="monospace" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">INTERNAL MEMO \u00b7 EYES ONLY</text><g font-family="monospace" font-size="9" fill="#3a2418"><text x="16" y="52">To: Board of Directors</text><text x="16" y="70">From:</text><rect x="52" y="61" width="120" height="11" fill="#111"/><text x="16" y="90">Re: Q3 revenue booked via</text><text x="16" y="104">side letters totaling</text><rect x="16" y="112" width="90" height="12" rx="2" fill="#facc15" opacity="0.8"/><text x="20" y="121" font-weight="700">$8.4 BILLION</text><text x="16" y="140">DO NOT DISCLOSE.</text></g><g transform="translate(150, 150) rotate(-14)"><rect x="-52" y="-14" width="104" height="26" fill="none" stroke="#c1121f" stroke-width="2.5" rx="3"/><text y="5" fill="#c1121f" font-family="monospace" font-weight="900" font-size="11" text-anchor="middle" letter-spacing="1">CONFIDENTIAL</text></g></g></svg>`)}`
   },
@@ -26760,7 +26760,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Company bar chart racing up the screen as valuations leapfrog each other year by year. The "watch an empire overtake another" visual.',
+    description: 'Company bar chart racing up the screen as valuations leapfrog each other year by year. The "watch an empire.',
     tags: ['Business Storytelling', 'Market Cap Race Bars', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a15"/><text x="24" y="30" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="1.5">MARKET CAP \u00b7 2026</text><text x="376" y="30" fill="#ffd23f" font-family="monospace" font-weight="900" font-size="13" text-anchor="end">Q4</text><g transform="translate(24, 48)" font-family="'Inter', sans-serif" font-weight="700" font-size="10"><g transform="translate(0,0)"><text y="13" fill="#fff">NVDA</text><rect x="60" y="2" width="290" height="15" rx="3" fill="#76b900"/><text x="344" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$3.1T</text></g><g transform="translate(0,26)"><text y="13" fill="#fff">MSFT</text><rect x="60" y="2" width="262" height="15" rx="3" fill="#00a4ef"/><text x="316" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.8T</text></g><g transform="translate(0,52)"><text y="13" fill="#fff">AAPL</text><rect x="60" y="2" width="248" height="15" rx="3" fill="#f5f5f7"/><text x="302" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.6T</text></g><g transform="translate(0,78)"><text y="13" fill="#fff">AMZN</text><rect x="60" y="2" width="180" height="15" rx="3" fill="#ff9900"/><text x="234" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.9T</text></g><g transform="translate(0,104)"><text y="13" fill="#fff">GOOGL</text><rect x="60" y="2" width="160" height="15" rx="3" fill="#ea4335"/><text x="214" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.7T</text></g><g transform="translate(0,130)"><text y="13" fill="#9a9aa5">TSLA</text><rect x="60" y="2" width="84" height="15" rx="3" fill="#cc0000"/><text x="138" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$0.8T</text></g></g></svg>`)}`
   },
@@ -26774,7 +26774,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Shareholder pie devouring slices stake by stake until one logo swallows the whole boardroom. For acquisitions and proxy fights.',
+    description: 'Shareholder pie devouring slices stake by stake until one logo swallows the whole boardroom. For acquisitions.',
     tags: ['Business Storytelling', 'Hostile Takeover Progress', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0d0d16"/><text x="200" y="28" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">OWNERSHIP STAKE \u00b7 51% CONTROL</text><g transform="translate(130, 40)"><circle cx="70" cy="70" r="48" fill="none" stroke="#ff4757" stroke-width="26" stroke-dasharray="154 301.6"/><circle cx="70" cy="70" r="48" fill="none" stroke="#7c5cff" stroke-width="26" stroke-dasharray="75 301.6" stroke-dashoffset="-154"/><circle cx="70" cy="70" r="48" fill="none" stroke="#8a8a95" stroke-width="26" stroke-dasharray="72.6 301.6" stroke-dashoffset="-229"/><text x="70" y="66" fill="#fff" font-family="monospace" font-weight="900" font-size="15" text-anchor="middle">51%</text><text x="70" y="82" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8" text-anchor="middle">ACQUIRER</text></g><g transform="translate(28, 190)" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.85)"><circle cx="8" cy="-4" r="4" fill="#ff4757"/><text x="16" y="0">Predator Fund 51%</text><circle cx="130" cy="-4" r="4" fill="#7c5cff"/><text x="138" y="0">Founders 25%</text><circle cx="238" cy="-4" r="4" fill="#8a8a95"/><text x="246" y="0">Public Float 24%</text></g></svg>`)}`
   },
@@ -26787,7 +26787,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Tiered pyramid filling with investors layer by layer, then cracking and collapsing when the money runs out. Built for Ponzi takedowns.',
+    description: 'Tiered pyramid filling with investors layer by layer, then cracking and collapsing when the money runs out.',
     tags: ['Business Storytelling', 'Pyramid Scheme Collapse', 'Motion Template'],
     defaultImage: '/pyramid_concrete_plate_clean.png',
     secondaryImage: '/pyramid_matrix_plate_clean.png',
@@ -26795,14 +26795,14 @@ id: 'map',
   },
   {
     id: 'investigate-globe',
-    title: 'Investigative Globe (Johnny Harris Zoom)',
+    title: 'Investigative Globe',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
     badge: 'JOHNNY HARRIS',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Slowly rotating wireframe globe that zooms into a hotspot, drops a red pin and stamps a location label \u2014 the signature Johnny Harris "but here\'s where it gets crazy" map move.',
+    description: 'Slowly rotating wireframe globe that zooms into a hotspot, drops a red pin and stamps a location label \u2014.',
     tags: ['Business Storytelling', 'Investigative Globe (Johnny Harris Zoom)', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#04070f"/><circle cx="170" cy="115" r="80" fill="#0a1226" stroke="#1e3a6e" stroke-width="1.5"/><g stroke="#1e3a6e" stroke-width="1" fill="none" opacity="0.8"><ellipse cx="170" cy="115" rx="80" ry="26"/><ellipse cx="170" cy="115" rx="80" ry="55"/><ellipse cx="170" cy="115" rx="28" ry="80"/><line x1="90" y1="115" x2="250" y2="115"/></g><path d="M 130 80 q 20 -12 40 -4 t 30 10 q -14 10 -34 6 t -36 -12z" fill="#16325c" opacity="0.9"/><path d="M 150 140 q 26 -8 44 4 t -10 20 q -26 4 -44 -8 z" fill="#16325c" opacity="0.9"/><circle cx="205" cy="98" r="4" fill="#ff4757"/><circle cx="205" cy="98" r="10" fill="none" stroke="#ff4757" stroke-width="1.5" opacity="0.6"/><text x="218" y="88" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="11">DUBAI</text><text x="218" y="101" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8">THE MONEY LANDS HERE \u2192</text></svg>`)}`
   },
@@ -26816,7 +26816,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Flat dark world map where city dots light up one by one and great-circle arcs draw themselves between them \u2014 supply chains, trade routes, empire expansion.',
+    description: 'Flat dark world map where city dots light up one by one and great-circle arcs draw themselves between them.',
     tags: ['Business Storytelling', 'World Map Connection Flyover', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 95 75 Q 150 20 215 55" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 215 55 Q 270 30 315 72" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 315 72 Q 250 120 155 152" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><circle cx="95" cy="75" r="5" fill="#ffd23f"/><circle cx="215" cy="55" r="5" fill="#ffd23f"/><circle cx="315" cy="72" r="5" fill="#ffd23f"/><circle cx="155" cy="152" r="6" fill="#00f0ff"/><text x="155" y="172" fill="#00f0ff" font-family="monospace" font-size="8" text-anchor="middle">SINGAPORE \u00b7 FINAL ASSEMBLY</text><text x="200" y="20" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="10" letter-spacing="2" text-anchor="middle">GLOBAL SUPPLY CHAIN \u00b7 2026</text></svg>`)}`
   },
@@ -26830,7 +26830,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Dark world map with glowing dotted arcs hopping shell companies between tax havens until cash lands in one account. The follow-the-money sequence.',
+    description: 'Dark world map with glowing dotted arcs hopping shell companies between tax havens until cash lands in one.',
     tags: ['Business Storytelling', 'Offshore Money Trail Map', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#060a14"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 90 80 Q 160 20 230 62" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 230 62 Q 290 40 320 92" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 320 92 Q 260 130 160 158" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><circle cx="90" cy="80" r="6" fill="#00f0ff"/><circle cx="230" cy="62" r="6" fill="#00f0ff"/><circle cx="320" cy="92" r="6" fill="#00f0ff"/><circle cx="160" cy="158" r="8" fill="#ffd23f"/><text x="90" y="66" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">DELIVERY CO.</text><text x="230" y="48" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">CAYMAN SHELL</text><text x="320" y="78" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">TRUST FUND</text><text x="160" y="180" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">PERSONAL ACCOUNT \u00b7 $47M</text></svg>`)}`
   },
@@ -26844,7 +26844,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Flat dot-map where one country floods red, detaches and lifts off the map with a drop shadow while everything else dims \u2014 the "this one place is the whole story" reveal.',
+    description: 'Flat dot-map where one country floods red, detaches and lifts off the map with a drop shadow while everything.',
     tags: ['Business Storytelling', 'Country Morph Highlight', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="245" cy="90" r="16"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757"/><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757" transform="translate(6,-14)" opacity="0.95"/><text x="215" y="150" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="13" text-anchor="middle">PANAMA</text><text x="215" y="166" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8" text-anchor="middle">0.1% OF LAND \u00b7 5% OF TRADE</text></svg>`)}`
   },
@@ -26858,7 +26858,7 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Camera punches way out from a tiny pin to reveal the whole map, then stamps a stat card: "this tiny island controls X% of Y". The scale-reversal beat.',
+    description: 'Camera punches way out from a tiny pin to reveal the whole map, then stamps a stat card: "this tiny island.',
     tags: ['Business Storytelling', 'Zoom-Out Context Card', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#04070f"/><g fill="#12203a"><circle cx="90" cy="80" r="30"/><circle cx="140" cy="110" r="22"/><circle cx="230" cy="70" r="26"/><circle cx="300" cy="100" r="20"/><circle cx="180" cy="160" r="18"/></g><circle cx="238" cy="82" r="5" fill="#ff4757"/><rect x="252" y="52" width="132" height="60" rx="6" fill="rgba(4,7,15,0.9)" stroke="#ff4757" stroke-width="1.5"/><text x="318" y="76" fill="#ffd23f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="20" text-anchor="middle">72%</text><text x="318" y="94" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">OF GLOBAL SHIPPING REGISTRIES</text><text x="318" y="106" fill="rgba(255,255,255,0.45)" font-family="monospace" font-size="7" text-anchor="middle">POPULATION: 103,000</text></svg>`)}`
   },
@@ -26872,21 +26872,21 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Two territories tint blue and red on a flat map, the disputed strip between them fills with hazard hatching and pulses, with a CLAIMED / DISPUTED legend.',
+    description: 'Two territories tint blue and red on a flat map, the disputed strip between them fills with hazard hatching and.',
     tags: ['Business Storytelling', 'Border Conflict Shading', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><pattern id="hatch-bc" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="8" stroke="#ffd23f" stroke-width="3"/></pattern></defs><rect width="400" height="225" fill="#05080f"/><path d="M 40 40 L 170 30 L 190 110 L 150 190 L 50 170 Z" fill="rgba(0,164,239,0.28)" stroke="#00a4ef" stroke-width="1.5"/><path d="M 230 34 L 360 44 L 350 176 L 250 196 L 226 116 Z" fill="rgba(255,71,87,0.28)" stroke="#ff4757" stroke-width="1.5"/><path d="M 170 30 L 230 34 L 226 116 L 190 110 Z" fill="url(#hatch-bc)" opacity="0.85"/><text x="105" y="115" fill="#00a4ef" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="12" text-anchor="middle">COUNTRY A</text><text x="295" y="115" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="12" text-anchor="middle">COUNTRY B</text><text x="200" y="20" fill="#ffd23f" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">DISPUTED CORRIDOR</text></svg>`)}`
   },
   {
     id: 'sanctions-embargo-arrows',
     hidden: true,
-    title: 'Sanctions & Embargo Reroute',
+    title: 'Sanctions',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
     badge: 'FORENSIC',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'A direct trade route gets drawn in, slammed with a red BLOCKED \u2715 stamp, then a longer smuggling reroute draws itself around the blockade. Sanctions-evasion storytelling.',
+    description: 'A direct trade route gets drawn in, slammed with a red BLOCKED \u2715 stamp, then a longer smuggling reroute.',
     tags: ['Business Storytelling', 'Sanctions Embargo Arrows', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="110" r="26"/><circle cx="320" cy="110" r="26"/><circle cx="200" cy="60" r="18"/></g><path d="M 106 110 L 292 110" stroke="#00f0ff" stroke-width="3" stroke-dasharray="6 5" fill="none"/><g stroke="#ff4757" stroke-width="7" stroke-linecap="round"><line x1="186" y1="92" x2="214" y2="128"/><line x1="214" y1="92" x2="186" y2="128"/></g><text x="200" y="150" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">BLOCKED</text><path d="M 96 92 Q 150 30 210 44 T 306 90" stroke="#ffd23f" stroke-width="3" fill="none" marker-end="url(#arr-sx)"/><defs><marker id="arr-sx" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ffd23f"/></marker></defs><text x="200" y="24" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">REROUTED VIA DUBAI \u00b7 +$14M/YR</text></svg>`)}`
   },
@@ -26900,47 +26900,47 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Empire territory spreads across a map as a big year counter scrubs forward (1990 \u2192 2026) with an animated timeline handle \u2014 expansion, collapse or acquisition over time.',
+    description: 'Empire territory spreads across a map as a big year counter scrubs forward (1990 \u2192 2026) with an animated.',
     tags: ['Business Storytelling', 'Timeline Scrubber Map', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><g fill="#7c5cff" opacity="0.85"><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="240" cy="60" r="18"/><circle cx="222" cy="78" r="14"/></g><text x="26" y="42" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="30">2018</text><text x="26" y="58" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8">PEAK EXPANSION</text><line x1="30" y1="200" x2="370" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="3"/><line x1="30" y1="200" x2="240" y2="200" stroke="#7c5cff" stroke-width="3"/><circle cx="240" cy="200" r="7" fill="#7c5cff" stroke="#fff" stroke-width="2"/><text x="30" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">1990</text><text x="345" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">2026</text></svg>`)}`
   },
   // === Business Storytelling suite (Magnates channel templates) ===
   {
     id: 'directional-push-split-wipe',
-    title: 'Directional Push & Split Wipe (4-Way & Motion Blur)',
+    title: 'Directional Push',
     category: 'Transitions',
     badge: 'Pro Transition',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.55), rgba(2, 6, 23, 0.98))',
-    description: 'Cinema NLE 4-way push & split wipe: pushes outgoing scene out while pulling incoming footage forward from Negative-Z depth with sub-door contact shadow, clamped directional motion blur, and velocity-adaptive whoosh SFX.',
+    description: 'Cinema NLE 4-way push & split wipe: pushes outgoing scene out while pulling incoming footage forward from.',
     tags: ['Push Wipe', 'Split Wipe', 'Negative-Z Depth', 'Sub-Door Blur', 'Adaptive Whoosh SFX', 'Pro NLE Transition'],
     defaultImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'doc-highlighter-loupe-suite',
-    title: 'Article & Document Highlighter',
+    title: 'Article',
     category: 'Paper / Cutout',
     origCategory: 'Text & Titles',
     badge: 'Vox / Johnny Harris',
     difficulty: '1-Click',
     timeToApply: '6 sec',
     previewGradient: 'linear-gradient(to top, rgba(202, 138, 4, 0.8), rgba(161, 98, 7, 0.4), rgba(15, 23, 42, 0.95))',
-    description: 'Signature investigative document highlighter: authentic Forbes article scan with animated yellow marker sweep hugging real sentences, full on-canvas selection handles, and sidebar controls.',
+    description: 'Signature investigative document highlighter: authentic Forbes article scan with animated yellow marker sweep.',
     tags: ['Documentary', 'Highlighter', 'Whiteout', 'Dark Spotlight', 'Loupe Lens', 'Vox Style'],
     defaultImage: '/forbes_article_hd.svg',
     previewThumb: '/forbes_article_hd.svg'
   },
   {
     id: 'dark-power-sigil',
-    title: 'Dark Power Sigil (Act 1 Multiplane Dolly & FX)',
+    title: 'Dark Power Sigil',
     category: 'Parallax',
     badge: 'Magnates Media',
     difficulty: 'Pro Motion',
     timeToApply: '5 sec',
     previewGradient: 'linear-gradient(to top, rgba(6, 78, 59, 0.8), rgba(4, 120, 87, 0.4), rgba(2, 6, 23, 0.95))',
-    description: 'Act 1 Cinematic: Multiplane parallax separation with framing hand silhouettes, breathing neon aura, electric discharge arcs, and customizable emblem core.',
+    description: 'Act 1 Cinematic: Multiplane 3D depth separation with framing hand silhouettes, breathing neon aura, electric.',
     tags: ['Dark Sigil', 'OpenAI Act 1', 'Multiplane', '2.5D Parallax', 'Lightning FX'],
     defaultImage: '/dark_power_sigil_core.png',
     cutoutImage: '/dark_power_sigil_hands.png',
@@ -26950,13 +26950,13 @@ id: 'map',
 
   {
     id: 'subject-25d-parallax',
-    title: '2.5D Animated Subject Cutout (Auto BG Removed)',
+    title: '2.5D Animated Subject Cutout',
     category: 'Parallax',
     badge: 'Vox / Johnny Harris',
     difficulty: 'Popular',
     timeToApply: '6 sec',
     previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.7), rgba(76, 29, 149, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Automatically strips out the image background, leaving a clean 3D floating subject that moves over a panning environment.',
+    description: 'Automatically strips out the image background, leaving a clean 3D floating subject that moves over a panning.',
     tags: ['2.5D Cutout', 'BG Removed', 'Vox Style'],
     defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
     cutoutImage: '/portrait_cutout_clean.png',
@@ -26971,14 +26971,14 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.7), rgba(154, 52, 18, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Authentic 3D paper tear reveal with fibrous deckle edges, peel curl physics, directional drop shadows, and 12 fps stop-motion cadence.',
+    description: 'Authentic 3D paper tear reveal with fibrous deckle edges, peel curl physics, directional drop shadows, and 12.',
     tags: ['Paper Tear', 'Deckle Edge', 'Stop Motion', 'Johnny Harris', 'Vox'],
     defaultImage: '/paper_tear_hero_gold.jpg',
     secondaryImage: '/paper_tear_revealed_city.jpg'
   },
   {
     id: 'gold-frame-spin',
-    title: 'Dark Luxury Gold Frame 3D Spin',
+    title: 'Dark Luxury Gold Frame',
     category: 'Parallax',
     badge: 'Magnates Media',
     difficulty: 'Easy',
@@ -26990,33 +26990,33 @@ id: 'map',
   },
   {
     id: 'text-texturing-grunge',
-    title: 'James Jani Grunge Text & Paper Texture',
+    title: 'Grunge Text',
     category: 'Text & Titles',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.8), rgba(69, 26, 3, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'James Jani signature 12fps stop-motion chapter card with tactile aged paper, fiber displacement, letterpress serif typography, and 35mm film artifacts.',
+    description: 'Ignature 12fps stop-motion chapter card with tactile aged paper, fiber displacement, letterpress serif.',
     tags: ['James Jani', 'Grunge Text', 'Paper Texture', 'Stop Motion', 'Chapter Title'],
     defaultImage: '/jani_chapter_card_thumbnail.jpg',
     secondaryImage: '/paper_tear_stock_archival_news.jpg'
   },
   {
     id: 'kinetic-decode-typewriter',
-    title: 'Tension Decode & Typewriter Kinetic Text',
+    title: 'Tension Decode',
     category: 'Text & Titles',
     badge: 'James Jani / Vox 3D',
     difficulty: '1-Click',
     timeToApply: '4 sec',
     previewGradient: 'linear-gradient(to top, rgba(28, 25, 23, 0.92), rgba(13, 16, 23, 0.8), rgba(4, 5, 8, 0.96))',
-    description: '3D investigative darkroom dossier with mechanical cipher character lock-in, redaction sweep, and tungsten spotlighting.',
+    description: '3D investigative darkroom dossier with mechanical cipher character lock-in, redaction sweep, and tungsten.',
     tags: ['Decode Text', 'Typewriter', 'Kinetic Typo', 'James Jani'],
     defaultImage: '/clean_terminal_warroom_plate.png'
   },
   {
     id: 'archival-ink-highlight',
     hidden: true,
-    title: 'Archival Document & Ink Sweep',
+    title: 'Archival Document',
     category: 'Text & Titles',
     badge: 'Vox / James Jani',
     difficulty: '1-Click',
@@ -27029,7 +27029,7 @@ id: 'map',
   {
     id: 'spotlight-lens-sweep',
     hidden: true,
-    title: 'Dramatic Spotlight & Vignette Cut',
+    title: 'Dramatic Spotlight',
     category: 'Color & Vibe',
     badge: 'James Jani',
     difficulty: 'Easy',
@@ -27042,7 +27042,7 @@ id: 'map',
   {
     id: 'financial-graph-wipe',
     hidden: true,
-    title: 'Stock Graph & Neon Chart Transition',
+    title: 'Stock Graph',
     category: 'Transitions',
     badge: 'Magnates Media',
     difficulty: 'Beginner',
@@ -27055,13 +27055,13 @@ id: 'map',
   {
     id: 'magnates-paper-vector-cutout',
     hidden: true,
-    title: 'Magnates Paper Cutout & Sticker Contour (Depth Text Behind)',
+    title: 'Paper Cutout',
     category: 'Paper / Cutout',
     badge: 'Magnates Vector FX',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(239, 68, 68, 0.75), rgba(185, 28, 28, 0.45), rgba(15, 23, 42, 0.9))',
-    description: 'Crisp multi-pass white contour outline sticker contour over isolated subject with massive bold kinetic typography placed directly behind the subject.',
+    description: 'Crisp multi-pass white contour outline sticker contour over isolated subject with massive bold animated.',
     tags: ['Paper Cutout', 'Sticker Contour', 'Text Behind', 'Magnates'],
     defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
@@ -27069,20 +27069,20 @@ id: 'map',
   {
     id: 'vox-newspaper-cream-dossier',
     hidden: true,
-    title: 'Vox Newspaper Cream & Archival Paper Dossier',
+    title: 'Newspaper Cream',
     category: 'Paper / Cutout',
     badge: 'Vox Aesthetic',
     difficulty: '1-Click',
     timeToApply: '4 sec',
     previewGradient: 'linear-gradient(to top, rgba(217, 119, 6, 0.7), rgba(245, 158, 11, 0.4), rgba(28, 25, 23, 0.9))',
-    description: 'Warm textured vintage newsprint cream parchment (#f4eedb) stage with paper cutout documents, stamp titles, and forensic loupe highlights.',
+    description: 'Warm textured vintage newsprint cream parchment (#f4eedb) stage with paper cut-out subjects documents, stamp.',
     tags: ['Vox Paper', 'Newsprint Cream', 'Archival Dossier', 'Loupe'],
     defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'vintage-film-burn',
-    title: 'Film Burn & Gate Flash Transition',
+    title: 'Film Burn',
     category: 'Transitions',
     badge: 'Johnny Harris',
     difficulty: '1-Click',
@@ -27113,72 +27113,72 @@ id: 'map',
     difficulty: 'Beginner',
     timeToApply: '8 sec',
     previewGradient: 'linear-gradient(to top, rgba(22, 78, 99, 0.7), rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Futuristic chromatic aberration and visual noise pulse for high-energy cuts.',
+    description: 'Futuristic color split and visual noise pulse for high-energy cuts.',
     tags: ['VFX', 'Cyberpunk', 'Transition'],
     defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'spatial-3d-motion-suite',
-    title: '3D Spatial Motion Titles & Parallax Rig',
+    title: '3D Spatial Motion Titles',
     category: '3D Spatial',
     badge: 'James Jani Style',
     difficulty: '1-Click',
     timeToApply: '4 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Cinematic 3D documentary title & multi-plane evidence parallax rig with warm volumetric god-rays, world-map floor pedestal, 5 camera presets, and 3 art directions.',
+    description: 'Cinematic 3D documentary title & multi-plane evidence 3D depth rig with warm volumetric god-rays, world-map.',
     tags: ['3D Titles', 'Parallax Rig', 'James Jani', 'Documentary'],
     defaultImage: '/assets/aistudio/image_84dd7e42.png',
     secondaryImage: '/paper_tear_stock_archival_news.jpg'
   },
   {
     id: 'document-3d-fx-engine',
-    title: 'James Jani 3D Document & Paper FX',
+    title: '3D Document',
     category: '3D Spatial',
     badge: 'Documentary FX',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Cinematic 3D camera flyover of investigative newspapers with animated highlighter wipes, classified redaction leaks, and 3D headline pop-outs.',
+    description: 'Cinematic 3D camera flyover of investigative newspapers with animated highlighter wipes, classified redaction.',
     tags: ['Document FX', 'Highlighter', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'jani-puzzle-narrative-suite',
-    title: 'James Jani Puzzle: Modular Reconstruction & Shuffle Engine',
+    title: 'Puzzle',
     category: '3D Spatial',
     origCategory: '3D Spatial',
     badge: 'JANI SIGNATURE',
     difficulty: 'Cinematic',
     timeToApply: '10 sec',
     previewGradient: 'linear-gradient(135deg, rgba(3, 15, 28, 0.95), rgba(2, 6, 12, 0.95))',
-    description: 'Authentic James Jani interlocking puzzle documentary animation: neon cyan glowing edges, dynamic entry & interlocking connection, customizable image slicing, shuffleable falling & popping physics, and narrative badge overlays.',
+    description: 'Authentic interlocking puzzle documentary animation: neon cyan glowing edges, dynamic entry & interlocking.',
     tags: ['James Jani', 'Puzzle', 'Neon Glow', 'Reconstruction', 'Shuffle', 'Image Slicing', 'Crypto Boom'],
     defaultImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'jani-ftx-logo-reveal',
-    title: 'James Jani FTX 3D Kinetic Logo Builder',
+    title: 'FTX 3D Kinetic Logo',
     category: '3D Spatial',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '7 sec',
     previewGradient: 'linear-gradient(to top, rgba(3, 7, 16, 0.95), rgba(0, 240, 255, 0.25), rgba(7, 9, 14, 0.4))',
-    description: 'Cinematic 3D geometric block deconstruction with high-energy flare, wavy shockwave boom, kinetic cube ripple, and magnetic FTX logo convergence.',
+    description: 'Cinematic 3D geometric block deconstruction with high-energy flare, wavy shockwave boom, animated cube ripple.',
     tags: ['Logo Reveal', 'FTX', '3D Blocks', 'Shockwave Boom', 'James Jani', 'Kinetic'],
     defaultImage: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23030710%22%2F%3E%3Crect%20x%3D%22100%22%20y%3D%2270%22%20width%3D%2260%22%20height%3D%2218%22%20rx%3D%222%22%20fill%3D%22%2300f0ff%22%20filter%3D%22drop-shadow(0%200%208px%20%2300f0ff)%22%2F%3E%3Crect%20x%3D%22120%22%20y%3D%2294%22%20width%3D%2240%22%20height%3D%2218%22%20rx%3D%222%22%20fill%3D%22%2300f0ff%22%20filter%3D%22drop-shadow(0%200%208px%20%2300f0ff)%22%2F%3E%3Crect%20x%3D%22100%22%20y%3D%2294%22%20width%3D%2216%22%20height%3D%2218%22%20rx%3D%222%22%20fill%3D%22%2300f0ff%22%20filter%3D%22drop-shadow(0%200%208px%20%2300f0ff)%22%2F%3E%3Crect%20x%3D%22115%22%20y%3D%22118%22%20width%3D%2216%22%20height%3D%2218%22%20rx%3D%222%22%20fill%3D%22%23ffffff%22%20filter%3D%22drop-shadow(0%200%2010px%20%23ffffff)%22%2F%3E%3Ctext%20x%3D%22180%22%20y%3D%22112%22%20fill%3D%22%23ffffff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2236%22%20font-weight%3D%22900%22%3EFTX%3C%2Ftext%3E%3Ctext%20x%3D%22100%22%20y%3D%22158%22%20fill%3D%22%2300f0ff%22%20font-family%3D%22monospace%22%20font-size%3D%2211%22%20font-weight%3D%22700%22%20letter-spacing%3D%223%22%3ETHE%20GREAT%20FRAUD%3C%2Ftext%3E%3C%2Fsvg%3E',
     secondaryImage: ''
   },
   {
     id: 'jani-countdown-panic-suite',
-    title: 'James Jani "The Countdown Effect" & Panic Ticker Tape',
+    title: '"The Countdown Effect"',
     category: '3D Spatial',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '5 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Build unbearable narrative suspense with customizable T-Minus digital clocks, collapsing stock tickers, dynamic charts, audio risers, and climax screen shake.',
+    description: 'Build unbearable narrative suspense with customizable T-Minus digital clocks, collapsing stock tickers, dynamic.',
     tags: ['Countdown Effect', 'James Jani', 'Panic Ticker', 'Audio Riser', 'Climax Impact'],
     defaultImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
@@ -27191,7 +27191,7 @@ id: 'map',
     difficulty: 'Instant',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Sudden, stylized temporal jumps with high-contrast exposure flashes, 45\u00b0 motion blur sweeps, memory tint color grades, and archival headlines.',
+    description: 'Sudden, stylized temporal jumps with high-contrast exposure flashes, 45\u00b0 motion blur sweeps, memory tint.',
     tags: ['Flashback', 'Flashforward', 'Time Jump', 'White Flash', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
@@ -27199,65 +27199,65 @@ id: 'map',
   {
     id: 'puzzle-piece-reveal',
     hidden: true,
-    title: 'The "Puzzle Piece" Reveal & Story Arc Masking',
+    title: 'The "Puzzle Piece" Reveal',
     category: '3D Spatial',
     badge: 'James Jani Signature',
     difficulty: 'Pro FX',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Jani\u2019s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
+    description: 'Jani\u2019s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and.',
     tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
     defaultImage: '/investigative_decode_dossier_plate.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'light-rays-lens-leaks',
-    title: 'Light Rays & Ambient Lens Leaks',
+    title: 'Light Rays',
     category: 'Color & Vibe',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Subtle ambient light leaks, anamorphic lens flare streaks, and volumetric ray scattering overlayed on footage to emulate real camera lens imperfections.',
+    description: 'Subtle ambient light leaks, wide cinema lens flare streaks, and volumetric ray scattering overlayed on footage.',
     tags: ['Light Leaks', 'Lens Flare', 'Scattering', 'Anamorphic', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'monochromatic-crushed-grading',
-    title: 'Deep Monochromatic / Low-Saturated Grading',
+    title: 'Deep Monochromatic / Low-Saturated',
     category: 'Color & Vibe',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Muted tones, crushed black levels, heavy vignette, and shifted RGB channel offsets that emphasize shadow detail, build narrative tension, and deliver an investigative noir atmosphere.',
+    description: 'Muted tones, crushed black levels, heavy darkened edges, and shifted RGB channel offsets that emphasize shadow.',
     tags: ['Crushed Blacks', 'Low Saturation', 'Muted Tones', 'Color Offset', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'heavy-elliptical-vignette',
-    title: 'Dark Financial Thriller & Heavy Vignette',
+    title: 'Dark Financial Thriller',
     category: 'Color & Vibe',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'An Adjustment Clip with a heavily feathered elliptical mask (size constraint ~0.7, feathering >2.8x) that darkens frame edges to direct viewer focus strictly to the center narrative focal point.',
+    description: 'An Adjustment Clip with a heavily feathered elliptical mask (size constraint ~0.7, feathering >2.8x) that.',
     tags: ['Heavy Vignette', 'Elliptical Mask', 'Financial Thriller', 'Focal Pull', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'text-reveal-modifiers',
-    title: 'Text Reveal Modifiers & Character Offset Decode',
+    title: 'Text Reveal Modifiers',
     category: 'Text & Titles',
     badge: 'James Jani Signature',
     difficulty: 'Instant',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Dynamic character offset scrambling, typewriter cursors, matrix-style glyph decoding, and "decode lines together" text assembly for investigative tension.',
+    description: 'Dynamic character offset scrambling, typewriter cursors, matrix-style glyph decoding, and "decode lines.',
     tags: ['Typewriter', 'Character Offset', 'Decode Lines', 'Glitch Reveal', 'James Jani'],
     defaultImage: '/investigative_decode_dossier_plate.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80'
@@ -27265,13 +27265,13 @@ id: 'map',
   {
     id: 'glow-drop-shadows',
     hidden: true,
-    title: 'Glow & Drop Shadows',
+    title: 'Glow',
     category: 'Text & Titles',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Duplicated text layer technique. Heavy ambient glow on bottom layer with massive blur radius and soft drop shadows on top to isolate text from dark backdrops.',
+    description: 'Duplicated text layer technique. Heavy ambient glow on bottom layer with massive blur radius and soft drop.',
     tags: ['Duplicated Layer', 'Glow Radius', 'Drop Shadows', 'Text Contrast', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80'
@@ -27279,13 +27279,13 @@ id: 'map',
   {
     id: '3d-camera-move-rotation',
     hidden: true,
-    title: '3D Camera Move & Rotation',
+    title: '3D Camera Move',
     category: '3D Spatial',
     badge: 'James Jani Signature',
     difficulty: 'Pro 3D',
     timeToApply: '4 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Text mapped onto 3D layers with slow backward/forward camera tracking and subtle X/Y-rotation tweaks that make typography float dynamically in physical space.',
+    description: 'Text mapped onto 3D layers with slow backward/forward camera tracking and subtle X/Y-rotation tweaks that make.',
     tags: ['3D Layers', 'Camera Tracking', 'X/Y Rotation', 'Spatial Depth', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80'
@@ -27293,26 +27293,26 @@ id: 'map',
   {
     id: 'audio-visual-jl-cuts',
     hidden: true,
-    title: 'Audio-Visual Pacing: J-Cuts & L-Cuts',
+    title: 'J-Cuts',
     category: 'Transitions',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'James Jani constantly shifts the audio track of the upcoming scene or voiceover so it plays before the visuals catch up (J-Cut), or lets dialogue bleed across the visual cut into the next shot (L-Cut) to bridge nonlinear jumps seamlessly.',
+    description: 'Constantly shifts the audio track of the upcoming scene or voiceover so it plays before the visuals catch up.',
     tags: ['J-Cut', 'L-Cut', 'Audio-Visual Pacing', 'Sound Bridge', 'Nonlinear Jump', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'subbass-drops-risers',
-    title: 'Sub-bass Drops & Risers (Attention Reset)',
+    title: 'Sub-bass Drops',
     category: 'Sound FX',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Dramatic low-frequency bass sweeps (sub-bass dive to 28Hz) paired with a crescendo riser and sudden impact camera cuts to snap and reset viewer attention spans.',
+    description: 'Dramatic low-frequency bass sweeps (sub-bass dive to 28Hz) paired with a crescendo riser and sudden impact.',
     tags: ['Sub-bass Drop', 'Audio Riser', 'Camera Cut', 'Attention Reset', 'Sound Design', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80'
@@ -27325,7 +27325,7 @@ id: 'map',
     difficulty: 'Multi-Step Pro',
     timeToApply: '8 sec',
     previewGradient: 'linear-gradient(to top, rgba(2, 132, 199, 0.85), rgba(56, 189, 248, 0.45), rgba(7, 9, 14, 0.3))',
-    description: 'Brings static photographs to life using the 4-step Photoshop parallax technique: 1) Subject Cutout, 2) Clean Inpaint Plate, 3) Multi-Plane Z-Depth, and 4) Timeline Push-In Keyframing.',
+    description: 'Brings static photographs to life using the 4-step Photoshop 3D depth technique: 1) Subject cut-out subjects.',
     tags: ['2.5D Parallax', 'Chris Spooner', 'Photoshop Tutorial', 'Subject Isolation', 'Content-Aware Inpaint', 'Multi-Plane', 'Push-In Zoom', 'Spatial Depth'],
     defaultImage: 'hiker_parallax_reference.png',
     cutoutImage: 'hiker_cutout.png',
@@ -27340,7 +27340,7 @@ id: 'map',
     difficulty: 'Pro 3D',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45), rgba(7, 9, 14, 0.3))',
-    description: 'The definitive Magnates Media optical parallax depth illusion. Slices visual scenes into Foreground, Midground, and Background depth layers with independent speed multipliers, 2.5D camera drift, and atmospheric lighting.',
+    description: 'The definitive optical 3D depth depth illusion. Slices visual scenes into Foreground, Midground, and Background.',
     tags: ['OG Parallax', 'Foreground Layer', 'Midground Layer', 'Background Layer', 'Speed Multiplier', 'Depth Illusion', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80'
@@ -27348,13 +27348,13 @@ id: 'map',
   {
     id: 'magnates-media-3d-projection',
     hidden: true,
-    title: '3D Layer Projection & 50mm Camera',
+    title: '3D Layer Projection',
     category: '3D Spatial',
     badge: 'Magnates Media Signature',
     difficulty: 'Pro 3D',
     timeToApply: '4 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Core 3D & Spatial Effects: Converting 2D cutout images, portraits, and text into 3D space by enabling 3D mode on layers and setting up a 3D camera (such as a 50mm focal length camera linked to a null object controller).',
+    description: 'Core 3D & Spatial Effects: Converting 2D cut-out subjects images, portraits, and text into 3D space by enabling.',
     tags: ['3D Projection', '50mm Camera', 'Null Object', 'Portrait Cutout', 'Spatial Depth', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
@@ -27362,13 +27362,13 @@ id: 'map',
   {
     id: 'magnates-media-cc-vignette-dof',
     hidden: true,
-    title: 'Magnates Media CC Vignette & Depth of Focus',
+    title: 'CC Vignette',
     category: 'Color & Vibe',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Keyframing CC Vignette angles and depth-of-field blur to draw viewer focus strictly toward specific characters or cutouts, isolating subjects against blurred backgrounds.',
+    description: 'Keyframing CC darkened edges angles and background blur to draw viewer focus strictly toward specific.',
     tags: ['CC Vignette', 'Depth of Focus', 'DOF Blur', 'Magnates Media', 'Focus Pull', 'Cutout Isolation'],
     defaultImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
@@ -27376,13 +27376,13 @@ id: 'map',
   {
     id: 'magnates-media-brightness-glow',
     hidden: true,
-    title: 'Brightness, Contrast, & Glow (PNG Cutout Pop)',
+    title: 'Brightness',
     category: 'Color & Vibe',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Stacking brightness, contrast adjustments, and dual inner/outer glows on PNG cutout subjects to make them pop intensely against dark or blurred backdrops.',
+    description: 'Stacking brightness, contrast adjustments, and dual inner/outer glows on PNG cut-out subjects subjects to make.',
     tags: ['Brightness & Contrast', 'Inner Glow', 'Outer Glow', 'PNG Cutout Pop', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
@@ -27390,13 +27390,13 @@ id: 'map',
   {
     id: 'magnates-media-multi-drop-shadows',
     hidden: true,
-    title: 'Multi-Layered Drop Shadows (2D Cutout Float)',
+    title: 'Multi-Layered Drop Shadows',
     category: '3D Spatial',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Applying stacked multi-tier drop shadows with custom directional angles to flat 2D cutouts so they float realistically over the background scene with spatial occlusion.',
+    description: 'Applying stacked multi-tier drop shadows with custom directional angles to flat 2D cut-out subjects so they.',
     tags: ['Multi-Layer Shadows', 'Drop Shadows', 'Cutout Elevation', 'Floating Card', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
@@ -27404,40 +27404,40 @@ id: 'map',
   {
     id: 'magnates-media-shadowization',
     hidden: true,
-    title: 'Color Grading & Shadowization (Fill Silhouettes)',
+    title: 'Color Grading',
     category: 'Color & Vibe',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Using Fill tools to transform characters into ominous flat black silhouettes or applying Gradient Colorize to stylize tone, mood, and dramatic investigative tension.',
+    description: 'Using Fill tools to transform characters into ominous flat black silhouettes or applying Gradient Colorize to.',
     tags: ['Shadowization', 'Fill Silhouette', 'Gradient Colorize', 'Noir Tension', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-blend-modes',
-    title: 'Blend Modes: Screen, Difference, & Overlay',
+    title: 'Screen',
     category: 'Color & Vibe',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Compositing with Screen mode for snow/particles, Difference mode for film noise & inverted vintage text, and Overlay mode for antique clock animations and organic paper textures.',
+    description: 'Layering with Screen mode for snow/particles, Difference mode for film noise & inverted vintage text, and.',
     tags: ['Blend Modes', 'Screen Blend', 'Difference Mode', 'Overlay Texture', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-printer-glitch-card',
-    title: 'Cinematic White Glitch & Floating Card Reveal',
+    title: 'White Glitch',
     category: 'Product / Hardware',
     origCategory: 'Documentary',
     badge: 'Hardware Glitch • Card Reveal',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(135deg, #1e222d 0%, #08090d 100%)',
-    description: 'Standalone hardware reveal: Ambient studio tabletop, subtle white luma movie-glitch printer spawn, smooth push-in camera zoom, 100ms pause, and center-out expanding floating product spec card with volumetric glow.',
+    description: 'Standalone hardware reveal: Ambient studio tabletop, subtle white luma movie-glitch printer spawn, smooth.',
     tags: [
       'White Glitch Reveal',
       'Product Spec Card',
@@ -27453,14 +27453,14 @@ id: 'map',
   },
   {
     id: 'magnates-media-paper-blueprint',
-    title: 'Paper-Based & Blueprint Cutouts (Merged Master: Logo Hook → $1M Silhouettes)',
+    title: 'Paper-Based',
     category: 'Paper / Cutout',
     origCategory: 'Documentary',
     badge: 'Merged Master Sequence • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Full merged master narrative combining Scene A (Glowing Brand App Icon bottom-up rise, left shift & wavy kinetic headline) with Scene B ($1,000,000 counter & dual glowing silhouettes). Bidirectionally linked with its two standalone scene templates.',
+    description: 'Full merged master narrative combining Scene A (Glowing Brand App Icon bottom-up rise, left shift & wavy.',
     tags: [
       'Paper-Based & Blueprint Cutouts',
       'Paper Cutout',
@@ -27481,14 +27481,14 @@ id: 'map',
   },
   {
     id: 'magnates-media-brand-wavy-hook',
-    title: 'Brand Icon Rise, Left Shift & Wavy Kinetic Headline (Scene 1)',
+    title: 'Brand Icon Rise',
     category: 'Text & Titles',
     origCategory: 'Documentary',
     badge: 'Scene 1 Standalone • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Standalone Scene 1: Starts on a customizable radial glow backdrop, rises a glowing brand/app icon from bottom to center, shifts it left, glides in Line 1, and animates Line 2 upward in a fluid wave. Live-synced with the Merged Master template.',
+    description: 'Standalone Scene 1: Starts on a customizable radial glow backdrop, rises a glowing brand/app icon from bottom.',
     tags: [
       'Brand Logo Reveal',
       'TEMU Logo',
@@ -27506,14 +27506,14 @@ id: 'map',
   },
   {
     id: 'magnates-media-product-price-unfurl',
-    title: 'Logo Shift Right & Center-Out Product / Price Split Unfurl (Scene 2)',
+    title: 'Logo Shift Right',
     category: 'Paper / Cutout',
     origCategory: 'Documentary',
     badge: 'Scene 2 Standalone • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Standalone Scene 2: Brand logo glides right to center (wiping away the headline), then unfurls the Left Product Card from the center toward top & bottom, unfurls the $2.00 Price Tag from the center toward left & right, followed by the Right Product Card and $5.00 Price Tag. Live-synced with the Merged Master template.',
+    description: 'Standalone Scene 2: Brand logo glides right to center (wiping away the headline), then unfurls the Left Product.',
     tags: [
       'Product Unfurl',
       'Price Tag Unfurl',
@@ -27530,27 +27530,27 @@ id: 'map',
   },
   {
     id: 'magnates-media-article-capitol-zoom',
-    title: 'Article Highlight, Capitol Rise & Office Zoom-Out (Scene 5)',
+    title: 'Article Highlight',
     category: 'Paper / Cutout',
     origCategory: 'Documentary',
     badge: 'Scene 5 Standalone • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(135deg, #111827 0%, #030712 100%)',
-    description: 'Standalone Scene 5: Transparent article headline with animated red marker sweep as US Capitol rises to apex, followed by an instant cut to zoomed-in Temu office and smooth trackback zoom-out.',
+    description: 'Standalone Scene 5: Transparent article headline with animated red marker sweep as US Capitol rises to apex.',
     tags: ['Article Highlight', 'Capitol Dome', 'Corporate Zoom-Out', 'Temu Boardroom', 'Documentary Motion'],
     defaultImage: '/capitol_dome_cutout.png'
   },
   {
     id: 'magnates-media-globe-wavy-nothing',
-    title: 'Spinning Earth Globe & Wavy-to-Flat Kinetic Headline (Scene 3)',
+    title: 'Spinning Earth Globe',
     category: 'Paper / Cutout',
     origCategory: 'Documentary',
     badge: 'Scene 3 Standalone • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Standalone Scene 3: As previous elements glide upward, a stylized Earth globe rises from the bottom and spins clockwise while words ("FOR ALMOST NOTHING") ripple in a wave, flatten into a straight line as the period snaps in, and then the globe glides downward to reveal the $1M counter. Live-synced with the Merged Master template.',
+    description: 'Standalone Scene 3: As previous elements glide upward, a stylized Earth globe rises from the bottom and spins.',
     tags: [
       'Spinning Globe',
       'Earth Cutout',
@@ -27566,14 +27566,14 @@ id: 'map',
   },
   {
     id: 'magnates-media-dual-silhouettes',
-    title: '$1,000,000 Counter & Dual Glowing Silhouettes Cutout (Scene B)',
+    title: '$1',
     category: 'Paper / Cutout',
     origCategory: 'Documentary',
     badge: 'Scene B Standalone • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Standalone Scene B: Rapidly counts up toward $1,000,000 while full-height glowing standing and sitting phone silhouettes glide in with millisecond stagger, reverse out, and fade the backdrop to black. Live-synced with the Merged Master template.',
+    description: 'Standalone Scene B: Rapidly counts up toward $1,000,000 while full-height glowing standing and sitting phone.',
     tags: [
       'Dual Silhouettes',
       'Glowing Silhouettes',
@@ -27591,26 +27591,26 @@ id: 'map',
   },
   {
     id: 'magnates-media-ink-reveal',
-    title: 'Ink Reveal & Stretchy Title Animation',
+    title: 'Ink Reveal',
     category: 'Text & Titles',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Organic ink-bleed stains and dynamic stretchy title text animations to dramatically introduce key character names, historical dates, and chapter headers.',
+    description: 'Organic ink-bleed stains and dynamic stretchy title text animations to dramatically introduce key character.',
     tags: ['Ink Bleed', 'Stretchy Text', 'Chapter Reveal', 'Organic Splatter', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-article-highlight',
-    title: 'Article & Text Highlighting Panning Camera',
+    title: 'Article',
     category: 'Paper / Cutout',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Smoothly panning and scaling across archival newspaper clippings or financial dossiers while highlighting specific smoking-gun text blocks with marker pen FX.',
+    description: 'Smoothly panning and scaling across archival newspaper clippings or financial dossiers while highlighting.',
     tags: ['Article Pan', 'Text Highlight', 'Newspaper Zoom', 'Marker Bleed', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
@@ -27618,20 +27618,20 @@ id: 'map',
   {
     id: 'magnates-media-particle-vfx',
     hidden: true,
-    title: 'Particle & VFX Overlays (Dust, Fire, Flare, Grain)',
+    title: 'Particle',
     category: 'Color & Vibe',
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Atmospheric floating dust motes, anamorphic optical flares, burning ember fire sparks, organic volumetric smoke, and retro 35mm film grain overlays.',
+    description: 'Atmospheric floating dust motes, wide cinema optical flares, burning ember fire sparks, organic volumetric.',
     tags: ['Dust Particles', 'Optical Flare', 'Fire Embers', 'Smoke Overlay', 'Film Grain', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'anim-punch-zoom',
-    title: 'Cinematic Punch Zoom (Snap Magnifier)',
+    title: 'Punch Zoom',
     category: 'Animations',
     badge: 'Vox & YouTube Classic',
     difficulty: '1-Click',
@@ -27650,46 +27650,46 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(6, 182, 212, 0.7), rgba(59, 130, 246, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Circular or rectangular magnified glass loupe focusing viewer attention directly onto forensic evidence or document details.',
+    description: 'Circular or rectangular magnified glass loupe focusing viewer attention directly onto forensic evidence or.',
     tags: ['Loupe Callout', 'Magnifier', 'Evidence Callout', 'Forensic', 'Animation'],
     defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'anim-whiteout-fade',
-    title: 'Whiteout Fade Focus (Pop & Leader Line)',
+    title: 'Whiteout Fade Focus',
     category: 'Animations',
     badge: 'Vox Newspaper Style',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(244, 244, 242, 0.95), rgba(226, 222, 208, 0.7), rgba(15, 23, 42, 0.9))',
-    description: 'Vox-style investigative document whiteout: fades ambient text into high-contrast off-white paper canvas (#F4F4F2) while isolating key quotes at 1.08x scale with dynamic leader line callout.',
+    description: 'Tyle investigative document whiteout: fades ambient text into high-contrast off-white paper canvas (#F4F4F2).',
     tags: ['Whiteout Fade', 'Document Focus', 'Vox Style', 'Redaction', 'Investigative', 'Animation'],
     defaultImage: '/sec_audit_confidential_document.svg',
     secondaryImage: '/sec_audit_confidential_document.svg'
   },
   {
     id: 'anim-document-dim-focus',
-    title: 'Document Ambient Dim Focus (Flat 1:1 Isolation)',
+    title: 'Document Ambient Dim Focus',
     category: 'Animations',
     badge: 'Documentary Signature',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(241, 236, 224, 0.95), rgba(213, 205, 185, 0.7), rgba(15, 23, 42, 0.9))',
-    description: 'Pure documentary whiteout/dimming: the non-focused document softly dims out in place while target text stays 100% sharp and flat with zero scale distortion or zoom.',
+    description: 'Pure documentary whiteout/dimming: the non-focused document softly dims out in place while target text stays.',
     tags: ['Document Dim', 'Whiteout Focus', 'Flat Isolation', 'No Zoom', 'Investigative', 'Animation'],
     defaultImage: '/sec_audit_confidential_document.svg',
     secondaryImage: '/sec_audit_confidential_document.svg'
   },
   {
     id: 'anim-dark-spotlight',
-    title: 'Dark Spotlight Focus (Cinematic Dimming)',
+    title: 'Dark Spotlight Focus',
     category: 'Animations',
     badge: 'Magnates Media Style',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(147, 51, 234, 0.7), rgba(88, 28, 135, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Darkens and vignettes everything outside the target subject with high-contrast feathered falloff for intense dramatic focus.',
+    description: 'Darkens and vignettes everything outside the target subject with high-contrast feathered falloff for intense.',
     tags: ['Dark Spotlight', 'Dim Surroundings', 'Vignette Focus', 'Dramatic', 'Animation'],
     defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
@@ -27837,7 +27837,7 @@ id: 'map',
   {
     id: 'supplydemand',
     hidden: true,
-    title: 'Supply & Demand Curves',
+    title: 'Supply',
     category: 'Finance',
     origCategory: 'Economics',
     badge: 'ECON 101',
@@ -27987,6 +27987,238 @@ function renderHomepageCategories() {
   });
 }
 
+
+function formatConciseTemplateTitle(rawTitle) {
+  let t = String(rawTitle || 'Studio Effect').trim();
+  t = t.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+  t = t.replace(/\b(James\s+Jani|Magnates\s*Media|Magnates|Spooner|Vox|Alex\s+Hormozi|Hormozi|Regaarder)\b[:\s\-'’s]*/gi, '').replace(/^[\s:·|\-–—]+|[\s:·|\-–—]+$/g, '');
+  if (t.includes(':')) {
+    const [l, r] = t.split(':').map(s => s.trim());
+    t = (r && r.split(/\s+/).length <= 4 && !/calibratable/i.test(r)) ? r : l;
+  }
+  t = t.split(/·|\||,|&/)[0].trim();
+  const words = t.split(/\s+/);
+  if (words.length > 4) t = words.slice(0, 4).join(' ');
+  return { short: t || 'Studio Effect', full: String(rawTitle || ''), hasMore: false };
+}
+
+function formatBeginnerDescription(rawDesc) {
+  let d = String(rawDesc || '').trim();
+  d = d.replace(/\b(James\s+Jani|Magnates\s*Media|Magnates|Spooner|Vox|Alex\s+Hormozi|Hormozi|Regaarder)\b[:\s\-'’s]*/gi, '');
+  d = d.replace(/\bdual[- ]layer transition\b/gi, 'two-part scene switch')
+       .replace(/\banamorphic\s+CRT\b/gi, 'wide glowing screen')
+       .replace(/\banamorphic\b/gi, 'wide cinema')
+       .replace(/\bcalibratable\s+depth[- ]of[- ]field\b/gi, 'adjustable background')
+       .replace(/\bdepth[- ]of[- ]field\b/gi, 'background')
+       .replace(/\bkinetic\b/gi, 'animated')
+       .replace(/\bparallax\b/gi, '3D depth')
+       .replace(/\bstrobes?\b/gi, 'flashes')
+       .replace(/\s{2,}/g, ' ').trim();
+  if (d.length > 115) d = d.slice(0, 112).replace(/\s+\S*$/, '') + '.';
+  return d || 'Adds a clean visual effect to your scene.';
+}
+
+window.isOverlayTemplate = isOverlayTemplate;
+function isOverlayTemplate(t) {
+  if (!t) return false;
+  const hay = `${t.id || ''} ${t.title || ''} ${t.category || ''} ${t.description || ''} ${(Array.isArray(t.tags) ? t.tags.join(' ') : '')}`.toLowerCase();
+  return /(overlay|rain|camera|screenshot|cctv|surveillance|film[- ]?burn|vignette|glitch|letterbox|dust|flare|light[- ]?rays|grain|strobe)/.test(hay);
+}
+
+function copyOverlayTemplate(tpl) {
+  if (!tpl) return;
+  window.__rgCopiedOverlayTemplate = tpl;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(JSON.stringify({ type: 'regaarder-overlay', id: tpl.id, title: tpl.title })).catch(() => {});
+    }
+  } catch (_) {}
+  if (typeof showTextTimingAlert === 'function') {
+    showTextTimingAlert(`Copied "${formatConciseTemplateTitle(tpl.title).short}" — press Ctrl+V in the Studio Editor to paste.`, 'success');
+  }
+}
+
+
+
+if (!window.__rgLayersRailWired) {
+  window.__rgLayersRailWired = true;
+  document.addEventListener('click', (e) => {
+    const railBtn = e.target.closest('[data-rail-tab="layers"], [data-panel="layers"], #rail-btn-layers');
+    if (!railBtn) return;
+    requestAnimationFrame(() => {
+    const panel = document.getElementById('tpl-modal-layers-panel');
+    if (!panel) return;
+    const host = panel.querySelector('#rg-inspector-pane-content') || panel.querySelector('.rg-inspector-scroll') || panel;
+
+    let box = document.getElementById('rg-rail-layers-box');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'rg-rail-layers-box';
+      box.className = 'rg-inspector-section';
+      box.style.cssText = 'margin-bottom:12px;border:1px solid rgba(168,85,247,0.35);border-radius:10px;background:#131520;';
+    }
+    host.prepend(box);
+
+    const tplId = window.topCustomizerState?.currentTpl?.id || '';
+    const rt = window.REGAARDER_CHAPTER_RUNTIME?.[tplId];
+    let layers = [];
+    if (rt && Array.isArray(rt.stageObjects) && rt.stageObjects.length) {
+      const seen = new Set();
+      rt.stageObjects.forEach((o) => {
+        if (!seen.has(o.layerId)) {
+          seen.add(o.layerId);
+          layers.push({ id: o.layerId, name: o.name || o.layerId, kind: 'chapter' });
+        }
+      });
+    } else {
+      layers = [
+        { id: 'primary', name: 'Foreground / Subject', kind: 'primary' },
+        { id: 'secondary', name: 'Background', kind: 'secondary' },
+      ];
+    }
+
+    box.innerHTML = `
+      <div class="rg-section-header" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;">
+        <span class="rg-section-title">Layers (${layers.length})</span>
+        <button type="button" data-rg-close-layers style="background:none;border:none;color:#94a3b8;cursor:pointer;font-size:13px;">&times;</button>
+      </div>
+      <div class="rg-section-body" style="padding:0 10px 10px;display:flex;flex-direction:column;gap:6px;">
+        ${layers.map((l) => `
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);">
+            <span style="font-size:11.5px;font-weight:600;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${l.name}</span>
+            <button type="button" data-rg-replace-layer="${l.id}" data-rg-layer-kind="${l.kind}" style="flex-shrink:0;padding:3px 9px;border-radius:6px;border:1px solid rgba(168,85,247,0.45);background:rgba(139,92,246,0.2);color:#e9d5ff;font-size:10.5px;font-weight:600;cursor:pointer;">Replace</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    box.style.display = 'block';
+
+    box.querySelector('[data-rg-close-layers]')?.addEventListener('click', () => {
+      box.style.display = 'none';
+    });
+
+    box.querySelectorAll('[data-rg-replace-layer]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const lid = btn.getAttribute('data-rg-replace-layer');
+        const kind = btn.getAttribute('data-rg-layer-kind');
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/*';
+        inp.onchange = () => {
+          const file = inp.files?.[0];
+          if (!file) return;
+          const url = URL.createObjectURL(file);
+          if (kind === 'chapter' && rt?.config?.layers?.[lid]) {
+            rt.config.layers[lid].customImageSrc = url;
+          } else if (kind === 'primary' && window.topCustomizerState) {
+            window.topCustomizerState.primaryUrl = url;
+          } else if (kind === 'secondary' && window.topCustomizerState) {
+            window.topCustomizerState.secondaryUrl = url;
+          }
+          if (typeof window.renderCustomizerFrameAtTime === 'function') {
+            window.renderCustomizerFrameAtTime(window.topCustomizerState?.currentTime || 0);
+          }
+          if (typeof showTextTimingAlert === 'function') {
+            showTextTimingAlert(`Replaced layer "${lid}"`, 'success');
+          }
+        };
+        inp.click();
+      });
+    });
+    });
+  }, true);
+}
+
+if (!window.__rgContextMenuWired) {
+  window.__rgContextMenuWired = true;
+  (function initStageContextMenu() {
+    let menu = document.getElementById('rg-stage-context-menu');
+    if (!menu) {
+      menu = document.createElement('div');
+      menu.id = 'rg-stage-context-menu';
+      menu.style.cssText = 'position:fixed;z-index:99999;display:none;min-width:210px;padding:6px;border-radius:10px;background:rgba(17,19,30,0.95);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 14px 34px rgba(0,0,0,0.65);font-family:inherit;';
+      document.body.appendChild(menu);
+    }
+    const hideMenu = () => { menu.style.display = 'none'; };
+    document.addEventListener('click', hideMenu);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideMenu(); });
+
+    document.addEventListener('contextmenu', (e) => {
+      const stageEl = e.target.closest('#tpl-modal-preview-stage-container');
+      const cardEl = e.target.closest('.home-tpl-card');
+      if (!stageEl && !cardEl) return;
+      e.preventDefault();
+
+      let targetTpl = null;
+      if (cardEl && typeof EFFECT_TEMPLATES_DATA !== 'undefined') {
+        targetTpl = EFFECT_TEMPLATES_DATA.find((t) => t.id === cardEl.dataset.templateId) || null;
+      } else if (stageEl && typeof topCustomizerState !== 'undefined') {
+        targetTpl = topCustomizerState.currentTpl || null;
+      }
+      const copied = window.__rgCopiedOverlayTemplate || null;
+      const copyName = targetTpl ? formatConciseTemplateTitle(targetTpl.title).short : 'Current Effect';
+      const pasteName = copied ? formatConciseTemplateTitle(copied.title).short : '';
+
+      menu.innerHTML = `
+        <button type="button" data-rg-ctx="copy" style="width:100%;text-align:left;background:transparent;border:none;color:#f1f5f9;padding:8px 10px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span>Copy "${copyName}"</span>
+          <span style="font-size:10px;color:#94a3b8;">Ctrl+C</span>
+        </button>
+        <button type="button" data-rg-ctx="paste" ${copied ? '' : 'disabled'} style="width:100%;text-align:left;background:transparent;border:none;color:${copied ? '#d8b4fe' : '#64748b'};padding:8px 10px;border-radius:7px;font-size:12px;font-weight:600;cursor:${copied ? 'pointer' : 'not-allowed'};display:flex;align-items:center;justify-content:space-between;gap:8px;opacity:${copied ? '1' : '0.55'};">
+          <span>${copied ? `Paste "${pasteName}"` : 'Paste Effect / Overlay'}</span>
+          <span style="font-size:10px;color:#94a3b8;">Ctrl+V</span>
+        </button>
+      `;
+
+      menu.querySelectorAll('button:not([disabled])').forEach((btn) => {
+        btn.addEventListener('mouseenter', () => { btn.style.background = 'rgba(168,85,247,0.18)'; });
+        btn.addEventListener('mouseleave', () => { btn.style.background = 'transparent'; });
+      });
+
+      const copyBtn = menu.querySelector('[data-rg-ctx="copy"]');
+      if (copyBtn && targetTpl) {
+        copyBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          copyOverlayTemplate(targetTpl);
+          hideMenu();
+        });
+      }
+      const pasteBtn = menu.querySelector('[data-rg-ctx="paste"]');
+      if (pasteBtn && copied) {
+        pasteBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          if (typeof applySelectedHomepageTemplate === 'function') {
+            applySelectedHomepageTemplate(copied.id);
+          }
+          hideMenu();
+        });
+      }
+
+      menu.style.left = Math.min(e.clientX, window.innerWidth - 230) + 'px';
+      menu.style.top = Math.min(e.clientY, window.innerHeight - 100) + 'px';
+      menu.style.display = 'block';
+    });
+  })();
+}
+
+if (!window.__rgOverlayPasteWired) {
+  window.__rgOverlayPasteWired = true;
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && String(e.key || '').toLowerCase() === 'v' && window.__rgCopiedOverlayTemplate) {
+      const tag = (document.activeElement && document.activeElement.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
+      const tpl = window.__rgCopiedOverlayTemplate;
+      if (typeof applySelectedHomepageTemplate === 'function') {
+        e.preventDefault();
+        applySelectedHomepageTemplate(tpl.id);
+        if (typeof showTextTimingAlert === 'function') {
+          showTextTimingAlert(`Pasted overlay: ${formatConciseTemplateTitle(tpl.title).short}`, 'success');
+        }
+      }
+    }
+  });
+}
+
 function renderHomepageTemplates() {
   const grid = document.getElementById('home-templates-grid');
   const countEl = document.getElementById('home-templates-count');
@@ -28058,7 +28290,7 @@ function renderHomepageTemplates() {
     return `
       <div class="home-tpl-card" data-template-id="${t.id}">
         <div class="home-tpl-media" id="media-wrap-${t.id}">
-          <img src="${(typeof window.tplGetSnapshot === 'function' && window.tplGetSnapshot(t.id)) || t.defaultImage}" alt="${t.title}" class="home-tpl-img" id="default-img-${t.id}" />
+          <img src="${(typeof window.tplGetSnapshot === 'function' && window.tplGetSnapshot(t.id)) || t.defaultImage}" alt="${t.title}" class="home-tpl-img" id="default-img-${t.id}" onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='/boardroom_scene_hd_thumb.jpg';}" />
           <div class="home-tpl-overlay" style="background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.65) 100%);"></div>
           
           <div class="home-tpl-center-label" id="center-label-${t.id}" style="display: none !important;">
@@ -28070,7 +28302,7 @@ function renderHomepageTemplates() {
           <!-- Container for dynamic Live Hover Video FX -->
           <div class="home-tpl-fx-container" id="fx-container-${t.id}" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; display: none;"></div>
 
-          <div class="home-tpl-badge" id="badge-${t.id}">${t.badge || ''}</div>
+          <div class="home-tpl-badge" id="badge-${t.id}">${t.category || t.origCategory || 'Template'}</div>
           <div class="home-tpl-time">${t.timeToApply || '6s'}</div>
 
           <div class="home-tpl-play-hover" id="play-hover-${t.id}">
@@ -28082,8 +28314,8 @@ function renderHomepageTemplates() {
 
         <div class="home-tpl-content">
           <div>
-            <h4 class="home-tpl-title">${t.title}</h4>
-            <p class="home-tpl-desc">${t.description || ''}</p>
+            <h4 class="home-tpl-title">${formatConciseTemplateTitle(t.title).short}</h4>
+            <p class="home-tpl-desc">${formatBeginnerDescription(t.description)}</p>
           </div>
 
           <div class="home-tpl-footer">
@@ -28135,7 +28367,20 @@ function renderHomepageTemplates() {
       });
     }
 
+    const moreBtn = card.querySelector('.home-tpl-more-pill');
+    if (moreBtn) {
+      moreBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const h4 = card.querySelector('.home-tpl-title');
+        if (h4) h4.textContent = h4.getAttribute('data-full-title') || tpl?.title || '';
+      });
+    }
+
     card.addEventListener('click', () => {
+      const isOverlayMode = document.getElementById('rm-library-tab-overlay')?.getAttribute('aria-selected') === 'true';
+      if (isOverlayMode && tpl) {
+        copyOverlayTemplate(tpl);
+      }
       applySelectedHomepageTemplate(tplId);
     });
   });
@@ -39254,13 +39499,29 @@ function renderCustomizerFrameAtTime(targetTime) {
 
 function startTopCustomizerLoop() {
   topCustomizerState.startTime = performance.now();
+  const speedSel = document.getElementById('tpl-hud-speed-select');
+  if (speedSel && !speedSel.dataset.wired) {
+    speedSel.dataset.wired = '1';
+    speedSel.addEventListener('change', (e) => {
+      const spd = parseFloat(e.target.value) || 1;
+      topCustomizerState.playbackSpeed = spd;
+      const aud = document.getElementById('modal-customizer-audio-player');
+      if (aud) aud.playbackRate = Math.max(0.0625, Math.min(4, spd));
+    });
+  }
 
-  let previousTick=performance.now();
+  let previousTick = performance.now();
+  let lastHudTextAt = 0;
   function loop(now) {
-    const elapsed=now-previousTick;previousTick=now;
+    const elapsed = Math.min(100, Math.max(0, now - previousTick));
+    previousTick = now;
     if (!topCustomizerState.isPlaying) {
       topCustomizerState.animId = requestAnimationFrame(loop);
       return;
+    }
+    const spd = Number(topCustomizerState.playbackSpeed) || 1;
+    if (spd !== 1 && typeof topCustomizerState.startTime === 'number') {
+      topCustomizerState.startTime += elapsed * (1 - spd);
     }
 
     if(window.getRegaarderPlaybackReadiness?.(topCustomizerState.currentTpl?.id,topCustomizerState.currentTime||0)===false){topCustomizerState.startTime+=elapsed;updateTopCustomizerFrame(topCustomizerState.currentTime||0,now);topCustomizerState.animId=requestAnimationFrame(loop);return;}

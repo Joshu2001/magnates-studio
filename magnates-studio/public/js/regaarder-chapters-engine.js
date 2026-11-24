@@ -713,7 +713,11 @@
     const canvas = viewport?.querySelector('canvas');
     if (!canvas) return;
     paintChapterFrame(canvas, templateId, elapsedSec);
-    syncChapterHitOverlay(container, templateId, elapsedSec);
+    const _now = performance.now();
+    if (!container._lastHitSyncAt || _now - container._lastHitSyncAt >= 100) {
+      container._lastHitSyncAt = _now;
+      syncChapterHitOverlay(container, templateId, elapsedSec);
+    }
   };
 
   // Toolbar action handler for all Chapter objects
@@ -774,6 +778,387 @@
     }).join('')}</div>`;
   }
 
+  let showAllSceneLayers = false;
+
+  function getActiveLayerIdsForTime(rt, layerIds, timeSec) {
+    if (showAllSceneLayers || !rt || !Array.isArray(rt.stageObjects) || !rt.stageObjects.length) {
+      return layerIds;
+    }
+    const t = Number(timeSec || 0);
+    const activeScene = Array.isArray(rt.scenes)
+      ? rt.scenes.find((s) => t >= (s.start || 0) && t < (s.end || s.start + 9999))
+      : null;
+    const matched = [];
+    rt.stageObjects.forEach((o) => {
+      const inTime = (o.minTime == null || t >= o.minTime) && (o.maxTime == null || t <= o.maxTime);
+      const inScene = !o.sceneId || !activeScene || o.sceneId === activeScene.id;
+      if (inTime && inScene && layerIds.includes(o.layerId) && !matched.includes(o.layerId)) {
+        matched.push(o.layerId);
+      }
+    });
+    return matched.length ? matched : layerIds;
+  }
+
+  function autoCutoutImageUrl(src, cb) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const w = img.naturalWidth || img.width;
+      const h = img.naturalHeight || img.height;
+      if (!w || !h) return cb(src);
+      const cv = document.createElement('canvas');
+      cv.width = w;
+      cv.height = h;
+      const ctx = cv.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      try {
+        const imData = ctx.getImageData(0, 0, w, h);
+        const d = imData.data;
+        // Sample 4 corners to estimate background color
+        const corners = [0, (w - 1) * 4, ((h - 1) * w) * 4, ((h * w) - 1) * 4];
+        let br = 0, bg = 0, bb = 0;
+        corners.forEach((idx) => { br += d[idx]; bg += d[idx + 1]; bb += d[idx + 2]; });
+        br /= 4; bg /= 4; bb /= 4;
+        const tol = 46;
+        for (let i = 0; i < d.length; i += 4) {
+          const dist = Math.hypot(d[i] - br, d[i + 1] - bg, d[i + 2] - bb);
+          if (dist < tol) {
+            d[i + 3] = 0;
+          } else if (dist < tol + 22) {
+            d[i + 3] = Math.round(((dist - tol) / 22) * d[i + 3]);
+          }
+        }
+        ctx.putImageData(imData, 0, 0);
+        cb(cv.toDataURL('image/png'));
+      } catch (_) {
+        cb(src);
+      }
+    };
+    img.onerror = () => cb(src);
+    img.src = src;
+  }
+
+  function openInlineRadialLayerEditor(src, label, layerObj, onApply) {
+    const stage = document.getElementById('tpl-modal-preview-stage');
+    if (!stage) return;
+    if (window.topCustomizerState) window.topCustomizerState.isPlaying = false;
+
+    const prev = document.getElementById('rg-inline-layer-editor');
+    if (prev) prev.remove();
+
+    const wrap = document.createElement('div');
+    wrap.id = 'rg-inline-layer-editor';
+    wrap.style.cssText = 'position:absolute;inset:0;z-index:80;background:#090b12;display:flex;align-items:center;justify-content:center;';
+    wrap.innerHTML = `
+      <canvas data-rle-canvas style="max-width:100%;max-height:100%;cursor:crosshair;display:block;transform-origin:center center;transition:transform 0.15s ease;"></canvas>
+      <div style="position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:8px;background:rgba(17,19,30,0.88);border:1px solid rgba(255,255,255,0.12);z-index:90;">
+        <button type="button" data-rle-zoom="-0.25" class="rg-layer-hdr-btn" title="Zoom Out" style="padding:2px 7px;">-</button>
+        <span data-rle-zoom-lbl style="font-size:10.5px;font-weight:600;color:#cbd5e1;min-width:38px;text-align:center;font-variant-numeric:tabular-nums;">100%</span>
+        <button type="button" data-rle-zoom="0.25" class="rg-layer-hdr-btn" title="Zoom In" style="padding:2px 7px;">+</button>
+      </div>
+      <div id="rg-radial-hub" class="rg-radial-hub">
+        <button type="button" class="rg-radial-core" data-rle-toggle title="Layer Tools"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
+        <button type="button" class="rg-radial-node is-active" data-rle-tool="brush" style="left:73px;top:11px;" title="Brush"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg></button>
+        <button type="button" class="rg-radial-node" data-rle-tool="pen" style="left:127px;top:42px;" title="Pen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></button>
+        <button type="button" class="rg-radial-node" data-rle-tool="pencil" style="left:127px;top:104px;" title="Pencil"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
+        <button type="button" class="rg-radial-node" data-rle-tool="erase" style="left:73px;top:135px;" title="Erase"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/></svg></button>
+        <button type="button" class="rg-radial-node" data-rle-tool="lasso" style="left:19px;top:104px;" title="Lasso Cutout"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 22a5 5 0 0 1-2-4"/><path d="M3.3 14A6.8 6.8 0 0 1 2 10c0-4.4 4.5-8 10-8s10 3.6 10 8-4.5 8-10 8a12 12 0 0 1-5-1"/></svg></button>
+        <button type="button" class="rg-radial-node" data-rle-eye style="left:19px;top:42px;" title="Toggle Visibility"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+      <div style="position:absolute;bottom:12px;right:12px;display:flex;gap:8px;z-index:90;">
+        <button type="button" data-rle-undo class="rg-layer-hdr-btn">Undo</button>
+        <button type="button" data-rle-cancel class="rg-layer-hdr-btn">Cancel</button>
+        <button type="button" data-rle-done class="rg-layer-hdr-btn is-primary">Done</button>
+      </div>
+    `;
+    stage.appendChild(wrap);
+
+    const hub = wrap.querySelector('#rg-radial-hub');
+    hub.querySelector('[data-rle-toggle]').addEventListener('click', () => {
+      hub.classList.toggle('is-open');
+    });
+
+    const cv = wrap.querySelector('[data-rle-canvas]');
+    const ctx = cv.getContext('2d');
+    const history = [];
+    const pushHist = () => {
+      if (cv.width && cv.height) history.push(ctx.getImageData(0, 0, cv.width, cv.height));
+      if (history.length > 15) history.shift();
+    };
+    let tool = 'brush';
+    let drawing = false;
+    let pts = [];
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      cv.width = img.naturalWidth || img.width || 640;
+      cv.height = img.naturalHeight || img.height || 360;
+      ctx.drawImage(img, 0, 0);
+      pushHist();
+    };
+    img.src = src;
+
+    hub.querySelectorAll('[data-rle-tool]').forEach((b) => {
+      b.addEventListener('click', () => {
+        tool = b.getAttribute('data-rle-tool');
+        hub.querySelectorAll('[data-rle-tool]').forEach((x) => x.classList.toggle('is-active', x === b));
+      });
+    });
+
+    hub.querySelector('[data-rle-eye]')?.addEventListener('click', () => {
+      if (layerObj) layerObj.visible = layerObj.visible === false;
+      cv.style.opacity = layerObj && layerObj.visible === false ? '0.2' : '1';
+    });
+
+    const getPos = (e) => {
+      const r = cv.getBoundingClientRect();
+      return { x: (e.clientX - r.left) * (cv.width / r.width), y: (e.clientY - r.top) * (cv.height / r.height) };
+    };
+
+    const strokeAt = (p, prevP) => {
+      ctx.save();
+      if (tool === 'erase') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = 22;
+      } else {
+        ctx.strokeStyle = '#a855f7';
+        ctx.lineWidth = tool === 'pencil' ? 2 : tool === 'pen' ? 5 : 14;
+      }
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(prevP.x, prevP.y);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      ctx.restore();
+    };
+
+    let lastP = null;
+    cv.addEventListener('pointerdown', (e) => {
+      drawing = true;
+      lastP = getPos(e);
+      if (tool === 'lasso') pts = [lastP];
+      else { pushHist(); strokeAt(lastP, lastP); }
+    });
+    cv.addEventListener('pointermove', (e) => {
+      if (!drawing) return;
+      const p = getPos(e);
+      if (tool === 'lasso') pts.push(p);
+      else { strokeAt(p, lastP); lastP = p; }
+    });
+    window.addEventListener('pointerup', () => {
+      if (!drawing) return;
+      drawing = false;
+      if (tool === 'lasso' && pts.length > 2) {
+        pushHist();
+        const snap = ctx.getImageData(0, 0, cv.width, cv.height);
+        const tmp = document.createElement('canvas');
+        tmp.width = cv.width; tmp.height = cv.height;
+        tmp.getContext('2d').putImageData(snap, 0, 0);
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(tmp, 0, 0);
+        ctx.restore();
+        pts = [];
+      }
+    });
+
+    let zoom = 1;
+    const zoomLbl = wrap.querySelector('[data-rle-zoom-lbl]');
+    wrap.querySelectorAll('[data-rle-zoom]').forEach((zb) => {
+      zb.addEventListener('click', () => {
+        zoom = Math.min(4, Math.max(0.25, zoom + parseFloat(zb.getAttribute('data-rle-zoom'))));
+        cv.style.transform = `scale(${zoom})`;
+        if (zoomLbl) zoomLbl.textContent = `${Math.round(zoom * 100)}%`;
+      });
+    });
+
+    wrap.querySelector('[data-rle-undo]').addEventListener('click', () => {
+      if (history.length > 1) {
+        history.pop();
+        ctx.putImageData(history[history.length - 1], 0, 0);
+      }
+    });
+    wrap.querySelector('[data-rle-cancel]').addEventListener('click', () => {
+      wrap.remove();
+    });
+    wrap.querySelector('[data-rle-done]').addEventListener('click', () => {
+      onApply(cv.toDataURL('image/png'));
+      wrap.remove();
+    });
+  }
+
+  function openLayerCutoutStudio(src, label, onApply) {
+    let modal = document.getElementById('rg-layer-cutout-studio');
+    if (modal) modal.remove();
+    modal = document.createElement('div');
+    modal.id = 'rg-layer-cutout-studio';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(6,7,12,0.82);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;';
+    modal.innerHTML = `
+      <div style="width:min(760px,96vw);background:#121420;border:1px solid rgba(255,255,255,0.12);border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.75);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.08);">
+          <span style="font-size:13px;font-weight:700;color:#f8fafc;">Layer Cutout Studio · ${label || 'Layer'}</span>
+          <button type="button" data-lcs-close style="background:none;border:none;color:#94a3b8;font-size:18px;cursor:pointer;">&times;</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#0d0f18;border-bottom:1px solid rgba(255,255,255,0.07);">
+          <button type="button" data-lcs-tool="lasso" class="rg-layer-hdr-btn is-primary">Lasso Cutout</button>
+          <button type="button" data-lcs-tool="erase" class="rg-layer-hdr-btn">Eraser</button>
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#94a3b8;margin-left:4px;">Size <input type="range" data-lcs-size min="6" max="64" value="24" style="width:70px;"></label>
+          <button type="button" data-lcs-auto class="rg-layer-hdr-btn" style="margin-left:auto;border-color:rgba(56,189,248,0.5);color:#bae6fd;">Auto Cutout</button>
+          <button type="button" data-lcs-undo class="rg-layer-hdr-btn">Undo</button>
+        </div>
+        <div style="position:relative;height:380px;display:flex;align-items:center;justify-content:center;background-image:linear-gradient(45deg,#1a1d2b 25%,transparent 25%),linear-gradient(-45deg,#1a1d2b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1a1d2b 75%),linear-gradient(-45deg,transparent 75%,#1a1d2b 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;background-color:#11131d;overflow:hidden;">
+          <canvas data-lcs-canvas style="max-width:100%;max-height:100%;cursor:crosshair;display:block;"></canvas>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);">
+          <button type="button" data-lcs-close class="rg-layer-hdr-btn">Cancel</button>
+          <button type="button" data-lcs-apply style="padding:6px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,#8b5cf6,#a855f7);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">Apply to Layer</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const cv = modal.querySelector('[data-lcs-canvas]');
+    const ctx = cv.getContext('2d');
+    const history = [];
+    let tool = 'lasso';
+    let drawing = false;
+    let pts = [];
+
+    const pushHist = () => {
+      if (cv.width && cv.height) history.push(ctx.getImageData(0, 0, cv.width, cv.height));
+      if (history.length > 15) history.shift();
+    };
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      cv.width = img.naturalWidth || img.width || 640;
+      cv.height = img.naturalHeight || img.height || 360;
+      ctx.drawImage(img, 0, 0);
+      pushHist();
+    };
+    img.src = src;
+
+    modal.querySelectorAll('[data-lcs-tool]').forEach((b) => {
+      b.addEventListener('click', () => {
+        tool = b.getAttribute('data-lcs-tool');
+        modal.querySelectorAll('[data-lcs-tool]').forEach((x) => x.classList.toggle('is-primary', x === b));
+      });
+    });
+
+    const getPos = (e) => {
+      const r = cv.getBoundingClientRect();
+      return { x: (e.clientX - r.left) * (cv.width / r.width), y: (e.clientY - r.top) * (cv.height / r.height) };
+    };
+
+    cv.addEventListener('pointerdown', (e) => {
+      drawing = true;
+      const p = getPos(e);
+      if (tool === 'lasso') {
+        pts = [p];
+      } else {
+        pushHist();
+        const sz = Number(modal.querySelector('[data-lcs-size]')?.value || 24);
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, sz / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    });
+
+    cv.addEventListener('pointermove', (e) => {
+      if (!drawing) return;
+      const p = getPos(e);
+      if (tool === 'lasso') {
+        pts.push(p);
+      } else {
+        const sz = Number(modal.querySelector('[data-lcs-size]')?.value || 24);
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, sz / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (!drawing) return;
+      drawing = false;
+      if (tool === 'lasso' && pts.length > 2) {
+        pushHist();
+        const snap = ctx.getImageData(0, 0, cv.width, cv.height);
+        const tmp = document.createElement('canvas');
+        tmp.width = cv.width; tmp.height = cv.height;
+        tmp.getContext('2d').putImageData(snap, 0, 0);
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        pts.slice(1).forEach((pt) => ctx.lineTo(pt.x, pt.y));
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(tmp, 0, 0);
+        ctx.restore();
+        pts = [];
+      }
+    });
+
+    modal.querySelector('[data-lcs-undo]')?.addEventListener('click', () => {
+      if (history.length > 1) {
+        history.pop();
+        ctx.putImageData(history[history.length - 1], 0, 0);
+      }
+    });
+
+    modal.querySelector('[data-lcs-auto]')?.addEventListener('click', () => {
+      autoCutoutImageUrl(cv.toDataURL('image/png'), (out) => {
+        const im2 = new Image();
+        im2.onload = () => { pushHist(); ctx.clearRect(0, 0, cv.width, cv.height); ctx.drawImage(im2, 0, 0); };
+        im2.src = out;
+      });
+    });
+
+    modal.querySelectorAll('[data-lcs-close]').forEach((b) => b.addEventListener('click', () => modal.remove()));
+    modal.querySelector('[data-lcs-apply]')?.addEventListener('click', () => {
+      onApply(cv.toDataURL('image/png'));
+      modal.remove();
+    });
+  }
+
+  function buildVisualLayerCardsHtml(rt, cfg, layerIds, curLayerId) {
+    return `<div class="rg-layer-visual-grid">${(layerIds || []).map((id) => {
+      const layer = (cfg.layers && cfg.layers[id]) || {};
+      const mediaEl = rt.media && rt.media[id];
+      let src = layer.customImageSrc || '';
+      if (!src && mediaEl) {
+        if (typeof mediaEl.src === 'string' && mediaEl.src) src = mediaEl.src;
+        else if (mediaEl.img && mediaEl.img.src) src = mediaEl.img.src;
+        else if (typeof mediaEl.toDataURL === 'function' && mediaEl.width > 0) {
+          try { src = mediaEl.toDataURL('image/png'); } catch (_) {}
+        }
+      }
+      const label = String(id).replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase()).trim();
+      const isActive = id === curLayerId;
+      return `<div class="rg-layer-card${isActive ? ' is-active' : ''}" data-ch-select-layer="${id}">
+        <div class="rg-layer-card-thumb">
+          ${src ? `<img src="${src}" alt="${label}" loading="lazy">` : `<span class="rg-layer-card-empty">${label}</span>`}
+          <button type="button" class="rg-layer-cutout-btn" data-ch-cutout-layer="${id}" title="Remove background">Cutout</button>
+          <button type="button" class="rg-layer-replace-btn" data-ch-replace-layer="${id}" title="Replace ${label}">Replace</button>
+        </div>
+        <div class="rg-layer-card-name">${label}</div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
   window.tplBuildRegaarderChapterRegaarderPanes = function (templateId) {
     const rt = chapterRuntime[templateId];
     if (!rt) return null;
@@ -827,14 +1212,9 @@
 
     const contentHtml = `
       <div class="rg-inspector-section">
-        <div class="rg-section-header"><span class="rg-section-title">Chapter Beats & Timeline</span></div>
+        <div class="rg-section-header"><span class="rg-section-title">Jump to Scene Beat</span></div>
         <div class="rg-section-body">
-          <div class="rg-ctrl-row">
-            <label class="rg-ctrl-label">Jump to Scene Beat</label>
-            <select class="rg-select" data-ch-action="jump-scene">
-              ${rt.scenes.map((s) => `<option value="${s.start}">${s.label} (${s.start}s)</option>`).join('')}
-            </select>
-          </div>
+          ${buildVisualSceneCardsHtml(rt.scenes, '/assets/regaarder-motion/portrait.png')}
         </div>
       </div>
 
@@ -846,18 +1226,15 @@
       </div>
 
       <div class="rg-inspector-section">
-        <div class="rg-section-header"><span class="rg-section-title">Independent Layer & Media Slot</span></div>
+        <div class="rg-section-header" style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <span class="rg-section-title">Scene Layers (${getActiveLayerIdsForTime(rt, layerIds, window.topCustomizerState?.currentTime || 0).length})</span>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <button type="button" class="rg-layer-hdr-btn" data-ch-toggle-all-layers>${showAllSceneLayers ? 'Current' : `All (${layerIds.length})`}</button>
+            <button type="button" class="rg-layer-hdr-btn is-primary" data-ch-add-layer>+ Add Layer</button>
+          </div>
+        </div>
         <div class="rg-section-body">
-          <div class="rg-ctrl-row">
-            <label class="rg-ctrl-label">Active Scene Layer (${layerIds.length} slots)</label>
-            <select class="rg-select" data-ch-action="select-layer">
-              ${layerIds.map((id) => `<option value="${id}" ${id === curLayerId ? 'selected' : ''}>${id}</option>`).join('')}
-            </select>
-          </div>
-          <div class="rg-ctrl-row" style="margin-top:8px;">
-            <label class="rg-ctrl-label">Replace Layer Image</label>
-            <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" data-ch-action="replace-layer-image" style="font-size:11px;width:100%;">
-          </div>
+          ${buildVisualLayerCardsHtml(rt, cfg, getActiveLayerIdsForTime(rt, layerIds, window.topCustomizerState?.currentTime || 0), curLayerId)}
         </div>
       </div>
     `;
@@ -1127,6 +1504,210 @@
       });
     }
 
+    modalEl.querySelectorAll('[data-ch-select-layer]').forEach((cardEl) => {
+      cardEl.addEventListener('click', (ev) => {
+        if (ev.target.closest('[data-ch-replace-layer]')) return;
+        rt.selectedLayer = cardEl.getAttribute('data-ch-select-layer');
+        if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+      });
+    });
+    modalEl.querySelectorAll('[data-ch-replace-layer]').forEach((btn) => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const lid = btn.getAttribute('data-ch-replace-layer');
+        rt.selectedLayer = lid;
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/png,image/jpeg,image/webp,image/svg+xml';
+        inp.onchange = () => {
+          const f = inp.files?.[0];
+          if (!f) return;
+          const url = URL.createObjectURL(f);
+          if (cfg.layers && cfg.layers[lid]) cfg.layers[lid].customImageSrc = url;
+          refreshStage();
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        };
+        inp.click();
+      });
+    });
+    modalEl.querySelectorAll('[data-ch-select-layer]').forEach((cardEl) => {
+      cardEl.addEventListener('click', (ev) => {
+        if (ev.target.closest('[data-ch-replace-layer]')) return;
+        rt.selectedLayer = cardEl.getAttribute('data-ch-select-layer');
+        if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+      });
+    });
+    modalEl.querySelectorAll('[data-ch-replace-layer]').forEach((btn) => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const lid = btn.getAttribute('data-ch-replace-layer');
+        rt.selectedLayer = lid;
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/png,image/jpeg,image/webp,image/svg+xml';
+        inp.onchange = () => {
+          const f = inp.files?.[0];
+          if (!f) return;
+          const url = URL.createObjectURL(f);
+          if (cfg.layers && cfg.layers[lid]) cfg.layers[lid].customImageSrc = url;
+          refreshStage();
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        };
+        inp.click();
+      });
+    });
+    modalEl.querySelectorAll('[data-ch-select-layer]').forEach((cardEl) => {
+      cardEl.addEventListener('click', (ev) => {
+        if (ev.target.closest('[data-ch-replace-layer]')) return;
+        rt.selectedLayer = cardEl.getAttribute('data-ch-select-layer');
+        if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+      });
+    });
+    modalEl.querySelectorAll('[data-ch-replace-layer]').forEach((btn) => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const lid = btn.getAttribute('data-ch-replace-layer');
+        rt.selectedLayer = lid;
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = 'image/png,image/jpeg,image/webp,image/svg+xml';
+        inp.onchange = () => {
+          const f = inp.files?.[0];
+          if (!f) return;
+          const url = URL.createObjectURL(f);
+          if (cfg.layers && cfg.layers[lid]) cfg.layers[lid].customImageSrc = url;
+          refreshStage();
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        };
+        inp.click();
+      });
+    });
+    modalEl.querySelector('[data-ch-toggle-all-layers]')?.addEventListener('click', () => {
+      showAllSceneLayers = !showAllSceneLayers;
+      if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+    });
+    modalEl.querySelector('[data-ch-add-layer]')?.addEventListener('click', () => {
+      const existingPop = document.getElementById('rg-add-layer-popover');
+      if (existingPop) { existingPop.remove(); return; }
+      const addBtn = modalEl.querySelector('[data-ch-add-layer]');
+      const pop = document.createElement('div');
+      pop.id = 'rg-add-layer-popover';
+      pop.style.cssText = 'position:fixed;z-index:99999;padding:8px;border-radius:10px;background:rgba(17,19,30,0.96);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 12px 30px rgba(0,0,0,0.65);display:flex;flex-direction:column;gap:6px;min-width:190px;';
+      const r = addBtn.getBoundingClientRect();
+      pop.style.top = (r.bottom + 6) + 'px';
+      pop.style.left = Math.min(r.left, window.innerWidth - 210) + 'px';
+      pop.innerHTML = '<button type="button" data-rg-place="fg" class="rg-layer-hdr-btn is-primary" style="text-align:left;padding:6px 10px;">Foreground (with Cutout)</button><button type="button" data-rg-place="bg" class="rg-layer-hdr-btn" style="text-align:left;padding:6px 10px;">Background</button>';
+      document.body.appendChild(pop);
+      pop.querySelectorAll('[data-rg-place]').forEach((pb) => {
+        pb.addEventListener('click', () => {
+          const isFg = pb.getAttribute('data-rg-place') === 'fg';
+          pop.remove();
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'image/png,image/jpeg,image/webp,image/svg+xml';
+      inp.onchange = () => {
+        const f = inp.files?.[0];
+        if (!f) return;
+        const rawUrl = URL.createObjectURL(f);
+        const finalizeAdd = (finalUrl) => {
+          const newId = 'custom_' + Date.now();
+          if (!cfg.layers) cfg.layers = {};
+          cfg.layers[newId] = { x: 0, y: 0, scale: isFg ? 0.75 : 1, rotation: 0, opacity: 1, blur: 0, depth: isFg ? 1.2 : 0.4, visible: true, customImageSrc: finalUrl };
+          if (Array.isArray(rt.stageObjects)) {
+            const obj = { id: 'obj_' + newId, layerId: newId, name: f.name.replace(/\.[^.]+$/, ''), variant: 'media', x: 50, y: 50, w: isFg ? 34 : 100, h: isFg ? 44 : 100 };
+            if (isFg) rt.stageObjects.push(obj); else rt.stageObjects.unshift(obj);
+          }
+          rt.selectedLayer = newId;
+          refreshStage();
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        };
+        if (isFg) openLayerCutoutStudio(rawUrl, f.name, finalizeAdd); else finalizeAdd(rawUrl);
+      };
+      inp.click();
+        });
+      });
+    });
+    modalEl.querySelectorAll('[data-ch-cutout-layer]').forEach((btn) => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const lid = btn.getAttribute('data-ch-cutout-layer');
+        const layer = cfg.layers && cfg.layers[lid];
+        const mediaEl = rt.media && rt.media[lid];
+        let src = (layer && layer.customImageSrc) || (mediaEl && (mediaEl.src || mediaEl.img?.src)) || '';
+        if (!src && mediaEl && typeof mediaEl.toDataURL === 'function') {
+          try { src = mediaEl.toDataURL('image/png'); } catch (_) {}
+        }
+        if (!src) return;
+        openInlineRadialLayerEditor(src, lid, layer, (cutUrl) => {
+          if (cfg.layers && cfg.layers[lid]) cfg.layers[lid].customImageSrc = cutUrl;
+          refreshStage();
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        });
+      });
+    });
+    modalEl.querySelector('[data-ch-toggle-all-layers]')?.addEventListener('click', () => {
+      showAllSceneLayers = !showAllSceneLayers;
+      if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+    });
+    modalEl.querySelector('[data-ch-add-layer]')?.addEventListener('click', () => {
+      const existingPop = document.getElementById('rg-add-layer-popover');
+      if (existingPop) { existingPop.remove(); return; }
+      const addBtn = modalEl.querySelector('[data-ch-add-layer]');
+      const pop = document.createElement('div');
+      pop.id = 'rg-add-layer-popover';
+      pop.style.cssText = 'position:fixed;z-index:99999;padding:8px;border-radius:10px;background:rgba(17,19,30,0.96);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.14);box-shadow:0 12px 30px rgba(0,0,0,0.65);display:flex;flex-direction:column;gap:6px;min-width:190px;';
+      const r = addBtn.getBoundingClientRect();
+      pop.style.top = (r.bottom + 6) + 'px';
+      pop.style.left = Math.min(r.left, window.innerWidth - 210) + 'px';
+      pop.innerHTML = '<button type="button" data-rg-place="fg" class="rg-layer-hdr-btn is-primary" style="text-align:left;padding:6px 10px;">Foreground (with Cutout)</button><button type="button" data-rg-place="bg" class="rg-layer-hdr-btn" style="text-align:left;padding:6px 10px;">Background</button>';
+      document.body.appendChild(pop);
+      pop.querySelectorAll('[data-rg-place]').forEach((pb) => {
+        pb.addEventListener('click', () => {
+          const isFg = pb.getAttribute('data-rg-place') === 'fg';
+          pop.remove();
+      const inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'image/png,image/jpeg,image/webp,image/svg+xml';
+      inp.onchange = () => {
+        const f = inp.files?.[0];
+        if (!f) return;
+        const rawUrl = URL.createObjectURL(f);
+        const finalizeAdd = (finalUrl) => {
+          const newId = 'custom_' + Date.now();
+          if (!cfg.layers) cfg.layers = {};
+          cfg.layers[newId] = { x: 0, y: 0, scale: isFg ? 0.75 : 1, rotation: 0, opacity: 1, blur: 0, depth: isFg ? 1.2 : 0.4, visible: true, customImageSrc: finalUrl };
+          if (Array.isArray(rt.stageObjects)) {
+            const obj = { id: 'obj_' + newId, layerId: newId, name: f.name.replace(/\.[^.]+$/, ''), variant: 'media', x: 50, y: 50, w: isFg ? 34 : 100, h: isFg ? 44 : 100 };
+            if (isFg) rt.stageObjects.push(obj); else rt.stageObjects.unshift(obj);
+          }
+          rt.selectedLayer = newId;
+          refreshStage();
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        };
+        if (isFg) openLayerCutoutStudio(rawUrl, f.name, finalizeAdd); else finalizeAdd(rawUrl);
+      };
+      inp.click();
+        });
+      });
+    });
+    modalEl.querySelectorAll('[data-ch-cutout-layer]').forEach((btn) => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const lid = btn.getAttribute('data-ch-cutout-layer');
+        const layer = cfg.layers && cfg.layers[lid];
+        const mediaEl = rt.media && rt.media[lid];
+        let src = (layer && layer.customImageSrc) || (mediaEl && (mediaEl.src || mediaEl.img?.src)) || '';
+        if (!src && mediaEl && typeof mediaEl.toDataURL === 'function') {
+          try { src = mediaEl.toDataURL('image/png'); } catch (_) {}
+        }
+        if (!src) return;
+        openInlineRadialLayerEditor(src, lid, layer, (cutUrl) => {
+          if (cfg.layers && cfg.layers[lid]) cfg.layers[lid].customImageSrc = cutUrl;
+          refreshStage();
+          if (typeof window.organizeUniversalTemplateControls === 'function') window.organizeUniversalTemplateControls();
+        });
+      });
+    });
     const layerSel = modalEl.querySelector('[data-ch-action="select-layer"]');
     if (layerSel) {
       layerSel.addEventListener('change', () => {
