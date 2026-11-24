@@ -904,9 +904,14 @@
     const prev = document.getElementById('rg-inline-layer-editor');
     if (prev) prev.remove();
 
+    document.body.classList.add('rg-cutout-editor-active');
+    if (window.RegaarderContextualToolbar && typeof window.RegaarderContextualToolbar.hide === 'function') {
+      window.RegaarderContextualToolbar.hide();
+    }
+
     const wrap = document.createElement('div');
     wrap.id = 'rg-inline-layer-editor';
-    wrap.style.cssText = 'position:absolute;inset:0;z-index:80;background:#090b12;display:flex;align-items:center;justify-content:center;';
+    wrap.style.cssText = 'position:absolute;inset:0;z-index:200;background:#090b12;display:flex;align-items:center;justify-content:center;';
     wrap.innerHTML = `
       <canvas data-rle-canvas style="max-width:100%;max-height:100%;cursor:crosshair;display:block;transform-origin:center center;transition:transform 0.15s ease;"></canvas>
       <div style="position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:8px;background:rgba(17,19,30,0.88);border:1px solid rgba(255,255,255,0.12);z-index:90;">
@@ -914,7 +919,7 @@
         <span data-rle-zoom-lbl style="font-size:10.5px;font-weight:600;color:#cbd5e1;min-width:38px;text-align:center;font-variant-numeric:tabular-nums;">100%</span>
         <button type="button" data-rle-zoom="0.25" class="rg-layer-hdr-btn" title="Zoom In" style="padding:2px 7px;">+</button>
       </div>
-      <div id="rg-radial-hub" class="rg-radial-hub">
+      <div id="rg-radial-hub" class="rg-radial-hub is-open">
         <button type="button" class="rg-radial-core" data-rle-toggle title="Layer Tools"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></button>
         <button type="button" class="rg-radial-node is-active" data-rle-tool="brush" style="left:73px;top:11px;" title="Brush"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.06 11.9l8.07-8.06a2.85 2.85 0 1 1 4.03 4.03l-8.06 8.08"/><path d="M7.07 14.94c-1.66 0-3 1.35-3 3.02 0 1.33-2.5 1.52-2 2.02 1.08 1.1 2.49 2.02 4 2.02 2.2 0 4-1.8 4-4.04a3.01 3.01 0 0 0-3-3.02z"/></svg></button>
         <button type="button" class="rg-radial-node" data-rle-tool="pen" style="left:127px;top:42px;" title="Pen"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></button>
@@ -1069,12 +1074,14 @@
         ctx.putImageData(history[history.length - 1], 0, 0);
       }
     });
-    wrap.querySelector('[data-rle-cancel]').addEventListener('click', () => {
+    const closeEditor = () => {
+      document.body.classList.remove('rg-cutout-editor-active');
       wrap.remove();
-    });
+    };
+    wrap.querySelector('[data-rle-cancel]').addEventListener('click', closeEditor);
     wrap.querySelector('[data-rle-done]').addEventListener('click', () => {
       onApply(cv.toDataURL('image/png'));
-      wrap.remove();
+      closeEditor();
     });
   }
 

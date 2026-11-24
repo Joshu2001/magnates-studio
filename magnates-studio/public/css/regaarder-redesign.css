@@ -2904,6 +2904,12 @@ body.rg-ctx-toolbar-active #stage-tf-label {
 }
 
 /* Main Floating Contextual Toolbar Container */
+body.rg-cutout-editor-active .rg-ctx-selection-frame,
+body.rg-cutout-editor-active .rg-ctx-toolbar,
+body.rg-cutout-editor-active #stage-tf-box {
+  display: none !important;
+}
+
 .rg-ctx-toolbar {
   position: fixed;
   z-index: 2147483640;

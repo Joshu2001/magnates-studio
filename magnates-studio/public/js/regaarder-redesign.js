@@ -5417,6 +5417,10 @@
     };
 
     const showForObject = (opts) => {
+      if (document.body.classList.contains('rg-cutout-editor-active') || document.getElementById('rg-inline-layer-editor')) {
+        hide();
+        return;
+      }
       const key = (opts && opts.objectKey) ? String(opts.objectKey).toLowerCase() : 'card';
       const meta = HUMAN_OBJECT_CATALOG[key] || {
         id: key,

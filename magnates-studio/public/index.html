@@ -76,6 +76,15 @@
             </button>
           </div>
         </details>
+        <!-- Auth Actions (Canva-inspired Sign up & Log in) -->
+        <div class="rm-auth-actions" id="rm-auth-actions">
+          <button type="button" class="rm-auth-btn rm-auth-signup" id="btn-auth-signup">Sign up</button>
+          <button type="button" class="rm-auth-btn rm-auth-login" id="btn-auth-login">Log in</button>
+          <button type="button" class="rm-auth-user" id="btn-auth-user" hidden title="Account">
+            <span class="rm-auth-avatar" id="rm-auth-avatar">RM</span>
+            <span class="rm-auth-user-name" id="rm-auth-user-name">Account</span>
+          </button>
+        </div>
         <!-- Contextual secondary tools (Editor Mode only) -->
         <div class="actions-contextual-group editor-only-nav" id="top-contextual-actions" style="display: none;"></div>
 
@@ -3470,12 +3479,15 @@
       <div class="rm-library-hero" style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 10px;">
         <!-- Clean Mature Subtitle Badge -->
         <div class="rm-library-eyebrow" style="display: inline-flex; align-items: center; padding: 5px 16px; border-radius: 9999px; background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(168, 85, 247, 0.28); color: #c084fc; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-          <span>REGAARDER CINEMATIC LIBRARY</span>
+          <span>Effortless Visual Effects &bull; Pro Storytelling</span>
         </div>
         
         <!-- Single-line balanced headline -->
         <h2 style="font-size: clamp(26px, 3.8vw, 44px); font-weight: 800; letter-spacing: -0.025em; color: #ffffff; line-height: 1.2; margin: 0; white-space: nowrap;">
-          Your next story <span>starts here.</span>
+          Intuitive Editing, 
+          <span style="background: linear-gradient(100deg, #c084fc 0%, #e879f9 50%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Endless Creativity
+          </span>
         </h2>
         <p class="rm-library-tagline" hidden style="display:none;"></p>
 

@@ -5,9 +5,9 @@
  if(!home||!topbar)return;
  const hero=home.firstElementChild;if(hero)hero.classList.add('rm-library-hero');
  const badge=hero?.querySelector('.rm-library-eyebrow')||hero?.firstElementChild;
- if(badge){badge.classList.add('rm-library-eyebrow');badge.textContent='REGAARDER CINEMATIC LIBRARY';}
+ if(badge){badge.classList.add('rm-library-eyebrow');badge.textContent='Effortless Visual Effects \u2022 Pro Storytelling';}
  const headline=hero?.querySelector('h2');
- if(headline)headline.innerHTML='Your next story <span>starts here.</span>';
+ if(headline)headline.innerHTML='Intuitive Editing, <span>Endless Creativity</span>';
  if(!hero?.querySelector('.rm-library-tagline')&&headline){
    const tagline=document.createElement('p');tagline.className='rm-library-tagline';tagline.textContent='Explore cinematic motion. Replace the assets. Make every scene yours.';headline.after(tagline);
  }
@@ -59,4 +59,164 @@
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  const discover=node=>{if(node.nodeType!==1)return;if(node.id==='btn-toggle-3d-interactive-mode')refineToggle(node);node.querySelectorAll?.('#btn-toggle-3d-interactive-mode').forEach(refineToggle);};
  discover(document.body);new MutationObserver(records=>{for(const record of records)for(const node of record.addedNodes)discover(node);}).observe(document.body,{childList:true,subtree:true});
+
+ // Top-bar Sign up / Log in buttons & Auth Modal
+ const AUTH_KEY = 'regaarder_motion_user';
+ const signupBtn = document.getElementById('btn-auth-signup');
+ const loginBtn = document.getElementById('btn-auth-login');
+ const userBtn = document.getElementById('btn-auth-user');
+ const avatarEl = document.getElementById('rm-auth-avatar');
+ const userNameEl = document.getElementById('rm-auth-user-name');
+
+ function getStoredUser() {
+   try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch (_) { return null; }
+ }
+ function syncAuthUI() {
+   const user = getStoredUser();
+   const signedIn = Boolean(user && user.email);
+   if (signupBtn) signupBtn.hidden = signedIn;
+   if (loginBtn) loginBtn.hidden = signedIn;
+   if (userBtn) userBtn.hidden = !signedIn;
+   if (signedIn) {
+     const display = user.name || user.email.split('@')[0];
+     const initials = display.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase() || 'RM';
+     if (avatarEl) avatarEl.textContent = initials;
+     if (userNameEl) userNameEl.textContent = display;
+   }
+ }
+
+ let authModal = null;
+ let authMode = 'login';
+ function ensureAuthModal() {
+   if (authModal) return authModal;
+   authModal = document.createElement('div');
+   authModal.id = 'rg-auth-modal';
+   authModal.className = 'rm-auth-backdrop';
+   authModal.setAttribute('role', 'dialog');
+   authModal.setAttribute('aria-modal', 'true');
+   authModal.setAttribute('aria-labelledby', 'rm-auth-heading');
+   authModal.innerHTML = `
+     <div class="rm-auth-card">
+       <button type="button" class="rm-auth-close" data-auth-close aria-label="Close">&times;</button>
+       <div class="rm-auth-brand">
+         <img src="/assets/regaarder-ribbon.svg" alt="" width="34" height="20">
+         <span>REGAARDER <em>MOTION</em></span>
+       </div>
+       <h3 class="rm-auth-title" id="rm-auth-heading">Welcome back</h3>
+       <p class="rm-auth-sub" data-auth-sub>Log in to save templates, sync scenes, and export in 4K.</p>
+       <div class="rm-auth-tabs" role="tablist">
+         <button type="button" class="rm-auth-tab" data-auth-tab="signup">Sign up</button>
+         <button type="button" class="rm-auth-tab is-active" data-auth-tab="login">Log in</button>
+       </div>
+       <div class="rm-auth-oauth">
+         <button type="button" class="rm-auth-oauth-btn" data-auth-provider="Google">
+           <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.25-.96 2.31-2.04 3.02l3.3 2.56c1.92-1.77 3.04-4.38 3.04-7.48 0-.72-.06-1.41-.19-2.08H12z"/><path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.3-2.56c-.9.61-2.05.97-3.32.97-2.55 0-4.71-1.72-5.48-4.04H3.1v2.64A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.52 13.95A6 6 0 0 1 6.2 12c0-.68.12-1.34.32-1.95V7.41H3.1A10 10 0 0 0 2 12c0 1.61.39 3.14 1.1 4.59l3.42-2.64z"/><path fill="#4285F4" d="M12 6.01c1.47 0 2.79.5 3.83 1.5l2.87-2.87C16.95 2.99 14.7 2 12 2A10 10 0 0 0 3.1 7.41l3.42 2.64C7.29 7.73 9.45 6.01 12 6.01z"/></svg>
+           <span>Continue with Google</span>
+         </button>
+       </div>
+       <div class="rm-auth-divider">or with email</div>
+       <form data-auth-form novalidate>
+         <div class="rm-auth-field" data-auth-name-wrap hidden>
+           <label for="rm-auth-name">Full name</label>
+           <input id="rm-auth-name" type="text" placeholder="Alex Rivera" autocomplete="name">
+         </div>
+         <div class="rm-auth-field">
+           <label for="rm-auth-email">Email</label>
+           <input id="rm-auth-email" type="email" placeholder="you@studio.com" autocomplete="email" required>
+         </div>
+         <div class="rm-auth-field">
+           <label for="rm-auth-pass">Password</label>
+           <div class="rm-auth-input-wrap">
+             <input id="rm-auth-pass" type="password" placeholder="At least 6 characters" autocomplete="current-password" required>
+             <button type="button" class="rm-auth-eye" data-auth-eye>Show</button>
+           </div>
+         </div>
+         <button type="submit" class="rm-auth-submit" data-auth-submit>Log in</button>
+         <div class="rm-auth-msg" data-auth-msg></div>
+       </form>
+       <div class="rm-auth-footer">
+         <span data-auth-switch-text>New to Regaarder Motion?</span>
+         <button type="button" data-auth-switch>Create an account</button>
+       </div>
+     </div>
+   `;
+   document.body.appendChild(authModal);
+
+   const setMode = (mode) => {
+     authMode = mode === 'signup' ? 'signup' : 'login';
+     const isSignup = authMode === 'signup';
+     authModal.querySelector('#rm-auth-heading').textContent = isSignup ? 'Create your account' : 'Welcome back';
+     authModal.querySelector('[data-auth-sub]').textContent = isSignup
+       ? 'Start building cinematic motion scenes and save your work.'
+       : 'Log in to save templates, sync scenes, and export in 4K.';
+     authModal.querySelector('[data-auth-name-wrap]').hidden = !isSignup;
+     authModal.querySelector('[data-auth-submit]').textContent = isSignup ? 'Create account' : 'Log in';
+     authModal.querySelector('[data-auth-switch-text]').textContent = isSignup ? 'Already have an account?' : 'New to Regaarder Motion?';
+     authModal.querySelector('[data-auth-switch]').textContent = isSignup ? 'Log in' : 'Create an account';
+     authModal.querySelector('[data-auth-msg]').textContent = '';
+     authModal.querySelectorAll('[data-auth-tab]').forEach((t) => {
+       t.classList.toggle('is-active', t.getAttribute('data-auth-tab') === authMode);
+     });
+   };
+
+   const closeModal = () => authModal.classList.remove('is-open');
+   authModal.addEventListener('click', (e) => {
+     if (e.target === authModal || e.target.closest('[data-auth-close]')) closeModal();
+   });
+   document.addEventListener('keydown', (e) => {
+     if (e.key === 'Escape' && authModal.classList.contains('is-open')) closeModal();
+   });
+   authModal.querySelectorAll('[data-auth-tab]').forEach((t) => {
+     t.addEventListener('click', () => setMode(t.getAttribute('data-auth-tab')));
+   });
+   authModal.querySelector('[data-auth-switch]').addEventListener('click', () => {
+     setMode(authMode === 'signup' ? 'login' : 'signup');
+   });
+   authModal.querySelector('[data-auth-eye]').addEventListener('click', (e) => {
+     const inp = authModal.querySelector('#rm-auth-pass');
+     const show = inp.type === 'password';
+     inp.type = show ? 'text' : 'password';
+     e.currentTarget.textContent = show ? 'Hide' : 'Show';
+   });
+   authModal.querySelector('[data-auth-provider]').addEventListener('click', () => {
+     const msg = authModal.querySelector('[data-auth-msg]');
+     localStorage.setItem(AUTH_KEY, JSON.stringify({ name: 'Creator Studio', email: 'creator@regaarder.studio' }));
+     msg.classList.add('is-ok');
+     msg.textContent = 'Signed in with Google.';
+     syncAuthUI();
+     setTimeout(closeModal, 450);
+   });
+   authModal.querySelector('[data-auth-form]').addEventListener('submit', (e) => {
+     e.preventDefault();
+     const name = authModal.querySelector('#rm-auth-name').value.trim();
+     const email = authModal.querySelector('#rm-auth-email').value.trim();
+     const pass = authModal.querySelector('#rm-auth-pass').value;
+     const msg = authModal.querySelector('[data-auth-msg]');
+     msg.classList.remove('is-ok');
+     if (!email || !email.includes('@')) { msg.textContent = 'Please enter a valid email address.'; return; }
+     if (pass.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; return; }
+     localStorage.setItem(AUTH_KEY, JSON.stringify({ name: name || email.split('@')[0], email }));
+     msg.classList.add('is-ok');
+     msg.textContent = authMode === 'signup' ? 'Account created!' : 'Logged in!';
+     syncAuthUI();
+     setTimeout(closeModal, 450);
+   });
+   authModal._setMode = setMode;
+   return authModal;
+ }
+
+ window.openRegaarderAuthModal = (mode = 'login') => {
+   const m = ensureAuthModal();
+   m._setMode(mode);
+   m.classList.add('is-open');
+   setTimeout(() => m.querySelector(mode === 'signup' ? '#rm-auth-name' : '#rm-auth-email')?.focus(), 60);
+ };
+
+ signupBtn?.addEventListener('click', () => window.openRegaarderAuthModal('signup'));
+ loginBtn?.addEventListener('click', () => window.openRegaarderAuthModal('login'));
+ userBtn?.addEventListener('click', () => {
+   localStorage.removeItem(AUTH_KEY);
+   syncAuthUI();
+ });
+ syncAuthUI();
 })();
