@@ -635,7 +635,7 @@
 
     return `
       <div id="regaarder-n3d-viewport-${suffix}" class="rg-n3d-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#0b0f17;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;cursor:default;">
-        <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;cursor:default;"></canvas>
+        <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:${isHover ? 'cover' : 'contain'};display:block;cursor:default;"></canvas>
         <div data-n3d-status role="status" style="position:absolute;left:12px;top:52px;z-index:25;padding:5px 9px;background:#080b10cc;color:#cbd5e1;font:12px Arial;pointer-events:none"></div>
         ${hitOverlayHtml}
         ${!isHover?`<nav aria-label="3D viewport zoom" style="position:absolute;left:14px;bottom:56px;z-index:31;display:flex;gap:6px;padding:6px;border-radius:var(--rg-toolbar-radius,12px);background:var(--rg-toolbar-bg,#1B1628);border:1px solid var(--rg-toolbar-border,#3B2A5F)"><button class="rg-btn-secondary" data-n3d-zoom="out" aria-label="Zoom out">−</button><button class="rg-btn-secondary" data-n3d-zoom="in" aria-label="Zoom in">Zoom +</button><button class="rg-btn-secondary" data-n3d-zoom="reset">Fit</button><output data-n3d-zoom-label>${state.cameraZoom.toFixed(2)}×</output></nav>`:''}

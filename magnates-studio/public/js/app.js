@@ -25850,7 +25850,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro Suite',
     timeToApply: '1614.6s',
     previewGradient: 'linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(6, 8, 12, 0.99))',
-    description: 'The complete 26-minute Regaarder documentary master sequence spanning all chapters from minute 0 to minute 26: Herzogenaurach Origins, Decades Feud, Native 3D Humanoid Rig, Minute 16 Warehouse & Victory, Minute 17 Rain Rivalry, Pelé Pact, and The Final Chapter.',
+    description: 'All 7 documentary scenes in one timeline: Origins map reveal, archival feud, 3D rig, warehouse & rain rivalry, Pelé Pact, and the burning-shoe finale.',
     tags: ['Master Documentary', 'Full Movie', '26 Minutes', 'All Chapters', '3D Spatial', 'Cinematic Motion'],
     defaultImage: '/assets/regaarder-motion/portrait.png',
     secondaryImage: '/assets/final-chapter/wall.png',
@@ -25865,9 +25865,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro Suite',
     timeToApply: '84.0 sec',
     previewGradient: 'linear-gradient(135deg, rgba(22, 55, 67, 0.96), rgba(8, 14, 20, 0.98))',
-    description: 'Wine & dine restaurant with independent cutouts, descending handshake clasp, escalating rival bids with burning cash, Mexico 70 camera roll, Placard newspaper collage, crossed brand cards, and iconic bicycle kick boot punch-in.',
+    description: 'Scene effects: restaurant cutouts, descending handshake, burning cash bids, newspaper collage, crossed brand cards, and kick punch-in.',
     tags: ['Pelé Pact', 'Chapter 6', 'Handshake', 'Mexico 70', 'Newspaper Collage', 'Bicycle Kick', 'Documentary'],
-    defaultImage: '/assets/regaarder-motion/portrait.png',
+    defaultImage: '/assets/regaarder-motion/outdoor.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
@@ -25879,9 +25879,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro Suite',
     timeToApply: '60.0 sec',
     previewGradient: 'linear-gradient(135deg, rgba(11, 36, 48, 0.96), rgba(7, 9, 11, 0.98))',
-    description: 'Trophy archival crowd passage, shoe showcase pedestal pullback with money stacks, water reflection with Adidas/Puma ocean shipment split, and warehouse boot elevation with pointing accusatory hands.',
+    description: 'Scene effects: archival crowd passage, 3D shoe pedestal with money stacks, ocean shipment water reflection, and warehouse boot reveal.',
     tags: ['Minute 16', 'Cargo Ships', 'Water Reflection', 'Shoe Pedestal', 'Warehouse Accusations', 'Documentary'],
-    defaultImage: '/assets/regaarder-motion/portrait.png',
+    defaultImage: '/assets/minute16/celebration-group-v123.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
@@ -25893,9 +25893,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro Suite',
     timeToApply: '60.0 sec',
     previewGradient: 'linear-gradient(135deg, rgba(36, 38, 75, 0.96), rgba(3, 4, 6, 0.98))',
-    description: 'City profile portraits under torrential seeded rain, heat-shimmering sportswear products, masked family panel rises with reflection pools, retreating archival photograph, and chromatic cyan/crimson split with blinding optical flare.',
+    description: 'Scene effects: rain-swept city portraits, heat-shimmer products, rising family panels, and cyan/crimson chromatic split flare.',
     tags: ['Minute 17', 'Seeded Rain', 'Next Generation', 'Family Panels', 'Photo Split', 'Optical Flare'],
-    defaultImage: '/assets/regaarder-motion/portrait.png',
+    defaultImage: '/assets/minute17/confrontation-city-v120.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
@@ -25907,7 +25907,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro Suite',
     timeToApply: '205.6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(35, 14, 18, 0.96), rgba(5, 5, 8, 0.98))',
-    description: 'Full documentary climax: Founders parlor pullback, burning sneaker with dynamic video flame emitters, financial distress with wave-deforming brand cards, Nike gold vortex, Predator showcase, Yeezy gloss card, Alexander McQueen runway, and headquarters aerial pins.',
+    description: 'Scene effects: parlor pullback, burning sneaker flames, wave-deforming brand cards, gold vortex, and aerial headquarters pins.',
     tags: ['Final Chapter', 'Chapter 7', 'Burning Shoe', 'Video Flame Atlas', 'Nike Vortex', 'Predator', 'Headquarters Pins'],
     defaultImage: '/assets/regaarder-motion/fire.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
@@ -25921,7 +25921,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro Suite',
     timeToApply: 'Interactive',
     previewGradient: 'linear-gradient(135deg, rgba(20, 24, 32, 0.96), rgba(11, 15, 21, 0.98))',
-    description: 'Full native 3D anatomical humanoid workspace: multiresolution surface subdivision, planar/cylindrical UV unwrapping, 3D vertex paint brush, PBR roughness/metalness/bump-to-normal maps, tailored hat/wardrobe, and GLB export.',
+    description: 'Interactive 3D character rig: sculpted surface subdivision, vertex paint, PBR shading, tailored wardrobe, and GLB export.',
     tags: ['Native 3D', 'Surface Builder', 'Multiresolution', 'UV Unwrapping', 'Vertex Paint', 'PBR Shading', 'GLB Export'],
     defaultImage: '/assets/regaarder-motion/standing.png',
     secondaryImage: '/assets/regaarder-motion/outdoor.png'
@@ -25935,9 +25935,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro Suite',
     timeToApply: '13.6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(40, 61, 79, 0.96), rgba(16, 17, 19, 0.98))',
-    description: 'Bavarian aerial town map, Adidas & PUMA dual lockups, historical portrait with customizable torn-paper eye strip, organic spreading paper tears reveal, and optional Living Fire & Desk Lamp continuation.',
+    description: 'Scene effects: aerial town map, dual brand lockups, torn-paper eye strip, spreading paper tears, and living fire reveal.',
     tags: ['Slow Reveal', 'Eye Strip', 'Organic Paper Tears', 'Herzogenaurach', 'Living Fire', 'Regaarder Motion'],
-    defaultImage: '/assets/regaarder-motion/portrait.png',
+    defaultImage: '/assets/regaarder-motion/map.png',
     secondaryImage: '/assets/regaarder-motion/reveal.png'
   },
   {
@@ -28071,7 +28071,6 @@ function renderHomepageTemplates() {
           <div class="home-tpl-fx-container" id="fx-container-${t.id}" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; display: none;"></div>
 
           <div class="home-tpl-badge" id="badge-${t.id}">${t.badge || ''}</div>
-          ${is3D ? `<div class="home-tpl-3d-badge">\u2b21 3D VIDEO</div>` : ''}
           <div class="home-tpl-time">${t.timeToApply || '6s'}</div>
 
           <div class="home-tpl-play-hover" id="play-hover-${t.id}">
@@ -28096,7 +28095,7 @@ function renderHomepageTemplates() {
                 <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
               </button>
               <span class="home-tpl-btn-use">
-                Open FX
+                Use This
                 <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
               </span>
             </div>
@@ -32370,7 +32369,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       // Update timer pill & hud if open in customizer
       const timerBadge = document.getElementById('tpl-modal-timer-badge');
       if (timerBadge) {
-        timerBadge.textContent = `${(normT * durationSec).toFixed(1)}s / ${durationSec.toFixed(1)}s (Scene 1)`;
+        timerBadge.textContent = `${(normT * durationSec).toFixed(1)}s / ${durationSec.toFixed(1)}s \u00b7 Scene 1`;
       }
 
       // 1. Slow Dramatic Dolly Zoom on background atmosphere
@@ -38217,7 +38216,7 @@ function updateTopCustomizerFrame(seqTime, now) {
 
   const timerBadge = document.getElementById('tpl-modal-timer-badge');
   if (timerBadge) {
-    timerBadge.textContent = `${seqTime.toFixed(1)}s / ${totalSeqDur.toFixed(1)}s (Scene ${activeStoryboardSceneIndex + 1})`;
+    timerBadge.textContent = `${seqTime.toFixed(1)}s / ${totalSeqDur.toFixed(1)}s \u00b7 Scene ${activeStoryboardSceneIndex + 1}`;
   }
 
   // Update YouTube-Style Floating HUD Timecode & Scrubber

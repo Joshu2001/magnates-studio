@@ -3470,14 +3470,14 @@
       <div class="rm-library-hero" style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 10px;">
         <!-- Clean Mature Subtitle Badge -->
         <div class="rm-library-eyebrow" style="display: inline-flex; align-items: center; padding: 5px 16px; border-radius: 9999px; background: rgba(147, 51, 234, 0.1); border: 1px solid rgba(168, 85, 247, 0.28); color: #c084fc; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
-          <span>REGAARDER CINEMATIC LIBRARY</span>
+          <span>EFFORTLESS VISUAL EFFECTS &bull; PRO STORYTELLING</span>
         </div>
         
         <!-- Single-line balanced headline -->
         <h2 style="font-size: clamp(26px, 3.8vw, 44px); font-weight: 800; letter-spacing: -0.025em; color: #ffffff; line-height: 1.2; margin: 0; white-space: nowrap;">
-          Your next story <span>starts here.</span>
+          Intuitive design, <span>endless creativity</span>
         </h2>
-        <p class="rm-library-tagline">Explore cinematic motion. Replace the assets. Make every scene yours.</p>
+        <p class="rm-library-tagline" hidden style="display:none;"></p>
 
         <!-- Central Search Bar -->
         <div class="rm-library-search" style="position: relative; width: 100%; max-width: 680px; margin: 8px auto 0;">
@@ -3511,7 +3511,7 @@
           <button type="button" role="tab" data-library-kind="effect" id="rm-library-tab-effect" aria-controls="home-templates-grid" aria-selected="false" tabindex="-1">Effects &amp; Layers</button>
         </div>
         <details class="rm-filter-menu">
-          <summary>Filters <span aria-hidden="true">⌄</span></summary>
+          <summary>Filters <svg viewBox="0 0 24 24" aria-hidden="true" style="width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.5;display:inline-block;flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6"/></svg></summary>
           <div id="home-category-pills" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;"></div>
         </details>
       </div>
@@ -7287,17 +7287,11 @@
           <!-- 1. Center Preview Canvas Container (Spacious, seamless dark bezel) -->
           <div id="tpl-modal-preview-canvas-box" style="background: #0e1017; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
             <!-- Flush Preview Stage: Rounded cinema frame with subtle inset shadow & responsive 16:9 ratio -->
-            <div id="tpl-modal-preview-stage-container" style="position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 480px; min-height: 240px; margin: 0 auto; background: #000; border-radius: 10px; overflow: visible; border: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
-              
-              <!-- Live Preview Container: centered 16:9 stage that adapts responsively -->
-              <div id="tpl-modal-preview-stage" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 10px;">
-                <!-- Dynamic FX layers rendered by JS -->
-              </div>
-
+            <!-- Unified Continuous Stage Control Bar -->
+            <div id="tpl-modal-stage-toolbar" class="rg-stage-toolbar">
               <!-- Top left Format Aspect Ratio Switcher Dropdown Pill -->
-              <div class="stage-aspect-dropdown-wrap" style="position: absolute; top: 12px; left: 12px; z-index: 9999;">
+              <div class="stage-aspect-dropdown-wrap rg-stage-bar-group" style="position: relative; z-index: 60;">
                 <button type="button" id="tpl-modal-btn-aspect" class="stage-aspect-pill-btn" title="Switch Video Format / Aspect Ratio">
-                  <span class="aspect-icon-badge">&#x1F4D0;</span>
                   <span id="tpl-modal-val-aspect" class="aspect-label">16:9 YouTube</span>
                   <span class="aspect-caret">&#x25BE;</span>
                 </button>
@@ -7413,6 +7407,25 @@
                   <span id="label-3d-mode">3D EDIT MODE</span>
                 </button>
               </div>
+              <!-- Top right time code pill matching homepage tags + Theater & Fullscreen Toggle -->
+              <span id="tpl-modal-timer-badge" style="font-size: 11.5px; font-weight: 500; font-variant-numeric: tabular-nums; color: #94a3b8;">2.4s / 6.0s &middot; Scene 1</span>
+              <div class="rg-stage-bar-group">
+                <button type="button" id="btn-tpl-modal-theater" style="background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.18); color: #cbd5e1; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 5px; transition: all 0.2s;" title="Toggle Theater / Expanded Stage View (Takes full vertical space)">
+                  <span id="tpl-theater-icon">&#x26F6;</span> <span id="tpl-theater-label">Theater View</span>
+                </button>
+                <button type="button" id="btn-tpl-modal-fullscreen" style="background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 4px;" title="Toggle Fullscreen Stage">
+                  <span>&#x2922;</span> Fullscreen
+                </button>
+              </div>
+            </div>
+            <div id="tpl-modal-preview-stage-container" style="position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 480px; min-height: 240px; margin: 0 auto; background: #000; border-radius: 10px; overflow: visible; border: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
+              
+              <!-- Live Preview Container: centered 16:9 stage that adapts responsively -->
+              <div id="tpl-modal-preview-stage" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 10px;">
+                <!-- Dynamic FX layers rendered by JS -->
+              </div>
+
+
 
               <!-- Floating Context Toolbar over selected object -->
               <div id="sigil-floating-layer-toolbar" style="display: none; position: absolute; z-index: 1000; background: rgba(15,23,42,0.95); border: 1px solid rgba(168,85,247,0.6); box-shadow: 0 10px 25px rgba(0,0,0,0.9); border-radius: 8px; padding: 4px 8px; align-items: center; gap: 6px; backdrop-filter: blur(8px);">
@@ -7448,16 +7461,7 @@
                 <button type="button" id="btn-doc-float-done" style="font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: #22c55e; border: 1px solid #4ade80; color: #000; cursor: pointer; display: flex; align-items: center; gap: 3px;" title="Done editing (hide toolbar to preview clean document)">&#x2713; Done</button>
               </div>
 
-              <!-- Top right time code pill matching homepage tags + Theater & Fullscreen Toggle -->
-              <div style="position: absolute; top: 12px; right: 12px; z-index: 20; display: flex; align-items: center; gap: 8px;">
-                <button type="button" id="btn-tpl-modal-theater" style="background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.18); color: #cbd5e1; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 5px; transition: all 0.2s;" title="Toggle Theater / Expanded Stage View (Takes full vertical space)">
-                  <span id="tpl-theater-icon">&#x26F6;</span> <span id="tpl-theater-label">Theater View</span>
-                </button>
-                <button type="button" id="btn-tpl-modal-fullscreen" style="background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 4px;" title="Toggle Fullscreen Stage">
-                  <span>&#x2922;</span> Fullscreen
-                </button>
-                <span id="tpl-modal-timer-badge" style="font-size: 11px; font-weight: 600; font-family: ui-monospace, monospace; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); color: #f1f5f9; padding: 4px 10px; border-radius: 20px;">2.4s / 6.0s (Scene 1)</span>
-              </div>
+
 
               <!-- YouTube-Style Floating Hover Player HUD -->
               <div id="tpl-modal-player-hud" class="tpl-modal-player-hud">

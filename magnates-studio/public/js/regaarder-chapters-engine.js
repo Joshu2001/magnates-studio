@@ -661,7 +661,7 @@
 
     return `
       <div id="regaarder-chapter-viewport-${suffix}" class="rg-chapter-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#04060a;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;">
-        <canvas id="regaarder-chapter-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
+        <canvas id="regaarder-chapter-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:${isHover ? 'cover' : 'contain'};display:block;"></canvas>
         ${templateId === 'regaarder-full-documentary' && !isHover ? '<iframe data-documentary-source title="Documentary sequence" src="/regaarder-documentary/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:1"></iframe>' : ''}
         ${interactiveOverlayHtml}
       </div>
@@ -747,15 +747,41 @@
   };
 
   // Build standardized 4-Tab Contextual Inspector (Content, Motion, Look, Effects) + Advanced Controls
+  const SCENE_THUMB_MAP = {
+    origins: '/assets/regaarder-motion/map.png',
+    early_feud: '/assets/regaarder-motion/portrait.png',
+    checkpoint3d: '/assets/regaarder-motion/standing.png',
+    minute16: '/assets/minute16/celebration-group-v123.png',
+    minute17: '/assets/minute17/confrontation-city-v120.png',
+    pele: '/assets/regaarder-motion/outdoor.png',
+    final: '/assets/regaarder-motion/fire.png'
+  };
+  function buildVisualSceneCardsHtml(scenes, fallbackThumb) {
+    const curT = Number(window.topCustomizerState?.currentTime || 0);
+    return `<div class="rg-scene-visual-grid">${(scenes || []).map((scene, idx) => {
+      const thumb = SCENE_THUMB_MAP[scene.id] || fallbackThumb || '/assets/regaarder-motion/portrait.png';
+      const isActive = curT >= scene.start && curT < (scene.end || scene.start + 999);
+      const cleanTitle = String(scene.label || '').replace(/^\d+\s*·\s*\d+:\d+\s*/, '').trim();
+      const mins = Math.floor((scene.start || 0) / 60);
+      const secs = Math.floor((scene.start || 0) % 60).toString().padStart(2, '0');
+      return `<button type="button" class="rg-scene-card${isActive ? ' is-active' : ''}" data-ch-jump-sec="${scene.start}" title="${scene.label}">
+        <div class="rg-scene-card-thumb">
+          <img src="${thumb}" alt="${cleanTitle}" loading="lazy">
+          <span class="rg-scene-card-time">${mins}:${secs}</span>
+        </div>
+        <div class="rg-scene-card-title">${String(idx + 1).padStart(2, '0')} · ${cleanTitle}</div>
+      </button>`;
+    }).join('')}</div>`;
+  }
+
   window.tplBuildRegaarderChapterRegaarderPanes = function (templateId) {
     const rt = chapterRuntime[templateId];
     if (!rt) return null;
     const cfg = ensureFallbackConfig(templateId);
     if(templateId === 'regaarder-full-documentary') {
       return {
-        content: `<div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Documentary scenes</span></div><div class="rg-section-body">
-          <label class="rg-ctrl-label">Jump to scene</label><select class="rg-select" data-ch-action="jump-scene">${rt.scenes.map(scene=>`<option value="${scene.start}">${scene.label}</option>`).join('')}</select>
-          <p style="font-size:11px;color:#94a3b8">Original scene playback. The source sponsor interval (18:00–18:50) is skipped. Use the individual chapter templates to edit their layers.</p>
+        content: `<div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Jump to scene</span></div><div class="rg-section-body">
+          ${buildVisualSceneCardsHtml(rt.scenes, '/assets/regaarder-motion/portrait.png')}
         </div></div>`,
         motion:'',look:'',effects:'',advanced:'<div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Original scene settings</span></div><div class="rg-section-body"><button type="button" class="rg-btn-secondary" data-ch-all-controls>Load current scene controls</button><div data-ch-all-settings></div></div></div>' 
       };
@@ -1068,6 +1094,21 @@
         const layer = cfg.layers && cfg.layers[rt.selectedLayer];
         if (!layer) return;
         layer[k] = inp.checked;
+        refreshStage();
+      });
+    });
+
+    modalEl.querySelectorAll('[data-ch-jump-sec]').forEach((cardBtn) => {
+      cardBtn.addEventListener('click', () => {
+        const sec = parseFloat(cardBtn.getAttribute('data-ch-jump-sec')) || 0;
+        modalEl.querySelectorAll('[data-ch-jump-sec]').forEach((b) => b.classList.remove('is-active'));
+        cardBtn.classList.add('is-active');
+        if (typeof window.renderCustomizerFrameAtTime === 'function') window.renderCustomizerFrameAtTime(sec + 0.1);
+        else if (window.topCustomizerState) {
+          window.topCustomizerState.currentTime = sec + 0.1;
+          window.topCustomizerState.pausedElapsedMs = (sec + 0.1) * 1000;
+          window.topCustomizerState.startTime = performance.now() - (sec + 0.1) * 1000;
+        }
         refreshStage();
       });
     });
