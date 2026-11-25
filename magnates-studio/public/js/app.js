@@ -28631,9 +28631,14 @@ function renderHomepageTemplates() {
   const headingEl = document.getElementById('home-templates-heading');
   if (!grid) return;
 
-  // Merge user custom templates with built-in templates
+  // Merge user custom templates with built-in templates (deduplicated by id)
   const customTemplates = getCustomTemplates();
-  const allTemplates = [...customTemplates, ...EFFECT_TEMPLATES_DATA].filter(t => !t.hidden);
+  const seenTplIds = new Set();
+  const allTemplates = [...customTemplates, ...EFFECT_TEMPLATES_DATA].filter(t => {
+    if (!t || t.hidden || seenTplIds.has(t.id)) return false;
+    seenTplIds.add(t.id);
+    return true;
+  });
 
   const filtered = allTemplates.filter(t => {
     let matchesCat = false;
@@ -30189,8 +30194,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       }
     } else if (tplId === 'map') {
       const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : {};
+      const isCardHover = !cardEl || cardEl.id !== 'tpl-modal-preview-stage';
       if (typeof window.tplBuildInvestigativeGlobeHtml === 'function') {
-        fxContainer.innerHTML = window.tplBuildInvestigativeGlobeHtml(mData);
+        fxContainer.innerHTML = window.tplBuildInvestigativeGlobeHtml(mData, { forceSvg: isCardHover });
       } else {
         fxContainer.innerHTML = `<div class="tpl-map"></div>`;
       }
@@ -33010,14 +33016,21 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
     } else if (BIZ_STORY_IDS.includes(tplId)) {
       fxContainer.innerHTML = `<div class="tpl-biz tpl-biz-${tplId}">${bizStoryHoverMarkup(tplId)}</div>`;
     } else {
-      fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; overflow: hidden;">
-          <img id="fx-bg-${tplId}" src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; filter: blur(3px) brightness(0.65);" />
-          <div id="fx-fg-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
-            <img src="${tpl.defaultImage}" style="width: 78%; height: 78%; object-fit: cover; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.9);" />
+      const fallbackImg = tpl.defaultImage || (typeof window.tplGetSnapshot === 'function' ? window.tplGetSnapshot(tplId) : '') || (defaultImg ? defaultImg.src : '');
+      if (fallbackImg) {
+        fxContainer.innerHTML = `
+          <div style="position: absolute; inset: 0; overflow: hidden;">
+            <img id="fx-bg-${tplId}" src="${fallbackImg}" style="width: 100%; height: 100%; object-fit: cover; filter: blur(3px) brightness(0.65);" />
+            <div id="fx-fg-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+              <img src="${fallbackImg}" style="width: 78%; height: 78%; object-fit: cover; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.9);" />
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      }
+    }
+    if (!fxContainer.innerHTML || !fxContainer.innerHTML.trim()) {
+      fxContainer.style.display = 'none';
+      if (defaultImg) defaultImg.style.opacity = '1';
     }
   }
 
@@ -35669,6 +35682,16 @@ function openTopTemplateCustomizer(tpl) {
   if (!modal) return;
   modal.style.display = 'flex';
 
+  // Immediately clear previous stage/inspector and sync header so a failing sub-renderer can never leave a stale template on screen
+  const prevTitleEl = document.getElementById('tpl-modal-title');
+  if (prevTitleEl) prevTitleEl.textContent = (tpl.title || 'Template').split('(')[0].trim();
+  const prevBadgeEl = document.getElementById('tpl-modal-badge');
+  if (prevBadgeEl) prevBadgeEl.textContent = tpl.badge || 'PRO FX';
+  const prevDescEl = document.getElementById('tpl-modal-desc');
+  if (prevDescEl) prevDescEl.textContent = tpl.description || 'Customize template layers before applying to timeline.';
+  const prevDyn = document.getElementById('tpl-modal-dynamic-controls');
+  if (prevDyn) prevDyn.innerHTML = '';
+
   const paperModeSwitcher = document.getElementById('paper-rip-mode-switcher');
   const paperModeVideo = document.getElementById('btn-paper-rip-mode-video');
   const paperMode3D = document.getElementById('btn-paper-rip-mode-3d');
@@ -35853,7 +35876,13 @@ function openTopTemplateCustomizer(tpl) {
 
   if (typeof initDocFullscreenToggle === 'function') initDocFullscreenToggle();
   if (typeof window.tplInitTheaterToggle === 'function') window.tplInitTheaterToggle();
-  if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tpl.id);
+  if (typeof window.tplRenderContextualInspector === 'function') {
+    try {
+      window.tplRenderContextualInspector(tpl.id);
+    } catch (inspErr) {
+      console.error('[openTopTemplateCustomizer] Contextual inspector error for', tpl.id, inspErr);
+    }
+  }
 
   // 1. Populate Header info
   const titleEl = document.getElementById('tpl-modal-title');

@@ -2105,7 +2105,7 @@
     return true;
   };
 
-  window.tplBuildInvestigativeGlobeHtml = function(mData) {
+  window.tplBuildInvestigativeGlobeHtml = function(mData, opts) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('map') : {});
     const proj = d.projection || 'globe';
     const styleKey = d.mapStyle || 'harris-dark';
@@ -2573,7 +2573,7 @@
       </svg>
     `;
 
-    const useThreeGlobe = (proj === 'globe' && typeof THREE !== 'undefined');
+    const useThreeGlobe = (proj === 'globe' && typeof THREE !== 'undefined' && !(opts && opts.forceSvg));
     const rig3DStyle = (!useThreeGlobe && is3D)
       ? `animation: none !important; transform: perspective(1000px) rotateX(${pitch3D}deg) rotateY(${yaw3D}deg) scale(${Math.min(1.35, Math.max(1.0, zoomLvl * 0.65))}); transform-style: preserve-3d; transition: transform 0.15s ease-out;`
       : '';
@@ -8802,6 +8802,7 @@
         { id: 'crimson-noir', label: 'Crimson Noir (Rose & Blood Red)' }
       ];
 
+      const milestones = Array.isArray(data.milestones) && data.milestones.length > 0 ? data.milestones : presets[0].milestones;
       const is3D = !!data.is3DMode;
       const cameraPitch = typeof data.cameraPitch === 'number' ? data.cameraPitch : 26;
       const cameraYaw = typeof data.cameraYaw === 'number' ? data.cameraYaw : -14;
