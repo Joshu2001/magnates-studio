@@ -414,13 +414,7 @@
   const scene=[...scenes].reverse().find(s=>time>=s.start)||scenes[0];
   const select=shell.querySelector('[data-ch-action="jump-scene"]');
   if(scene&&select&&document.activeElement!==select)select.value=String(scene.start);
-  let context=shell.querySelector(':scope > .rm-inspector-context');
-  if(!context){context=document.createElement('div');context.className='rm-inspector-context';context.innerHTML='<span class="rm-context-kicker"></span><strong></strong><span class="rm-context-help"></span>';shell.querySelector('.rg-inspector-tabs')?.after(context);}
-  const identity=document.querySelector('.rg-ctx-toolbar:not([hidden]) .rg-ctx-identity-label');
-  const selected=identity&&identity.getClientRects().length?identity.textContent.trim():'';
-  const heading=scene?.label?.replace(/^\d+\s*[·:.]?\s*/,'')||selected||'Scene settings';
-  const values=[scene?'CURRENT SCENE':selected?'SELECTED OBJECT':'INSPECTOR',heading,selected?'Selected: '+selected:scene?'Select an object on the canvas to edit it.':'Open a section to adjust its settings.'];
-  [context.children[0],context.children[1],context.children[2]].forEach((el,i)=>{if(el.textContent!==values[i])el.textContent=values[i];});
+  shell.querySelector(':scope > .rm-inspector-context')?.remove();
   const mediaSelect=shell.querySelector('[data-ch-action="select-layer"]');
   if(mediaSelect){
    for(const option of mediaSelect.options){const name=rt?.stageObjects?.find(o=>o.layerId===option.value)?.name||option.value.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());if(option.textContent!==name)option.textContent=name;}

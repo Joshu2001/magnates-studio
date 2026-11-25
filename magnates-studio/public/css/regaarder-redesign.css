@@ -3430,23 +3430,28 @@ body.rg-cutout-editor-active #stage-tf-box {
 }
 
 .rg-rail-btn-ai {
-  background: var(--rg-accent, #823CF0);
+  background: transparent;
   border: 1px solid transparent;
   color: #ffffff;
 }
 
+.rg-rail-btn-ai svg {
+  fill: #ffffff;
+  stroke: #ffffff;
+}
+
 .rg-rail-btn-ai:hover {
-  background: var(--rg-accent-hover, #9353F5);
+  background: rgba(255, 255, 255, 0.06);
   border-color: transparent;
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(130, 60, 240, 0.35);
+  box-shadow: none;
 }
 
 .rg-rail-btn-ai.is-active {
-  background: var(--rg-accent, #823CF0);
-  border-color: rgba(216, 180, 254, 0.75);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
   color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(130, 60, 240, 0.32), 0 4px 16px rgba(130, 60, 240, 0.4);
+  box-shadow: none;
 }
 
 .rg-rail-btn-storyboard {
