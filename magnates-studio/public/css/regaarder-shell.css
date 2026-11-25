@@ -139,8 +139,8 @@ body,
 }
 
 #main-nav-rail .rail-btn {
-  width: 68px !important;
-  min-height: 56px !important;
+  width: 60px !important;
+  min-height: 54px !important;
   height: auto !important;
   margin: 0 auto !important;
   padding: 6px 4px !important;
@@ -176,12 +176,12 @@ body,
 }
 
 #main-nav-rail .rail-btn.active {
-  background: linear-gradient(180deg, rgba(124, 58, 237, 0.28) 0%, rgba(91, 33, 182, 0.18) 100%) !important;
-  border: 1px solid rgba(139, 92, 246, 0.55) !important;
+  background: rgba(139, 92, 246, 0.18) !important;
+  border: 1px solid rgba(167, 139, 250, 0.28) !important;
   border-radius: 10px !important;
   color: #e9d5ff !important;
   font-weight: 600 !important;
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.18), inset 0 0 8px rgba(168, 85, 247, 0.1) !important;
+  box-shadow: none !important;
 }
 
 #main-nav-rail .rail-btn.active .rail-label {
