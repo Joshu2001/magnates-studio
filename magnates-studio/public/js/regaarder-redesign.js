@@ -31,6 +31,7 @@
     effects: '<svg viewBox="0 0 24 24"><path d="m15 4-1 1 4 4 1-1a2.83 2.83 0 1 0-4-4Z"/><path d="m13 6-8.5 8.5a2.12 2.12 0 1 0 3 3L16 9"/><path d="M19 2v3"/><path d="M20.5 3.5h-3"/><path d="M6 3v3"/><path d="M7.5 4.5h-3"/></svg>',
     settings: '<svg viewBox="0 0 24 24"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/><circle cx="8" cy="6" r="2" fill="#0B0B11"/><circle cx="16" cy="12" r="2" fill="#0B0B11"/><circle cx="10" cy="18" r="2" fill="#0B0B11"/></svg>',
     aiDirector: '<svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z"/></svg>',
+    storyboard: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="7" rx="1.2"/><rect x="13" y="4" width="8" height="7" rx="1.2"/><rect x="3" y="13" width="8" height="7" rx="1.2"/><rect x="13" y="13" width="8" height="7" rx="1.2"/></svg>',
     bell: '<svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
     arrowLeft: '<svg viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
     chevronLeft: '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>',
@@ -173,14 +174,15 @@
       { id: 'layers', label: 'Scene Layers', icon: LUCIDE_ICONS.layers },
       { id: 'effects', label: 'AI & Visual Effects', icon: LUCIDE_ICONS.effects },
       { id: 'settings', label: 'Controls & Settings', icon: LUCIDE_ICONS.settings },
-      { id: 'ai', label: 'AI Director Chat', icon: LUCIDE_ICONS.aiDirector, isAI: true }
+      { id: 'ai', label: 'AI Director Chat', icon: LUCIDE_ICONS.aiDirector, isAI: true },
+      { id: 'storyboard', label: 'Storyboard Mode', icon: LUCIDE_ICONS.storyboard, isStoryboard: true }
     ];
 
     let html = '';
     items.forEach((item) => {
       if (item.isAI) html += '<div class="rg-rail-divider" aria-hidden="true"></div>';
       html += `
-        <button type="button" class="rg-rail-btn ${item.active ? 'is-active' : ''} ${item.isAI ? 'rg-rail-btn-ai' : ''}" data-rail="${item.id}" data-tooltip="${item.label}" aria-label="${item.label}">
+        <button type="button" class="rg-rail-btn ${item.active ? 'is-active' : ''} ${item.isAI ? 'rg-rail-btn-ai' : ''} ${item.isStoryboard ? 'rg-rail-btn-storyboard' : ''}" data-rail="${item.id}" data-tooltip="${item.label}" aria-label="${item.label}">
           ${item.icon}
         </button>
       `;
@@ -188,13 +190,50 @@
 
     rail.innerHTML = html;
 
+    function toggleInlineStoryboardMode(forceOpen) {
+      const studioBody = rail.closest('.rg-studio-body');
+      const stageContainer = studioBody?.querySelector('#tpl-modal-preview-stage-container, #magnates-bp-stage, .rg-stage-frame');
+      if (!stageContainer) return;
+      let sbHost = stageContainer.querySelector('.rg-inline-storyboard-host');
+      const isCurrentlyOpen = !!(sbHost && sbHost.style.display !== 'none');
+      const nextOpen = typeof forceOpen === 'boolean' ? forceOpen : !isCurrentlyOpen;
+      const sbBtn = rail.querySelector('.rg-rail-btn[data-rail="storyboard"]');
+
+      if (nextOpen) {
+        if (!sbHost) {
+          sbHost = document.createElement('div');
+          sbHost.className = 'rg-inline-storyboard-host';
+          sbHost.style.cssText = 'position:absolute;inset:0;z-index:60;background:#0B0B0E;display:flex;flex-direction:column;border-radius:inherit;overflow:hidden;';
+          stageContainer.appendChild(sbHost);
+        }
+        sbHost.style.display = 'flex';
+        if (window.RegaarderStoryboardSketch && typeof window.RegaarderStoryboardSketch.openInline === 'function') {
+          window.RegaarderStoryboardSketch.openInline(sbHost, {
+            onSaveAndBack: () => toggleInlineStoryboardMode(false)
+          });
+        }
+        if (sbBtn) sbBtn.classList.add('is-active');
+      } else {
+        if (window.RegaarderStoryboardSketch && typeof window.RegaarderStoryboardSketch.closeInline === 'function') {
+          window.RegaarderStoryboardSketch.closeInline();
+        }
+        if (sbHost) sbHost.style.display = 'none';
+        if (sbBtn) sbBtn.classList.remove('is-active');
+      }
+    }
+
     rail.querySelectorAll('.rg-rail-btn').forEach((btn) => {
       btn.addEventListener('click', () => {
         const id = btn.getAttribute('data-rail');
         if (id === 'home') {
+          toggleInlineStoryboardMode(false);
           if (window.RegaarderContextualToolbar) window.RegaarderContextualToolbar.hide();
           if (typeof window.deselectMagnatesBPLayer === 'function') window.deselectMagnatesBPLayer();
           if (options && typeof options.onClose === 'function') options.onClose();
+          return;
+        }
+        if (id === 'storyboard') {
+          toggleInlineStoryboardMode();
           return;
         }
         if (id === 'ai') {

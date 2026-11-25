@@ -333,6 +333,58 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
     });
   });
 
+  function buildCommentAnimationAndAsset(commentText) {
+    const low = String(commentText || '').toLowerCase();
+    let anim = { type: 'dolly-zoom', label: 'Slow Dolly Zoom', scaleFrom: 1.0, scaleTo: 1.18, panX: 0, panY: 0, duration: 6, easing: 'ease-out' };
+    if (/\b(left|slide in|fly in)\b/i.test(low)) {
+      anim = { type: 'slide-left', label: 'Slide In Left', scaleFrom: 1.0, scaleTo: 1.04, panX: -14, panY: 0, duration: 2.4, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' };
+    } else if (/\b(up|rise|float)\b/i.test(low)) {
+      anim = { type: 'slide-up', label: 'Float Up', scaleFrom: 1.0, scaleTo: 1.05, panX: 0, panY: -12, duration: 3.0, easing: 'ease-out' };
+    } else if (/\b(pulse|glow|flash|beat)\b/i.test(low)) {
+      anim = { type: 'pulse-glow', label: 'Pulse Glow', scaleFrom: 0.98, scaleTo: 1.06, panX: 0, panY: 0, duration: 1.8, easing: 'ease-in-out' };
+    }
+
+    const needsAsset = /\b(add|create|generate|draw|make|skyline|city|arrow|chart|spotlight|badge|icon|background|overlay)\b/i.test(low);
+    let generatedAsset = null;
+    if (needsAsset) {
+      let svgBody = `<defs><radialGradient id="g" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.55"/><stop offset="100%" stop-color="#0b0c14" stop-opacity="0"/></radialGradient></defs><rect width="400" height="225" fill="url(#g)"/><circle cx="200" cy="112" r="54" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6 4"/>`;
+      let assetName = 'ai_overlay_fx.svg';
+      if (/\b(skyline|city|building)\b/i.test(low)) {
+        assetName = 'city_skyline_ai.svg';
+        svgBody = `<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#091324" stop-opacity="0.2"/><stop offset="100%" stop-color="#05070d" stop-opacity="0.9"/></linearGradient></defs><rect width="400" height="225" fill="url(#sky)"/><path d="M0 225V150h32v-32h24v32h18v-54h28v54h20v-70h34v70h22v-42h26v42h24v-82h38v82h20v-48h30v48h26v-64h32v64h26v75z" fill="#0f172a" stroke="#38bdf8" stroke-width="1.2" opacity="0.85"/>`;
+      } else if (/\b(arrow|pointer)\b/i.test(low)) {
+        assetName = 'ai_callout_arrow.svg';
+        svgBody = `<path d="M60 165 Q160 70 295 82" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/><polygon points="295,82 278,70 282,92" fill="#38bdf8"/>`;
+      } else if (/\b(chart|graph|stock)\b/i.test(low)) {
+        assetName = 'ai_trend_chart.svg';
+        svgBody = `<polyline points="35,175 110,145 175,158 245,95 355,48" fill="none" stroke="#34d399" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="355" cy="48" r="6" fill="#34d399"/>`;
+      }
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225">${svgBody}</svg>`;
+      generatedAsset = {
+        name: assetName,
+        kind: 'image',
+        dataUrl: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+      };
+    }
+
+    return { animation: anim, generatedAsset };
+  }
+
+  router.post('/animate-comment', (req, res) => {
+    const comment = String(req.body?.comment || '').trim();
+    if (!comment) return res.status(400).json({ ok: false, error: 'comment is required' });
+    const result = buildCommentAnimationAndAsset(comment);
+    res.json({
+      ok: true,
+      comment,
+      animation: result.animation,
+      generatedAsset: result.generatedAsset,
+      summary: result.generatedAsset
+        ? `Generated ${result.generatedAsset.name} and applied ${result.animation.label}.`
+        : `Applied ${result.animation.label} from comment.`
+    });
+  });
+
   // Browser client bridge endpoints
   router.get('/commands/pending', (req, res) => {
     const pending = commandQueue.filter((c) => c.status === 'queued');

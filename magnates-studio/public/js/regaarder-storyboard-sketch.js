@@ -171,6 +171,11 @@
         background: var(--rg-bg-canvas, #0B0B0E); color: var(--rg-text-primary, #F5F5F7);
         display: flex; flex-direction: column; font-family: Inter, system-ui, -apple-system, sans-serif;
       }
+      .rg-ed-root.rg-ed-embedded {
+        position: relative; inset: auto; z-index: 5; width: 100%; height: 100%; min-height: 0;
+      }
+      .rg-ed-root.rg-ed-embedded .rg-ed-stage { padding: 18px; }
+      .rg-ed-root.rg-ed-embedded .rg-ed-side { width: 224px; padding: 10px; }
       .rg-ed-main { flex: 1; display: flex; overflow: hidden; position: relative; }
       .rg-ed-stage {
         flex: 1; display: flex; align-items: flex-start; justify-content: flex-start;
@@ -473,7 +478,8 @@
   // ==========================================================================
   // SCENE EDITOR
   // ==========================================================================
-  function openSceneEditor(sceneId) {
+  function openSceneEditor(sceneId, opts) {
+    ensureStyles();
     const scene = state.scenes.find((s) => s.id === sceneId);
     if (!scene) return;
     ensureSceneSchema(scene);
@@ -506,8 +512,9 @@
       return `<button type="button" class="rg-orbit-btn ${item.active ? 'active' : ''}" ${item.attr} title="${item.title}" style="left:${x}px;top:${y}px;">${item.html}</button>`;
     }).join('');
 
+    const isEmbedded = !!(opts && opts.hostEl);
     editorEl = document.createElement('div');
-    editorEl.className = 'rg-ed-root';
+    editorEl.className = isEmbedded ? 'rg-ed-root rg-ed-embedded' : 'rg-ed-root';
     editorEl.innerHTML = `
       <div class="rg-sb-topbar">
         <div class="rg-sb-brand">
@@ -516,6 +523,7 @@
           <span id="rg-coord-readout" style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;">0, 0</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center;">
+          <button type="button" class="rg-sb-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">💬 Pin Comment</button>
           <button type="button" class="rg-sb-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">${ICONS.zoomBox} Area Zoom</button>
           <button type="button" class="rg-sb-btn" id="rg-zoom-out" title="Zoom Out">-</button>
           <span id="rg-zoom-label" style="font-size:12px; min-width:42px; text-align:center;">100%</span>
@@ -593,7 +601,12 @@
         </div>
       </div>
     `;
-    document.body.appendChild(editorEl);
+    if (isEmbedded) {
+      opts.hostEl.innerHTML = '';
+      opts.hostEl.appendChild(editorEl);
+    } else {
+      document.body.appendChild(editorEl);
+    }
 
     const stage = editorEl.querySelector('#rg-ed-stage');
     const canvas = editorEl.querySelector('#rg-ed-canvas');
@@ -1031,9 +1044,26 @@
         saveState();
         activeEditorApi = null;
         editorEl.remove(); editorEl = null;
-        renderBoard();
+        if (isEmbedded && typeof opts.onSaveAndBack === 'function') {
+          opts.onSaveAndBack();
+        } else {
+          renderBoard();
+        }
       }, 30);
     };
+
+    const pinCommentBtn = editorEl.querySelector('#rg-ed-comment-pin-btn');
+    if (pinCommentBtn) {
+      pinCommentBtn.onclick = () => {
+        if (window.RegaarderCommentPins && typeof window.RegaarderCommentPins.togglePinMode === 'function') {
+          const active = window.RegaarderCommentPins.togglePinMode(canvasWrap);
+          pinCommentBtn.classList.toggle('rg-sb-btn-accent', active);
+        }
+      };
+    }
+    if (window.RegaarderCommentPins && typeof window.RegaarderCommentPins.mountOn === 'function') {
+      window.RegaarderCommentPins.mountOn(canvasWrap, { scope: 'storyboard', sceneId: scene.id });
+    }
 
     function getPos(e) {
       const rect = canvas.getBoundingClientRect();
@@ -1327,7 +1357,27 @@
     renderBoard();
   }
 
-  window.RegaarderStoryboardSketch = { open, getState: () => state };
+  function openInline(hostEl, opts) {
+    if (!hostEl) return;
+    ensureStyles();
+    if (!Array.isArray(state.scenes) || state.scenes.length === 0) {
+      state.scenes = [{ id: uid('sc_'), title: 'Scene 1', aspectRatio: state.aspectRatio || '16:9', fps: 24, speed: 1, activeFrameIdx: 0, frames: [] }];
+      saveState();
+    }
+    openSceneEditor(state.scenes[0].id, {
+      hostEl,
+      onSaveAndBack: opts && opts.onSaveAndBack
+    });
+  }
+
+  function closeInline() {
+    if (playTimer) { clearInterval(playTimer); playTimer = null; }
+    closeContextMenu();
+    activeEditorApi = null;
+    if (editorEl) { editorEl.remove(); editorEl = null; }
+  }
+
+  window.RegaarderStoryboardSketch = { open, openInline, closeInline, getState: () => state };
 
   // Programmatic AI Harness
   window.RegaarderStoryboardAI = new Proxy({}, {

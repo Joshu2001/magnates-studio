@@ -16,6 +16,8 @@ def run_pass_1():
     ok = True
     js_files = [
         os.path.join(STUDIO, 'ai-harness.js'),
+        os.path.join(PUBLIC, 'js', 'regaarder-comment-pins.js'),
+        os.path.join(PUBLIC, 'js', 'regaarder-storyboard-sketch.js'),
         os.path.join(PUBLIC, 'js', 'regaarder-ai-director.js'),
         os.path.join(PUBLIC, 'js', 'regaarder-redesign.js'),
         os.path.join(PUBLIC, 'js', 'app.js'),
@@ -51,8 +53,10 @@ def run_pass_2():
 
     if "id: 'ai', label: 'AI Director Chat'" not in redesign or 'rg-rail-btn-ai' not in redesign:
         ok = fail('Left rail missing custom AI Director button')
+    elif "id: 'storyboard', label: 'Storyboard Mode'" not in redesign or 'toggleInlineStoryboardMode' not in redesign:
+        ok = fail('Left rail missing Storyboard Mode switch')
     else:
-        print('  OK left rail AI button (below Settings)')
+        print('  OK left rail AI Director + Storyboard Mode buttons (below Settings)')
 
     if 'window.RegaarderAIDirector.toggle(shell)' not in redesign or 'window.RegaarderAIDirector.close(shell)' not in redesign:
         ok = fail('Left rail / inspector tab toggle integration missing')
@@ -126,12 +130,21 @@ const server = app.listen(0, '127.0.0.1', () => {
       { id: 'kinetic', title: 'Kinetic Typography', category: 'Typography' }
     ]
   });
-  const req = http.request({ hostname: '127.0.0.1', port, path: '/api/ai/compose-sequence', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } }, (res) => {
+    const req = http.request({ hostname: '127.0.0.1', port, path: '/api/ai/compose-sequence', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } }, (res) => {
     let body = '';
     res.on('data', (c) => body += c);
     res.on('end', () => {
-      server.close();
-      console.log(body);
+      const p2 = JSON.stringify({ comment: 'Add glowing neon city skyline and slow dolly zoom' });
+      const req2 = http.request({ hostname: '127.0.0.1', port, path: '/api/ai/animate-comment', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(p2) } }, (res2) => {
+        let b2 = '';
+        res2.on('data', (c) => b2 += c);
+        res2.on('end', () => {
+          server.close();
+          console.log(JSON.stringify({ compose: JSON.parse(body), comment: JSON.parse(b2) }));
+        });
+      });
+      req2.write(p2);
+      req2.end();
     });
   });
   req.write(payload);
@@ -142,9 +155,11 @@ const server = app.listen(0, '127.0.0.1', () => {
     if res.returncode != 0:
         return fail(f'Node runtime test failed: {res.stderr.strip()}')
     try:
-        data = json.loads(res.stdout.strip())
+        parsed = json.loads(res.stdout.strip())
+        data = parsed.get('compose', {})
+        cdata = parsed.get('comment', {})
     except Exception as e:
-        return fail(f'Invalid JSON from /api/ai/compose-sequence: {e} | {res.stdout}')
+        return fail(f'Invalid JSON from /api/ai/*: {e} | {res.stdout}')
 
     bp = data.get('blueprint', {})
     secs = bp.get('sections', [])
@@ -154,7 +169,10 @@ const server = app.listen(0, '127.0.0.1', () => {
     tpls = [s.get('sourceTplId') for s in secs]
     if roles != ['intro', 'body', 'outro'] or tpls != ['map', 'balance', 'kinetic'] or bp.get('model') != 'online-gemini-pro' or bp.get('permission') != 'ask' or len(bp.get('attachments', [])) != 1:
         return fail(f'Mismatch in roles/templates/meta: roles={roles}, tpls={tpls}, bp={bp}')
+    if not cdata.get('ok') or not cdata.get('generatedAsset') or cdata.get('animation', {}).get('type') != 'dolly-zoom':
+        return fail(f'Unexpected /api/ai/animate-comment response: {cdata}')
     print(f'  OK /api/ai/compose-sequence -> roles={roles}, templates={tpls}, model={bp.get("model")}, perm={bp.get("permission")}, totalDuration={bp.get("totalDuration")}s')
+    print(f'  OK /api/ai/animate-comment -> asset={cdata["generatedAsset"]["name"]}, anim={cdata["animation"]["label"]}')
     return ok
 
 p1 = run_pass_1()
