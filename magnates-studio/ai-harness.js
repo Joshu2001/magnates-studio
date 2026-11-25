@@ -310,7 +310,95 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
     };
   }
 
-  router.post('/compose-sequence', (req, res) => {
+  async function fetchOllamaJson(urlPath, options = {}, timeoutMs = 2500) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(`http://127.0.0.1:11434${urlPath}`, {
+        ...options,
+        signal: controller.signal
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (_) {
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  router.get('/ollama/models', async (_req, res) => {
+    const data = await fetchOllamaJson('/api/tags', { method: 'GET' }, 2500);
+    if (!data || !Array.isArray(data.models)) {
+      return res.json({ ok: true, available: false, models: [] });
+    }
+    const models = data.models
+      .map((m) => ({
+        name: String(m.name || m.model || ''),
+        size: Number(m.size) || 0
+      }))
+      .filter((m) => m.name);
+    res.json({ ok: true, available: true, models });
+  });
+
+  async function tryComposeWithOllama(prompt, availableTemplates, requestedModel) {
+    let modelName = '';
+    if (requestedModel.startsWith('ollama:')) {
+      modelName = requestedModel.slice('ollama:'.length).trim();
+    } else if (requestedModel === 'local-ollama-llama3' || requestedModel === 'local-qwen-director') {
+      const tags = await fetchOllamaJson('/api/tags', { method: 'GET' }, 2000);
+      const list = Array.isArray(tags?.models) ? tags.models : [];
+      if (requestedModel === 'local-qwen-director') {
+        const qwen = list.find((m) => /qwen/i.test(String(m.name || '')));
+        modelName = qwen?.name || list[0]?.name || '';
+      } else {
+        modelName = list[0]?.name || '';
+      }
+    }
+    if (!modelName) return null;
+
+    const catalogText = availableTemplates.slice(0, 24)
+      .map((t) => `- ${t.id}: ${t.title} (${t.category || 'Scene'})`)
+      .join('\n');
+
+    const systemPrompt = [
+      'You are Regaarder AI Director for a 30-second video sequence.',
+      'Return ONLY valid JSON with keys: "summary" (1 concise sentence) and "sections" (array of 3 objects: intro, body, outro).',
+      'Each section object must have: "role" ("intro"|"body"|"outro"), "label" (e.g. "Intro"), "duration" (number in seconds), "sourceTplId" (from the catalog below).',
+      catalogText ? `Available templates:\n${catalogText}` : ''
+    ].filter(Boolean).join('\n');
+
+    const chatRes = await fetchOllamaJson('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: modelName,
+        stream: false,
+        format: 'json',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: prompt }
+        ]
+      })
+    }, 25000);
+
+    const rawContent = chatRes?.message?.content;
+    if (!rawContent) return null;
+    try {
+      const parsed = JSON.parse(rawContent);
+      return { modelName, parsed };
+    } catch (_) {
+      const match = String(rawContent).match(/\{[\s\S]*\}/);
+      if (!match) return null;
+      try {
+        return { modelName, parsed: JSON.parse(match[0]) };
+      } catch (__) {
+        return null;
+      }
+    }
+  }
+
+  router.post('/compose-sequence', async (req, res) => {
     const prompt = String(req.body?.prompt || '').trim();
     const attachments = Array.isArray(req.body?.attachments) ? req.body.attachments : [];
     if (!prompt && attachments.length === 0) {
@@ -321,15 +409,47 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
     const permission = ['ask', 'balanced', 'turbo'].includes(req.body?.permission) ? req.body.permission : 'turbo';
     const effectivePrompt = prompt || `Create a 30s visual sequence using attached media (${attachments.map((a) => a.name || 'asset').join(', ')})`;
     const blueprint = composeSequenceFromPrompt(effectivePrompt, availableTemplates);
-    blueprint.model = model;
+    let usedModel = model;
+    let customSummary = '';
+
+    const ollamaOut = await tryComposeWithOllama(effectivePrompt, availableTemplates, model);
+    if (ollamaOut?.parsed) {
+      usedModel = `ollama:${ollamaOut.modelName}`;
+      if (typeof ollamaOut.parsed.summary === 'string' && ollamaOut.parsed.summary.trim()) {
+        customSummary = ollamaOut.parsed.summary.trim();
+      }
+      if (Array.isArray(ollamaOut.parsed.sections) && ollamaOut.parsed.sections.length === 3) {
+        let cursor = 0;
+        blueprint.sections = ollamaOut.parsed.sections.map((sec, idx) => {
+          const fallback = blueprint.sections[idx];
+          const tpl = availableTemplates.find((t) => t.id === sec.sourceTplId);
+          const dur = Math.max(3, Math.min(30, Number(sec.duration) || fallback.duration));
+          const row = {
+            ...fallback,
+            role: ['intro', 'body', 'outro'][idx],
+            label: String(sec.label || fallback.label),
+            start: cursor,
+            duration: dur,
+            sourceTplId: tpl ? tpl.id : fallback.sourceTplId,
+            sourceTitle: tpl ? tpl.title : fallback.sourceTitle
+          };
+          cursor += dur;
+          return row;
+        });
+        blueprint.totalDuration = cursor;
+      }
+    }
+
+    blueprint.model = usedModel;
     blueprint.permission = permission;
     blueprint.attachments = attachments.map((a) => ({ name: String(a.name || 'attachment'), type: String(a.type || 'file') }));
     res.json({
       ok: true,
       blueprint,
-      model,
+      model: usedModel,
       permission,
-      summary: `Composed ${blueprint.totalDuration}s sequence (${model} · ${permission}) with Intro (${blueprint.sections[0].sourceTitle}), Body (${blueprint.sections[1].sourceTitle}), and Outro (${blueprint.sections[2].sourceTitle}).`,
+      engine: ollamaOut ? 'ollama' : 'fallback',
+      summary: customSummary || `Composed ${blueprint.totalDuration}s sequence (${usedModel} · ${permission}) with Intro (${blueprint.sections[0].sourceTitle}), Body (${blueprint.sections[1].sourceTitle}), and Outro (${blueprint.sections[2].sourceTitle}).`,
     });
   });
 

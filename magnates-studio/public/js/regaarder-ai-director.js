@@ -11,9 +11,9 @@
 
   const STORE_KEY = 'rg_ai_director_prefs_v1';
   const ROLE_COLORS = {
-    intro: { border: 'rgba(56, 189, 248, 0.55)', bg: 'rgba(14, 165, 233, 0.16)', text: '#bae6fd', tag: '#38bdf8' },
-    body: { border: 'rgba(168, 85, 247, 0.55)', bg: 'rgba(139, 92, 246, 0.18)', text: '#e9d5ff', tag: '#c084fc' },
-    outro: { border: 'rgba(52, 211, 153, 0.55)', bg: 'rgba(16, 185, 129, 0.16)', text: '#a7f3d0', tag: '#34d399' }
+    intro: { border: 'rgba(255, 255, 255, 0.10)', bg: 'rgba(255, 255, 255, 0.035)', text: '#e2e8f0', tag: '#c4b5fd' },
+    body: { border: 'rgba(255, 255, 255, 0.10)', bg: 'rgba(255, 255, 255, 0.035)', text: '#e2e8f0', tag: '#a78bfa' },
+    outro: { border: 'rgba(255, 255, 255, 0.10)', bg: 'rgba(255, 255, 255, 0.035)', text: '#e2e8f0', tag: '#8b5cf6' }
   };
 
   function loadPrefs() {
@@ -310,6 +310,26 @@
         state.model = modelSel.value;
         savePrefs({ model: state.model });
       });
+      fetch('/api/ai/ollama/models')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (!data?.available || !Array.isArray(data.models) || !data.models.length) return;
+          const localGroup = modelSel.querySelector('optgroup[label*="Local"]');
+          if (!localGroup) return;
+          localGroup.label = 'Local Models (Ollama)';
+          localGroup.innerHTML = data.models
+            .map((m) => `<option value="ollama:${escapeHtml(m.name)}">${escapeHtml(m.name)}</option>`)
+            .join('');
+          const hasSaved = [...modelSel.options].some((o) => o.value === state.model);
+          if (hasSaved) {
+            modelSel.value = state.model;
+          } else {
+            state.model = localGroup.querySelector('option')?.value || state.model;
+            modelSel.value = state.model;
+            savePrefs({ model: state.model });
+          }
+        })
+        .catch(() => {});
     }
     if (permSel) {
       permSel.value = state.permission;
@@ -781,9 +801,25 @@
     state.isOpen = !!open;
     targetShell.classList.toggle('is-ai-director-open', state.isOpen);
 
-    document.querySelectorAll('.rg-rail-btn[data-rail="ai"]').forEach((btn) => {
-      btn.classList.toggle('is-active', state.isOpen);
-    });
+    const rail = targetShell.closest('.rg-studio-body')?.querySelector('.rg-left-rail');
+    if (rail) {
+      if (state.isOpen) {
+        rail.querySelectorAll('.rg-rail-btn').forEach((b) => {
+          b.classList.toggle('is-active', b.getAttribute('data-rail') === 'ai');
+        });
+      } else {
+        const aiBtn = rail.querySelector('.rg-rail-btn[data-rail="ai"]');
+        if (aiBtn) aiBtn.classList.remove('is-active');
+        if (!rail.querySelector('.rg-rail-btn.is-active')) {
+          const editBtn = rail.querySelector('.rg-rail-btn[data-rail="edit"]');
+          if (editBtn) editBtn.classList.add('is-active');
+        }
+      }
+    } else {
+      document.querySelectorAll('.rg-rail-btn[data-rail="ai"]').forEach((btn) => {
+        btn.classList.toggle('is-active', state.isOpen);
+      });
+    }
     if (state.isOpen) {
       const inp = targetShell.querySelector('.rg-ai-director-input');
       if (inp) setTimeout(() => inp.focus(), 40);

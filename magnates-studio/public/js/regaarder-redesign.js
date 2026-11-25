@@ -190,6 +190,12 @@
 
     rail.innerHTML = html;
 
+    const setActiveRail = (targetId) => {
+      rail.querySelectorAll('.rg-rail-btn').forEach((b) => {
+        b.classList.toggle('is-active', b.getAttribute('data-rail') === targetId);
+      });
+    };
+
     function toggleInlineStoryboardMode(forceOpen) {
       const studioBody = rail.closest('.rg-studio-body');
       const stageContainer = studioBody?.querySelector('#tpl-modal-preview-stage-container, #magnates-bp-stage, .rg-stage-frame');
@@ -197,9 +203,12 @@
       let sbHost = stageContainer.querySelector('.rg-inline-storyboard-host');
       const isCurrentlyOpen = !!(sbHost && sbHost.style.display !== 'none');
       const nextOpen = typeof forceOpen === 'boolean' ? forceOpen : !isCurrentlyOpen;
-      const sbBtn = rail.querySelector('.rg-rail-btn[data-rail="storyboard"]');
 
       if (nextOpen) {
+        if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.close === 'function') {
+          const shell = studioBody?.querySelector('.rg-inspector-shell');
+          window.RegaarderAIDirector.close(shell);
+        }
         if (!sbHost) {
           sbHost = document.createElement('div');
           sbHost.className = 'rg-inline-storyboard-host';
@@ -216,13 +225,17 @@
             onSaveAndBack: () => toggleInlineStoryboardMode(false)
           });
         }
-        if (sbBtn) sbBtn.classList.add('is-active');
+        setActiveRail('storyboard');
       } else {
         if (window.RegaarderStoryboardSketch && typeof window.RegaarderStoryboardSketch.closeInline === 'function') {
           window.RegaarderStoryboardSketch.closeInline();
         }
         if (sbHost) sbHost.style.display = 'none';
-        if (sbBtn) sbBtn.classList.remove('is-active');
+        if (window.RegaarderAIDirector?.isOpen?.()) {
+          setActiveRail('ai');
+        } else {
+          setActiveRail('edit');
+        }
       }
     }
 
@@ -241,6 +254,7 @@
           return;
         }
         if (id === 'ai') {
+          toggleInlineStoryboardMode(false);
           const shell = rail.closest('.rg-studio-body')?.querySelector('.rg-inspector-shell');
           if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.toggle === 'function') {
             window.RegaarderAIDirector.toggle(shell);
@@ -251,8 +265,7 @@
           const shell = rail.closest('.rg-studio-body')?.querySelector('.rg-inspector-shell');
           window.RegaarderAIDirector.close(shell);
         }
-        rail.querySelectorAll('.rg-rail-btn').forEach((b) => b.classList.remove('is-active'));
-        btn.classList.add('is-active');
+        setActiveRail(id);
 
         if (id === 'settings') {
           const advTrigger = document.querySelector('.rg-inline-advanced-trigger');
