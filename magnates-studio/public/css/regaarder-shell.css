@@ -138,6 +138,11 @@ body,
   gap: 6px !important;
 }
 
+#main-nav-rail:has(details[open]) {
+  position: relative;
+  z-index: 2500 !important;
+}
+
 #main-nav-rail .rail-btn {
   width: 60px !important;
   min-height: 54px !important;
@@ -246,7 +251,7 @@ body,
   position: fixed;
   right: auto;
   width: 236px;
-  z-index: 1200;
+  z-index: 2500;
 }
 
 /* Rail More (...) Flyout & Bottom Notifications */
@@ -276,7 +281,7 @@ body,
 .rm-rail-more-menu,
 .rm-rail-notif-menu {
   position: fixed;
-  z-index: 1200;
+  z-index: 2500;
   background: #141622;
   border: 1px solid rgba(139, 92, 246, 0.26);
   border-radius: 14px;
