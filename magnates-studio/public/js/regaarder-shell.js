@@ -78,8 +78,29 @@
  const rail=document.getElementById('main-nav-rail');
  const syncRail=()=>{if(home.style.display==='none')return;for(const button of rail.querySelectorAll('.rail-btn')){const active=button.dataset.railTab==='templates';if(button.classList.contains('active')!==active)button.classList.toggle('active',active);}};
  if(rail){new MutationObserver(syncRail).observe(rail,{attributes:true,attributeFilter:['class'],subtree:true});new MutationObserver(syncRail).observe(home,{attributes:true,attributeFilter:['style']});syncRail();}
- const icons={templates:'M3 4h18v16H3z M3 9h18',all:'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7',elements:'M5 20V10 M12 20V4 M19 20v-7',animate:'M8 4l12 8-12 8z',text:'M4 5h16 M12 5v15',icons:'M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z',layers:'M12 3L2 8l10 5 10-5z M2 12l10 5 10-5 M2 16l10 5 10-5',projects:'M3 6h7l2 3h9v12H3z'};
- document.querySelectorAll('#main-nav-rail .rail-btn').forEach(button=>{const path=icons[button.dataset.railTab];if(path){const old=button.querySelector('svg');if(old){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');const p=document.createElementNS(svg.namespaceURI,'path');p.setAttribute('d',path);svg.appendChild(p);old.replaceWith(svg);}}});
+ const icons={templates:'M3 4h18v16H3z M3 9h18',all:'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7',elements:'M5 20V10 M12 20V4 M19 20v-7',animate:'M8 4l12 8-12 8z',transitions:'M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z',text:'M4 5h16 M12 5v15',icons:'M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z',layers:'M12 3L2 8l10 5 10-5z M2 12l10 5 10-5 M2 16l10 5 10-5',projects:'M3 6h7l2 3h9v12H3z'};
+ document.querySelectorAll('#main-nav-rail .rail-btn').forEach(button=>{
+   const path=icons[button.dataset.railTab];
+   const old=button.querySelector('svg');
+   let iconEl=old;
+   if(path&&old){
+     const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+     svg.setAttribute('viewBox','0 0 24 24');
+     svg.setAttribute('aria-hidden','true');
+     const p=document.createElementNS(svg.namespaceURI,'path');
+     p.setAttribute('d',path);
+     svg.appendChild(p);
+     old.replaceWith(svg);
+     iconEl=svg;
+   }
+   if(iconEl&&!iconEl.parentElement?.classList.contains('rm-rail-circle')){
+     const circle=document.createElement('span');
+     circle.className='rm-rail-circle';
+     circle.setAttribute('aria-hidden','true');
+     iconEl.parentNode.insertBefore(circle,iconEl);
+     circle.appendChild(iconEl);
+   }
+ });
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  function refineMeshInspector(section){
   if(section.dataset.rmPrecision||!section.querySelector('[data-n3d-prop="editTool"]'))return;

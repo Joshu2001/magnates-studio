@@ -35,3 +35,157 @@
 .rm-task-body .rg-media-asset-row:has(.rm-media-tools){flex-wrap:wrap}.rm-media-tools{display:flex;gap:6px;flex-wrap:wrap;width:100%}.rm-media-tools button{font-size:11px;min-height:30px;padding:5px 9px}
 .rm-background-picker{width:100%;font-size:11px;color:#c7b3df}.rm-background-picker>summary{padding:7px 0;cursor:pointer}.rm-background-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding-top:8px}.rm-background-grid button{min-height:42px;font-size:10px!important;border-radius:7px}.rm-background-grid label{display:flex;flex-direction:column;gap:6px}.rm-background-picker:not([open])>.rm-background-grid{display:none!important}.rm-task-body .rg-media-asset-row:has(.rm-background-picker){flex-wrap:wrap}
 .rm-task-heading{font-size:12px;font-weight:650;line-height:1.5;color:#eee9f5}.rm-task-actions .rg-section-title[hidden]{display:none!important}.rm-task-body>.rm-task-actions{padding:0!important;margin:0!important;border:0!important}
+
+/* ============================================================================
+   ELEVATED WORKSPACE SURFACE & CIRCULAR VERTICAL RAIL (Canva-inspired Dark)
+   ============================================================================ */
+:root {
+  --rm-shell-bg: #07080d;
+  --rm-surface-bg: #12141e;
+  --rm-surface-elevated: #181b28;
+  --rm-surface-border: rgba(255, 255, 255, 0.08);
+  --rm-surface-highlight: rgba(255, 255, 255, 0.06);
+  --rm-surface-radius: 18px;
+  --rm-rail-width: 78px;
+  --rm-rail-circle-size: 38px;
+  --rm-rail-circle-bg: rgba(255, 255, 255, 0.045);
+  --rm-rail-circle-hover: rgba(255, 255, 255, 0.10);
+  --rm-rail-circle-active: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+html,
+body,
+.app-container,
+#app-body-container {
+  background: var(--rm-shell-bg) !important;
+}
+
+#top-nav-bar {
+  background: var(--rm-shell-bg) !important;
+  border-bottom: 0 !important;
+  min-height: 56px !important;
+}
+
+#app-body-container {
+  height: calc(100vh - 56px) !important;
+}
+
+/* Recessed Left Vertical Rail with Circular Icon Containers */
+#main-nav-rail {
+  width: var(--rm-rail-width) !important;
+  min-width: var(--rm-rail-width) !important;
+  background: var(--rm-shell-bg) !important;
+  border-right: 0 !important;
+  padding: 10px 0 18px !important;
+  gap: 6px !important;
+}
+
+#main-nav-rail .rail-btn {
+  width: 68px !important;
+  min-height: 58px !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  padding: 4px 2px !important;
+  gap: 5px !important;
+  border-radius: 12px !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #8b94ab !important;
+  box-shadow: none !important;
+  transition: color 0.16s ease, transform 0.14s ease !important;
+}
+
+#main-nav-rail .rail-btn:hover {
+  background: transparent !important;
+  color: #e2e8f0 !important;
+}
+
+#main-nav-rail .rail-btn .rm-rail-circle {
+  width: var(--rm-rail-circle-size);
+  height: var(--rm-rail-circle-size);
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rm-rail-circle-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+}
+
+#main-nav-rail .rail-btn:hover .rm-rail-circle {
+  background: var(--rm-rail-circle-hover);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+#main-nav-rail .rail-btn svg {
+  width: 17px !important;
+  height: 17px !important;
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 1.75 !important;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#main-nav-rail .rail-label {
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.15px !important;
+  color: inherit !important;
+}
+
+#main-nav-rail .rail-btn.active {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #f3e8ff !important;
+}
+
+#main-nav-rail .rail-btn.active .rm-rail-circle {
+  background: var(--rm-rail-circle-active);
+  border-color: rgba(196, 181, 253, 0.55);
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+#main-nav-rail .rail-btn.active .rail-label {
+  color: #e9d5ff !important;
+  font-weight: 600 !important;
+}
+
+/* Elevated Main Workspace Sheet */
+#main-content-flow {
+  border-top-left-radius: var(--rm-surface-radius);
+  background: var(--rm-surface-bg);
+  border-top: 1px solid var(--rm-surface-border);
+  border-left: 1px solid var(--rm-surface-border);
+  box-shadow:
+    -6px -4px 28px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 var(--rm-surface-highlight);
+  overflow: hidden !important;
+}
+
+#home-templates-discovery {
+  background:
+    radial-gradient(ellipse 75% 36% at 50% 0%, rgba(139, 92, 246, 0.11) 0%, transparent 72%),
+    var(--rm-surface-bg) !important;
+  padding: 28px 36px 60px !important;
+}
+
+.rm-library-search > div {
+  background: var(--rm-surface-elevated) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.36) !important;
+}
+
+.home-tpl-card {
+  background: var(--rm-surface-elevated) !important;
+  border: 1px solid rgba(255, 255, 255, 0.085) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34) !important;
+}
+
+.home-tpl-card:hover {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5), 0 0 22px rgba(139, 92, 246, 0.16) !important;
+}
