@@ -208,7 +208,29 @@
       }
       .rg-sb-inline-topbar {
         display: flex; align-items: center; justify-content: space-between; gap: 10px;
-        width: 100%; flex-wrap: nowrap; min-width: 0;
+        width: 100%; flex-wrap: nowrap; min-width: 0; position: relative;
+      }
+      .rg-sb-inline-topbar .rg-sb-brand {
+        display: inline-flex; align-items: center; gap: 8px; flex-wrap: nowrap; white-space: nowrap; min-width: 0;
+      }
+      .rg-sb-scene-title-input {
+        background: transparent; border: 1px solid transparent; border-radius: 5px;
+        color: var(--rg-text-primary, #F5F5F7); font-size: 12.5px; font-weight: 600;
+        padding: 2px 6px; width: 92px; min-width: 60px; white-space: nowrap; outline: none;
+        transition: border-color 0.14s ease, background 0.14s ease;
+      }
+      .rg-sb-scene-title-input:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); }
+      .rg-sb-scene-title-input:focus { border-color: rgba(167,139,250,0.65); background: #101017; }
+      .rg-sb-more-wrap { position: relative; display: inline-flex; align-items: center; }
+      .rg-sb-more-menu {
+        position: absolute; top: calc(100% + 6px); right: 0; z-index: 99995; min-width: 178px;
+        padding: 5px; border-radius: 10px; background: #14141c;
+        border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 16px 38px rgba(0,0,0,0.72);
+        display: none; flex-direction: column; gap: 2px;
+      }
+      .rg-sb-more-menu.is-open { display: flex; }
+      .rg-sb-more-menu .rg-sb-flat-btn {
+        width: 100%; justify-content: flex-start; padding: 7px 10px; font-size: 12px; border-radius: 7px;
       }
       .rg-sb-inline-topbar .rg-sb-pill {
         background: rgba(255,255,255,0.06); color: var(--rg-text-secondary, #A1A1B0);
@@ -500,6 +522,7 @@
     });
     state.scenes.push(sc); saveState(); renderBoard();
     if (openAfter) openSceneEditor(sc.id);
+    return sc;
   }
 
   function triggerBatchImport() {
@@ -688,27 +711,31 @@
     const sidebarHostEl = (opts && opts.sidebarHostEl) || null;
     if (inlineCleanup) { try { inlineCleanup(); } catch (_) {} inlineCleanup = null; }
 
-    const commentPinSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
     const overviewSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`;
     const topbarInnerHtml = `
       <div class="rg-sb-brand">
-        <span>${escapeHtml(scene.title)}</span>
-        <span class="rg-sb-pill">${scene.aspectRatio || state.aspectRatio}</span>
-        <span id="rg-coord-readout" style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;">0, 0</span>
-        <span class="rg-sb-divider"></span>
-        <button type="button" class="rg-sb-flat-btn" id="rg-sb-new-btn" title="Archive current storyboard &amp; start a fresh blank Scene 1">+ New</button>
-        <button type="button" class="rg-sb-flat-btn" id="rg-sb-history-btn" title="Restore a previous storyboard from history">History</button>
+        <input type="text" class="rg-sb-scene-title-input" id="rg-sb-scene-title" value="${escapeHtml(scene.title)}" title="Click to rename scene" aria-label="Scene title" />
+        <span class="rg-sb-pill" style="white-space:nowrap;">${scene.aspectRatio || state.aspectRatio}</span>
+        <span id="rg-coord-readout" style="font-size:11px; color:var(--rg-text-muted); font-family:monospace; white-space:nowrap;">0, 0</span>
       </div>
       <div class="rg-sb-flat-group">
-        <button type="button" class="rg-sb-flat-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">${commentPinSvg} Pin Comment</button>
-        <span class="rg-sb-divider"></span>
         <button type="button" class="rg-sb-flat-btn" id="rg-sb-overview-btn" title="Zoom out to inspect all Intro / Body / Outro scenes">${overviewSvg} All Scenes</button>
-        <button type="button" class="rg-sb-flat-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">${ICONS.zoomBox} Area Zoom</button>
+        <span class="rg-sb-divider"></span>
         <button type="button" class="rg-sb-flat-btn" id="rg-zoom-out" title="Zoom Out" style="padding:4px 6px;">-</button>
-        <span id="rg-zoom-label" style="font-size:11.5px; min-width:36px; text-align:center; color:var(--rg-text-secondary);">100%</span>
+        <span id="rg-zoom-label" style="font-size:11.5px; min-width:36px; text-align:center; color:var(--rg-text-secondary); white-space:nowrap;">100%</span>
         <button type="button" class="rg-sb-flat-btn" id="rg-zoom-in" title="Zoom In (up to 300%)" style="padding:4px 6px;">+</button>
         <span class="rg-sb-divider"></span>
-        <button type="button" class="rg-sb-flat-btn" id="rg-ed-guides">${showGuides ? 'Guides: On' : 'Guides: Off'}</button>
+        <div class="rg-sb-more-wrap">
+          <button type="button" class="rg-sb-flat-btn" id="rg-sb-more-btn" title="More Storyboard tools" style="padding:4px 8px;font-weight:700;letter-spacing:1px;">⋯</button>
+          <div class="rg-sb-more-menu" id="rg-sb-more-menu">
+            <button type="button" class="rg-sb-flat-btn" id="rg-sb-new-btn" title="Archive current storyboard &amp; start a fresh blank Scene 1">+ New Storyboard</button>
+            <button type="button" class="rg-sb-flat-btn" id="rg-sb-history-btn" title="Restore a previous storyboard from history">History</button>
+            <div style="height:1px;background:rgba(255,255,255,0.07);margin:2px 4px;"></div>
+            <button type="button" class="rg-sb-flat-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">Pin Comment</button>
+            <button type="button" class="rg-sb-flat-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">Area Zoom</button>
+            <button type="button" class="rg-sb-flat-btn" id="rg-ed-guides">${showGuides ? 'Guides: On' : 'Guides: Off'}</button>
+          </div>
+        </div>
         <span class="rg-sb-divider"></span>
         <button type="button" class="rg-sb-btn rg-sb-btn-accent" id="rg-ed-save">Save &amp; Back</button>
       </div>
@@ -995,6 +1022,28 @@
 
     if (overviewBtn) {
       overviewBtn.onclick = () => setOverviewMode(!overviewMode);
+    }
+    const sceneTitleInput = q('#rg-sb-scene-title');
+    if (sceneTitleInput) {
+      sceneTitleInput.onchange = () => {
+        const nextTitle = sceneTitleInput.value.trim() || 'Scene 1';
+        scene.title = nextTitle;
+        sceneTitleInput.value = nextTitle;
+        saveState();
+      };
+    }
+    const sbMoreBtn = q('#rg-sb-more-btn');
+    const sbMoreMenu = q('#rg-sb-more-menu');
+    if (sbMoreBtn && sbMoreMenu) {
+      sbMoreBtn.onclick = (e) => {
+        e.stopPropagation();
+        sbMoreMenu.classList.toggle('is-open');
+      };
+      document.addEventListener('mousedown', (e) => {
+        if (sbMoreMenu.classList.contains('is-open') && !sbMoreMenu.contains(e.target) && e.target !== sbMoreBtn) {
+          sbMoreMenu.classList.remove('is-open');
+        }
+      });
     }
     const sbNewBtn = q('#rg-sb-new-btn');
     if (sbNewBtn) {

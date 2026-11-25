@@ -264,33 +264,37 @@
 
         <div class="rg-ai-attachments-strip" data-role="attachments" style="display:none;"></div>
 
-        <div class="rg-ai-composer-row">
-          <button type="button" class="rg-ai-plus-btn" data-role="plus-btn" title="Add files, stage frame, or assets" aria-label="Add attachments">+</button>
-          <textarea class="rg-ai-director-input" data-role="input" rows="1" placeholder="Describe a scene or template..."></textarea>
-          <div class="rg-ai-inline-controls">
-            <select class="rg-ai-model-select" data-role="model-select" title="Select AI Model (Local or Online)">
-              <optgroup label="Local Models">
-                <option value="local-studio-fast">Studio</option>
-                <option value="local-ollama-llama3">Ollama</option>
-                <option value="local-qwen-director">Qwen 2.5</option>
-              </optgroup>
-              <optgroup label="Online Models">
-                <option value="online-gemini-pro">Gemini Pro</option>
-                <option value="online-gemini-flash">Gemini Flash</option>
-                <option value="online-gpt4o">GPT-4o</option>
-              </optgroup>
-            </select>
-            <select class="rg-ai-perm-select" data-role="perm-select" title="AI Permission Level" aria-label="Permission Level">
-              <option value="turbo">Turbo</option>
-              <option value="balanced">Balanced</option>
-              <option value="ask">Ask</option>
-            </select>
-            <button type="button" class="rg-ai-voice-btn" data-role="voice" title="Voice Input" aria-label="Voice Input">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
-            </button>
-            <button type="button" class="rg-ai-director-send" data-role="send" title="Send" aria-label="Send">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-            </button>
+        <div class="rg-ai-composer-row" style="flex-direction:column;align-items:stretch;gap:6px;">
+          <textarea class="rg-ai-director-input" data-role="input" rows="1" placeholder="Describe a scene or template..." style="width:100%;"></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <div style="display:flex;align-items:center;gap:5px;">
+              <button type="button" class="rg-ai-plus-btn" data-role="plus-btn" title="Add files, stage frame, or assets" aria-label="Add attachments">+</button>
+              <select class="rg-ai-model-select" data-role="model-select" title="Select AI Model (Local or Online)">
+                <optgroup label="Local Models">
+                  <option value="local-studio-fast">Studio</option>
+                  <option value="local-ollama-llama3">Ollama</option>
+                  <option value="local-qwen-director">Qwen 2.5</option>
+                </optgroup>
+                <optgroup label="Online Models">
+                  <option value="online-gemini-pro">Gemini Pro</option>
+                  <option value="online-gemini-flash">Gemini Flash</option>
+                  <option value="online-gpt4o">GPT-4o</option>
+                </optgroup>
+              </select>
+              <select class="rg-ai-perm-select" data-role="perm-select" title="AI Permission Level" aria-label="Permission Level">
+                <option value="turbo">Turbo</option>
+                <option value="balanced">Balanced</option>
+                <option value="ask">Ask</option>
+              </select>
+            </div>
+            <div class="rg-ai-inline-controls">
+              <button type="button" class="rg-ai-voice-btn" data-role="voice" title="Voice Input" aria-label="Voice Input">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              </button>
+              <button type="button" class="rg-ai-director-send" data-role="send" title="Send" aria-label="Send">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -466,6 +470,12 @@
           historyMenu.style.display = 'none';
         });
       });
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      if (historyMenu && historyMenu.style.display !== 'none' && !historyMenu.contains(e.target) && e.target.id !== 'rg-ai-history-btn') {
+        historyMenu.style.display = 'none';
+      }
     });
 
     renderAttachments(panel);

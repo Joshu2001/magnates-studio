@@ -62,11 +62,11 @@ def run_pass_2():
         print('  OK left rail AI Director + Storyboard Mode buttons & stage/sidebar handoff')
 
     sb_js = open(os.path.join(PUBLIC, 'js', 'regaarder-storyboard-sketch.js'), encoding='utf-8').read()
-    for sb_feat in ['is-hover-wheel', 'rg-sb-inline-topbar', 'rg-sb-inspector-pane', 'is-storyboard-inspector', 'inlineCleanup', 'rg-sb-overview-btn', 'rg-sb-overview', 'setOverviewMode', 'applyOverviewZoom', 'rg-ov-card', 'rg-sb-new-btn', 'rg-sb-history-btn']:
+    for sb_feat in ['is-hover-wheel', 'rg-sb-inline-topbar', 'rg-sb-inspector-pane', 'is-storyboard-inspector', 'inlineCleanup', 'rg-sb-overview-btn', 'rg-sb-overview', 'setOverviewMode', 'applyOverviewZoom', 'rg-ov-card', 'rg-sb-new-btn', 'rg-sb-history-btn', 'rg-sb-more-btn', 'rg-sb-more-menu', 'rg-sb-scene-title', 'return sc;']:
         if sb_feat not in sb_js:
             ok = fail(f'regaarder-storyboard-sketch.js missing unified layout feature: {sb_feat}')
     if ok:
-        print('  OK Storyboard hover radial wheel, single unified topbar, + New/History, Brush/Layers & Zoomable Overview')
+        print('  OK Storyboard hover radial wheel, single unified topbar, ellipsis menu, + New/History, Brush/Layers & Zoomable Overview')
 
     if 'window.RegaarderAIDirector.toggle(shell)' not in redesign or 'window.RegaarderAIDirector.close(shell)' not in redesign:
         ok = fail('Left rail / inspector tab toggle integration missing')
