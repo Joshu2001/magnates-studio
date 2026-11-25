@@ -73,6 +73,7 @@
 
   let modalEl = null;
   let editorEl = null;
+  let inlineCleanup = null;
   let playTimer = null;
   let contextMenuEl = null;
   let activeEditorApi = null;
@@ -174,8 +175,38 @@
       .rg-ed-root.rg-ed-embedded {
         position: relative; inset: auto; z-index: 5; width: 100%; height: 100%; min-height: 0;
       }
-      .rg-ed-root.rg-ed-embedded .rg-ed-stage { padding: 18px; }
-      .rg-ed-root.rg-ed-embedded .rg-ed-side { width: 224px; padding: 10px; }
+      .rg-ed-root.rg-ed-embedded .rg-ed-stage { padding: 14px; }
+      .rg-radial-orbit.is-hover-wheel {
+        position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+        width: 156px; height: 156px; z-index: 25; pointer-events: none;
+      }
+      .rg-radial-orbit.is-hover-wheel .rg-orbit-hub { pointer-events: auto; }
+      .rg-radial-orbit.is-hover-wheel .rg-orbit-btn {
+        opacity: 0; transform: scale(0.55); pointer-events: none;
+        transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .rg-radial-orbit.is-hover-wheel:hover .rg-orbit-btn,
+      .rg-radial-orbit.is-hover-wheel.is-pinned .rg-orbit-btn {
+        opacity: 1; transform: scale(1); pointer-events: auto;
+      }
+      .rg-sb-inline-topbar {
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        width: 100%; flex-wrap: nowrap; min-width: 0;
+      }
+      .rg-sb-inline-topbar .rg-sb-btn {
+        padding: 4px 8px; font-size: 11px; white-space: nowrap;
+      }
+      .rg-inspector-shell .rg-sb-inspector-pane {
+        display: none; flex-direction: column; gap: 12px; padding: 14px;
+        overflow-y: auto; flex: 1; min-height: 0;
+      }
+      .rg-inspector-shell.is-storyboard-inspector:not(.is-ai-director-open) .rg-inspector-tabs,
+      .rg-inspector-shell.is-storyboard-inspector:not(.is-ai-director-open) .rg-inspector-scroll {
+        display: none !important;
+      }
+      .rg-inspector-shell.is-storyboard-inspector:not(.is-ai-director-open) .rg-sb-inspector-pane {
+        display: flex;
+      }
       .rg-ed-main { flex: 1; display: flex; overflow: hidden; position: relative; }
       .rg-ed-stage {
         flex: 1; display: flex; align-items: flex-start; justify-content: flex-start;
@@ -513,28 +544,61 @@
     }).join('');
 
     const isEmbedded = !!(opts && opts.hostEl);
+    const topbarHostEl = (opts && opts.topbarHostEl) || null;
+    const sidebarHostEl = (opts && opts.sidebarHostEl) || null;
+    if (inlineCleanup) { try { inlineCleanup(); } catch (_) {} inlineCleanup = null; }
+
+    const topbarInnerHtml = `
+      <div class="rg-sb-brand">
+        <span>${escapeHtml(scene.title)}</span>
+        <span class="rg-sb-pill">${scene.aspectRatio || state.aspectRatio}</span>
+        <span id="rg-coord-readout" style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;">0, 0</span>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:nowrap;">
+        <button type="button" class="rg-sb-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">💬 Pin Comment</button>
+        <button type="button" class="rg-sb-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">${ICONS.zoomBox} Area Zoom</button>
+        <button type="button" class="rg-sb-btn" id="rg-zoom-out" title="Zoom Out">-</button>
+        <span id="rg-zoom-label" style="font-size:11.5px; min-width:38px; text-align:center;">100%</span>
+        <button type="button" class="rg-sb-btn" id="rg-zoom-in" title="Zoom In (up to 300%)">+</button>
+        <button type="button" class="rg-sb-btn" id="rg-ed-guides">${showGuides ? 'Guides: On' : 'Guides: Off'}</button>
+        <button type="button" class="rg-sb-btn rg-sb-btn-accent" id="rg-ed-save">Save &amp; Back</button>
+      </div>
+    `;
+
+    const sidebarInnerHtml = `
+      <div class="rg-side-box rg-inspector-section">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:12px;">Brush &amp; Stroke</strong>
+          <span style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;" id="rg-size-readout">${brushSize}px</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <input type="range" id="rg-ed-size" min="1" max="40" value="${brushSize}" style="flex:1;" />
+          <input type="number" id="rg-ed-size-num" min="1" max="40" value="${brushSize}" class="rg-hex-input" style="width:46px; flex:none; text-align:center;" />
+        </div>
+        <div class="rg-style-pills">
+          ${['solid', 'dashed', 'dotted', 'straight'].map((st) => `<button type="button" class="rg-style-pill ${strokeStyle === st ? 'active' : ''}" data-stroke-style="${st}">${st[0].toUpperCase() + st.slice(1)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="rg-side-box rg-inspector-section">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="font-size:12px;">Layers</strong>
+          <div style="display:flex; gap:4px;">
+            <button type="button" class="rg-sb-btn" id="rg-add-sketch-layer" style="padding:4px 7px;font-size:11px;">+ Sketch</button>
+            <button type="button" class="rg-sb-btn" id="rg-add-img-layer" style="padding:4px 7px;font-size:11px;">+ Image</button>
+            <button type="button" class="rg-sb-btn" id="rg-use-tpl-layer" style="padding:4px 7px;font-size:11px;" title="Insert Saved Sketch Template">+ Tpl</button>
+          </div>
+        </div>
+        <div id="rg-layer-list" style="display:flex; flex-direction:column; gap:6px;"></div>
+      </div>
+    `;
+
     editorEl = document.createElement('div');
     editorEl.className = isEmbedded ? 'rg-ed-root rg-ed-embedded' : 'rg-ed-root';
     editorEl.innerHTML = `
-      <div class="rg-sb-topbar">
-        <div class="rg-sb-brand">
-          <span>${escapeHtml(scene.title)}</span>
-          <span class="rg-sb-pill">${scene.aspectRatio || state.aspectRatio}</span>
-          <span id="rg-coord-readout" style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;">0, 0</span>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button type="button" class="rg-sb-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">💬 Pin Comment</button>
-          <button type="button" class="rg-sb-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">${ICONS.zoomBox} Area Zoom</button>
-          <button type="button" class="rg-sb-btn" id="rg-zoom-out" title="Zoom Out">-</button>
-          <span id="rg-zoom-label" style="font-size:12px; min-width:42px; text-align:center;">100%</span>
-          <button type="button" class="rg-sb-btn" id="rg-zoom-in" title="Zoom In (up to 300%)">+</button>
-          <button type="button" class="rg-sb-btn" id="rg-ed-guides">${showGuides ? 'Guides: On' : 'Guides: Off'}</button>
-          <button type="button" class="rg-sb-btn rg-sb-btn-accent" id="rg-ed-save">Save &amp; Back</button>
-        </div>
-      </div>
+      ${topbarHostEl ? '' : `<div class="rg-sb-topbar">${topbarInnerHtml}</div>`}
       <div class="rg-ed-main">
-        <div class="rg-radial-orbit" id="rg-radial-orbit">
-          <button type="button" class="rg-orbit-hub" id="rg-orbit-hub" title="Toggle Tool Ring">${ICONS.hub}</button>
+        <div class="rg-radial-orbit ${isEmbedded ? 'is-hover-wheel' : ''}" id="rg-radial-orbit">
+          <button type="button" class="rg-orbit-hub" id="rg-orbit-hub" title="Hover for tools or click to pin">${ICONS.hub}</button>
           ${orbitHtml}
         </div>
         <div class="rg-popover" id="rg-shapes-popover" style="display:none;">
@@ -560,30 +624,7 @@
             <div class="rg-zoom-marquee" id="rg-zoom-marquee"></div>
           </div>
         </div>
-        <div class="rg-ed-sidebar">
-          <div class="rg-side-box">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px;">Brush &amp; Stroke</strong>
-              <span style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;" id="rg-size-readout">${brushSize}px</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <input type="range" id="rg-ed-size" min="1" max="40" value="${brushSize}" style="flex:1;" />
-              <input type="number" id="rg-ed-size-num" min="1" max="40" value="${brushSize}" class="rg-hex-input" style="width:46px; flex:none; text-align:center;" />
-            </div>
-            <div class="rg-style-pills">
-              ${['solid', 'dashed', 'dotted', 'straight'].map((st) => `<button type="button" class="rg-style-pill ${strokeStyle === st ? 'active' : ''}" data-stroke-style="${st}">${st[0].toUpperCase() + st.slice(1)}</button>`).join('')}
-            </div>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="font-size:12px;">Layers</strong>
-            <div style="display:flex; gap:4px;">
-              <button type="button" class="rg-sb-btn" id="rg-add-sketch-layer" style="padding:4px 7px;font-size:11px;">+ Sketch</button>
-              <button type="button" class="rg-sb-btn" id="rg-add-img-layer" style="padding:4px 7px;font-size:11px;">+ Image</button>
-              <button type="button" class="rg-sb-btn" id="rg-use-tpl-layer" style="padding:4px 7px;font-size:11px;" title="Insert Saved Sketch Template">+ Tpl</button>
-            </div>
-          </div>
-          <div id="rg-layer-list" style="display:flex; flex-direction:column; gap:6px;"></div>
-        </div>
+        ${sidebarHostEl ? '' : `<div class="rg-ed-sidebar">${sidebarInnerHtml}</div>`}
       </div>
       <div class="rg-ed-frames">
         <div class="rg-frame-list" id="rg-frame-list"></div>
@@ -601,6 +642,52 @@
         </div>
       </div>
     `;
+
+    let topbarMount = null;
+    let hiddenTopbarChildren = [];
+    if (topbarHostEl) {
+      hiddenTopbarChildren = Array.from(topbarHostEl.children).map((ch) => ({ el: ch, prev: ch.style.display }));
+      hiddenTopbarChildren.forEach(({ el }) => { el.style.display = 'none'; });
+      topbarMount = document.createElement('div');
+      topbarMount.className = 'rg-sb-inline-topbar';
+      topbarMount.innerHTML = topbarInnerHtml;
+      topbarHostEl.appendChild(topbarMount);
+    }
+
+    let sidebarMount = null;
+    if (sidebarHostEl) {
+      sidebarMount = document.createElement('div');
+      sidebarMount.className = 'rg-sb-inspector-pane';
+      sidebarMount.innerHTML = sidebarInnerHtml;
+      sidebarHostEl.appendChild(sidebarMount);
+      sidebarHostEl.classList.add('is-storyboard-inspector');
+    }
+
+    inlineCleanup = () => {
+      if (topbarMount) { topbarMount.remove(); topbarMount = null; }
+      hiddenTopbarChildren.forEach(({ el, prev }) => { el.style.display = prev; });
+      hiddenTopbarChildren = [];
+      if (sidebarMount) { sidebarMount.remove(); sidebarMount = null; }
+      if (sidebarHostEl) sidebarHostEl.classList.remove('is-storyboard-inspector');
+    };
+
+    const q = (sel) => {
+      for (const root of [editorEl, topbarMount, sidebarMount]) {
+        if (!root) continue;
+        const found = root.querySelector(sel);
+        if (found) return found;
+      }
+      return null;
+    };
+    const qAll = (sel) => {
+      const out = [];
+      for (const root of [editorEl, topbarMount, sidebarMount]) {
+        if (!root) continue;
+        root.querySelectorAll(sel).forEach((n) => out.push(n));
+      }
+      return out;
+    };
+
     if (isEmbedded) {
       opts.hostEl.innerHTML = '';
       opts.hostEl.appendChild(editorEl);
@@ -608,10 +695,10 @@
       document.body.appendChild(editorEl);
     }
 
-    const stage = editorEl.querySelector('#rg-ed-stage');
-    const canvas = editorEl.querySelector('#rg-ed-canvas');
-    const canvasWrap = editorEl.querySelector('#rg-ed-canvas-wrap');
-    const marquee = editorEl.querySelector('#rg-zoom-marquee');
+    const stage = q('#rg-ed-stage');
+    const canvas = q('#rg-ed-canvas');
+    const canvasWrap = q('#rg-ed-canvas-wrap');
+    const marquee = q('#rg-zoom-marquee');
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     const layerCanvas = document.createElement('canvas');
@@ -628,7 +715,7 @@
       canvas.style.height = displayH + 'px';
       canvasWrap.style.width = displayW + 'px';
       canvasWrap.style.height = displayH + 'px';
-      editorEl.querySelector('#rg-zoom-label').textContent = Math.round(zoomLevel * 100) + '%';
+      q('#rg-zoom-label').textContent = Math.round(zoomLevel * 100) + '%';
 
       if (typeof focusNormX === 'number' && typeof focusNormY === 'number') {
         requestAnimationFrame(() => {
@@ -639,14 +726,14 @@
     }
     applyZoom();
 
-    const zoomAreaBtn = editorEl.querySelector('#rg-zoom-area-btn');
+    const zoomAreaBtn = q('#rg-zoom-area-btn');
     zoomAreaBtn.onclick = () => {
       zoomBoxMode = !zoomBoxMode;
       zoomAreaBtn.classList.toggle('active', zoomBoxMode);
       canvas.style.cursor = zoomBoxMode ? 'zoom-in' : 'crosshair';
     };
-    editorEl.querySelector('#rg-zoom-in').onclick = () => { zoomLevel = Math.min(3, Math.round((zoomLevel + 0.25) * 100) / 100); applyZoom(); };
-    editorEl.querySelector('#rg-zoom-out').onclick = () => { zoomLevel = Math.max(0.5, Math.round((zoomLevel - 0.25) * 100) / 100); applyZoom(); };
+    q('#rg-zoom-in').onclick = () => { zoomLevel = Math.min(3, Math.round((zoomLevel + 0.25) * 100) / 100); applyZoom(); };
+    q('#rg-zoom-out').onclick = () => { zoomLevel = Math.max(0.5, Math.round((zoomLevel - 0.25) * 100) / 100); applyZoom(); };
 
     function getActiveFrame() { return scene.frames[scene.activeFrameIdx] || scene.frames[0]; }
     function getActiveLayer() {
@@ -756,7 +843,7 @@
     }
 
     function renderLayersPanel() {
-      const list = editorEl.querySelector('#rg-layer-list');
+      const list = q('#rg-layer-list');
       const fr = getActiveFrame();
       list.innerHTML = fr.layers.slice().reverse().map((ly) => `
         <div class="rg-layer-row ${ly.id === activeLayerId ? 'active' : ''}" data-ly="${ly.id}">
@@ -855,7 +942,7 @@
     }
 
     function renderFramesStrip() {
-      const list = editorEl.querySelector('#rg-frame-list');
+      const list = q('#rg-frame-list');
       list.innerHTML = scene.frames.map((fr, idx) => `
         <div class="rg-frame-chip ${idx === scene.activeFrameIdx ? 'active' : ''}" data-fidx="${idx}">F${idx + 1}</div>
       `).join('');
@@ -870,22 +957,27 @@
     }
 
     // Orbit Wheel, Shapes Popover, Color Popover & Brush Controls
-    const shapesPopover = editorEl.querySelector('#rg-shapes-popover');
-    const colorPopover = editorEl.querySelector('#rg-color-popover');
-    const shapesBtn = editorEl.querySelector('#rg-shapes-btn');
-    const colorBtn = editorEl.querySelector('#rg-color-btn');
+    const shapesPopover = q('#rg-shapes-popover');
+    const colorPopover = q('#rg-color-popover');
+    const shapesBtn = q('#rg-shapes-btn');
+    const colorBtn = q('#rg-color-btn');
     const setActiveOrbitBtn = (btn) => {
-      editorEl.querySelectorAll('.rg-orbit-btn').forEach((b) => b.classList.remove('active'));
+      qAll('.rg-orbit-btn').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
     };
 
-    editorEl.querySelector('#rg-orbit-hub').onclick = () => {
-      orbitOpen = !orbitOpen;
-      editorEl.querySelectorAll('.rg-orbit-btn').forEach((b) => { b.style.display = orbitOpen ? 'inline-flex' : 'none'; });
+    q('#rg-orbit-hub').onclick = () => {
+      const orbitEl = q('#rg-radial-orbit');
+      if (orbitEl && orbitEl.classList.contains('is-hover-wheel')) {
+        orbitEl.classList.toggle('is-pinned');
+      } else {
+        orbitOpen = !orbitOpen;
+        qAll('.rg-orbit-btn').forEach((b) => { b.style.display = orbitOpen ? 'inline-flex' : 'none'; });
+      }
       shapesPopover.style.display = 'none'; colorPopover.style.display = 'none';
     };
 
-    editorEl.querySelectorAll('[data-tool]').forEach((btn) => {
+    qAll('[data-tool]').forEach((btn) => {
       btn.onclick = () => {
         tool = btn.getAttribute('data-tool');
         zoomBoxMode = false; zoomAreaBtn.classList.remove('active'); canvas.style.cursor = 'crosshair';
@@ -901,7 +993,7 @@
       e.stopPropagation(); shapesPopover.style.display = 'none';
       colorPopover.style.display = colorPopover.style.display === 'none' ? 'block' : 'none';
     };
-    editorEl.querySelectorAll('[data-shape]').forEach((btn) => {
+    qAll('[data-shape]').forEach((btn) => {
       btn.onclick = () => {
         activeShape = btn.getAttribute('data-shape'); tool = 'shape';
         zoomBoxMode = false; zoomAreaBtn.classList.remove('active'); canvas.style.cursor = 'crosshair';
@@ -912,37 +1004,37 @@
     function setColor(hex) {
       if (!/^#[0-9a-fA-F]{6}$/.test(hex)) return;
       brushColor = hex;
-      editorEl.querySelector('#rg-ed-color').value = hex;
-      editorEl.querySelector('#rg-ed-hex').value = hex.toUpperCase();
-      editorEl.querySelector('#rg-color-dot').style.background = hex;
+      q('#rg-ed-color').value = hex;
+      q('#rg-ed-hex').value = hex.toUpperCase();
+      q('#rg-color-dot').style.background = hex;
     }
 
-    editorEl.querySelectorAll('.rg-swatch').forEach((sw) => {
+    qAll('.rg-swatch').forEach((sw) => {
       sw.onclick = () => {
         setColor(sw.getAttribute('data-color'));
-        editorEl.querySelectorAll('.rg-swatch').forEach((s) => s.classList.remove('active'));
+        qAll('.rg-swatch').forEach((s) => s.classList.remove('active'));
         sw.classList.add('active');
       };
     });
-    editorEl.querySelector('#rg-ed-color').oninput = (e) => setColor(e.target.value);
-    editorEl.querySelector('#rg-ed-hex').oninput = (e) => {
+    q('#rg-ed-color').oninput = (e) => setColor(e.target.value);
+    q('#rg-ed-hex').oninput = (e) => {
       const val = e.target.value.startsWith('#') ? e.target.value : '#' + e.target.value;
       if (/^#[0-9a-fA-F]{6}$/.test(val)) setColor(val);
     };
 
     const syncBrushSize = (val) => {
       brushSize = Math.max(1, Math.min(40, parseInt(val, 10) || 6));
-      editorEl.querySelector('#rg-ed-size').value = brushSize;
-      editorEl.querySelector('#rg-ed-size-num').value = brushSize;
-      editorEl.querySelector('#rg-size-readout').textContent = brushSize + 'px';
+      q('#rg-ed-size').value = brushSize;
+      q('#rg-ed-size-num').value = brushSize;
+      q('#rg-size-readout').textContent = brushSize + 'px';
     };
-    editorEl.querySelector('#rg-ed-size').oninput = (e) => syncBrushSize(e.target.value);
-    editorEl.querySelector('#rg-ed-size-num').oninput = (e) => syncBrushSize(e.target.value);
+    q('#rg-ed-size').oninput = (e) => syncBrushSize(e.target.value);
+    q('#rg-ed-size-num').oninput = (e) => syncBrushSize(e.target.value);
 
-    editorEl.querySelectorAll('[data-stroke-style]').forEach((btn) => {
+    qAll('[data-stroke-style]').forEach((btn) => {
       btn.onclick = () => {
         strokeStyle = btn.getAttribute('data-stroke-style');
-        editorEl.querySelectorAll('[data-stroke-style]').forEach((b) => b.classList.remove('active'));
+        qAll('[data-stroke-style]').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
       };
     });
@@ -954,26 +1046,26 @@
     };
     canvas.oncontextmenu = (e) => { e.preventDefault(); showLayerContextMenu(e.clientX, e.clientY, activeLayerId); };
 
-    editorEl.querySelector('#rg-ed-guides').onclick = (e) => {
+    q('#rg-ed-guides').onclick = (e) => {
       showGuides = !showGuides;
       e.target.textContent = showGuides ? 'Guides: On' : 'Guides: Off';
-      editorEl.querySelector('#rg-ed-guides-el').style.display = showGuides ? 'block' : 'none';
+      q('#rg-ed-guides-el').style.display = showGuides ? 'block' : 'none';
     };
-    editorEl.querySelector('#rg-ed-undo').onclick = () => {
+    q('#rg-ed-undo').onclick = () => {
       if (undoStack.length > 0) {
         lctx.putImageData(undoStack.pop(), 0, 0);
         commitBufferToActiveLayer(); compositeAllLayers();
       }
     };
 
-    editorEl.querySelector('#rg-add-sketch-layer').onclick = () => {
+    q('#rg-add-sketch-layer').onclick = () => {
       commitBufferToActiveLayer();
       const fr = getActiveFrame();
       const ly = createDefaultLayer('Sketch ' + (fr.layers.length + 1), 'sketch', '');
       fr.layers.push(ly); activeLayerId = ly.id;
       saveState(); loadActiveLayerToBuffer(); renderLayersPanel();
     };
-    editorEl.querySelector('#rg-add-img-layer').onclick = () => {
+    q('#rg-add-img-layer').onclick = () => {
       const inp = document.createElement('input');
       inp.type = 'file'; inp.accept = 'image/*';
       inp.onchange = (e) => {
@@ -991,7 +1083,7 @@
       };
       inp.click();
     };
-    editorEl.querySelector('#rg-use-tpl-layer').onclick = () => {
+    q('#rg-use-tpl-layer').onclick = () => {
       if (!savedTemplates.length) { alert('No saved templates yet. Right-click or hover a layer and click Save to create one.'); return; }
       const listText = savedTemplates.map((t, i) => `${i + 1}. ${t.name}`).join('\n');
       const pick = parseInt(prompt('Enter template number to insert:\n' + listText, '1'), 10);
@@ -1004,15 +1096,15 @@
       saveState(); loadActiveLayerToBuffer(); renderLayersPanel();
     };
 
-    editorEl.querySelector('#rg-fr-add').onclick = () => {
+    q('#rg-fr-add').onclick = () => {
       commitBufferToActiveLayer();
       scene.frames.push(createDefaultFrame());
       scene.activeFrameIdx = scene.frames.length - 1;
       activeLayerId = getActiveFrame().layers[0].id;
       saveState(); loadActiveLayerToBuffer(); renderLayersPanel(); renderFramesStrip();
     };
-    editorEl.querySelector('#rg-fr-copy').onclick = () => { commitBufferToActiveLayer(); copiedFrame = JSON.parse(JSON.stringify(getActiveFrame())); };
-    editorEl.querySelector('#rg-fr-paste').onclick = () => {
+    q('#rg-fr-copy').onclick = () => { commitBufferToActiveLayer(); copiedFrame = JSON.parse(JSON.stringify(getActiveFrame())); };
+    q('#rg-fr-paste').onclick = () => {
       if (!copiedFrame) return;
       commitBufferToActiveLayer();
       const pasted = JSON.parse(JSON.stringify(copiedFrame));
@@ -1021,9 +1113,9 @@
       activeLayerId = getActiveFrame().layers[0].id;
       saveState(); loadActiveLayerToBuffer(); renderLayersPanel(); renderFramesStrip();
     };
-    editorEl.querySelector('#rg-fr-fps').onchange = (e) => { scene.fps = parseInt(e.target.value, 10) || 24; saveState(); };
-    editorEl.querySelector('#rg-fr-speed').onchange = (e) => { scene.speed = parseFloat(e.target.value) || 1; saveState(); };
-    editorEl.querySelector('#rg-fr-play').onclick = (e) => {
+    q('#rg-fr-fps').onchange = (e) => { scene.fps = parseInt(e.target.value, 10) || 24; saveState(); };
+    q('#rg-fr-speed').onchange = (e) => { scene.speed = parseFloat(e.target.value) || 1; saveState(); };
+    q('#rg-fr-play').onclick = (e) => {
       if (playTimer) { clearInterval(playTimer); playTimer = null; e.target.textContent = 'Play'; return; }
       e.target.textContent = 'Pause';
       const intervalMs = Math.max(16, Math.round(1000 / ((scene.fps || 24) * (scene.speed || 1))));
@@ -1034,7 +1126,7 @@
       }, intervalMs);
     };
 
-    editorEl.querySelector('#rg-ed-save').onclick = () => {
+    q('#rg-ed-save').onclick = () => {
       if (playTimer) { clearInterval(playTimer); playTimer = null; }
       closeContextMenu();
       commitBufferToActiveLayer();
@@ -1043,6 +1135,7 @@
         scene.thumbUrl = canvas.toDataURL('image/png');
         saveState();
         activeEditorApi = null;
+        if (inlineCleanup) { try { inlineCleanup(); } catch (_) {} inlineCleanup = null; }
         editorEl.remove(); editorEl = null;
         if (isEmbedded && typeof opts.onSaveAndBack === 'function') {
           opts.onSaveAndBack();
@@ -1052,7 +1145,7 @@
       }, 30);
     };
 
-    const pinCommentBtn = editorEl.querySelector('#rg-ed-comment-pin-btn');
+    const pinCommentBtn = q('#rg-ed-comment-pin-btn');
     if (pinCommentBtn) {
       pinCommentBtn.onclick = () => {
         if (window.RegaarderCommentPins && typeof window.RegaarderCommentPins.togglePinMode === 'function') {
@@ -1125,7 +1218,7 @@
 
     canvas.onpointermove = (e) => {
       const pos = getPos(e);
-      editorEl.querySelector('#rg-coord-readout').textContent = `${pos.x}, ${pos.y}`;
+      q('#rg-coord-readout').textContent = `${pos.x}, ${pos.y}`;
       if (zoomBoxMode && zoomDragStart) {
         marquee.style.left = Math.min(zoomDragStart.dispX, pos.dispX) + 'px';
         marquee.style.top = Math.min(zoomDragStart.dispY, pos.dispY) + 'px';
@@ -1249,7 +1342,7 @@
       },
       copyLayer: (id) => copyLayerById(id || activeLayerId),
       pasteLayer: () => pasteCopiedLayer(),
-      addFrame: () => { editorEl.querySelector('#rg-fr-add').click(); return scene.activeFrameIdx; },
+      addFrame: () => { q('#rg-fr-add').click(); return scene.activeFrameIdx; },
       selectFrame: (idx) => {
         if (idx < 0 || idx >= scene.frames.length) return false;
         commitBufferToActiveLayer(); scene.activeFrameIdx = idx;
@@ -1257,8 +1350,8 @@
         loadActiveLayerToBuffer(); renderLayersPanel(); renderFramesStrip();
         return true;
       },
-      copyFrame: () => editorEl.querySelector('#rg-fr-copy').click(),
-      pasteFrame: () => editorEl.querySelector('#rg-fr-paste').click(),
+      copyFrame: () => q('#rg-fr-copy').click(),
+      pasteFrame: () => q('#rg-fr-paste').click(),
       setTiming: (opts = {}) => {
         if (opts.fps) scene.fps = opts.fps;
         if (opts.speed) scene.speed = opts.speed;
@@ -1366,6 +1459,8 @@
     }
     openSceneEditor(state.scenes[0].id, {
       hostEl,
+      topbarHostEl: opts && opts.topbarHostEl,
+      sidebarHostEl: opts && opts.sidebarHostEl,
       onSaveAndBack: opts && opts.onSaveAndBack
     });
   }
@@ -1374,6 +1469,7 @@
     if (playTimer) { clearInterval(playTimer); playTimer = null; }
     closeContextMenu();
     activeEditorApi = null;
+    if (inlineCleanup) { try { inlineCleanup(); } catch (_) {} inlineCleanup = null; }
     if (editorEl) { editorEl.remove(); editorEl = null; }
   }
 

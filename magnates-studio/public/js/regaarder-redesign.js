@@ -208,7 +208,11 @@
         }
         sbHost.style.display = 'flex';
         if (window.RegaarderStoryboardSketch && typeof window.RegaarderStoryboardSketch.openInline === 'function') {
+          const topbarHostEl = stageContainer.previousElementSibling;
+          const sidebarHostEl = studioBody?.querySelector('.rg-inspector-shell');
           window.RegaarderStoryboardSketch.openInline(sbHost, {
+            topbarHostEl,
+            sidebarHostEl,
             onSaveAndBack: () => toggleInlineStoryboardMode(false)
           });
         }

@@ -55,8 +55,17 @@ def run_pass_2():
         ok = fail('Left rail missing custom AI Director button')
     elif "id: 'storyboard', label: 'Storyboard Mode'" not in redesign or 'toggleInlineStoryboardMode' not in redesign:
         ok = fail('Left rail missing Storyboard Mode switch')
+    elif 'topbarHostEl' not in redesign or 'sidebarHostEl' not in redesign:
+        ok = fail('toggleInlineStoryboardMode missing topbarHostEl / sidebarHostEl handoff')
     else:
-        print('  OK left rail AI Director + Storyboard Mode buttons (below Settings)')
+        print('  OK left rail AI Director + Storyboard Mode buttons & stage/sidebar handoff')
+
+    sb_js = open(os.path.join(PUBLIC, 'js', 'regaarder-storyboard-sketch.js'), encoding='utf-8').read()
+    for sb_feat in ['is-hover-wheel', 'rg-sb-inline-topbar', 'rg-sb-inspector-pane', 'is-storyboard-inspector', 'inlineCleanup']:
+        if sb_feat not in sb_js:
+            ok = fail(f'regaarder-storyboard-sketch.js missing unified layout feature: {sb_feat}')
+    if ok:
+        print('  OK Storyboard hover radial wheel, single unified topbar, and right-sidebar Brush/Layers')
 
     if 'window.RegaarderAIDirector.toggle(shell)' not in redesign or 'window.RegaarderAIDirector.close(shell)' not in redesign:
         ok = fail('Left rail / inspector tab toggle integration missing')
