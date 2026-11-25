@@ -143,13 +143,19 @@ body,
   z-index: 2500 !important;
 }
 
-#main-nav-rail .rail-btn {
+#main-nav-rail .rail-btn,
+#main-nav-rail .rm-rail-action-btn {
   width: 60px !important;
   min-height: 54px !important;
   height: auto !important;
   margin: 0 auto !important;
   padding: 6px 4px !important;
   gap: 5px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   border-radius: 10px !important;
   border: 1px solid transparent !important;
   background: transparent !important;
@@ -158,12 +164,14 @@ body,
   transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease !important;
 }
 
-#main-nav-rail .rail-btn:hover {
+#main-nav-rail .rail-btn:hover,
+#main-nav-rail .rm-rail-action-btn:hover {
   background: rgba(255, 255, 255, 0.06) !important;
   color: #f1f5f9 !important;
 }
 
-#main-nav-rail .rail-btn svg {
+#main-nav-rail .rail-btn svg,
+#main-nav-rail .rm-rail-action-btn svg {
   width: 20px !important;
   height: 20px !important;
   fill: none !important;

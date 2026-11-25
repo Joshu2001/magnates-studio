@@ -125,7 +125,7 @@
    if(secondary.length){
      const moreWrap=document.createElement('details');
      moreWrap.className='rm-rail-more';
-     moreWrap.innerHTML='<summary class="rail-btn rm-rail-more-btn" title="More tools &amp; layers"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg><span class="rail-label">More</span></summary><div class="rm-rail-more-menu" role="menu"></div>';
+     moreWrap.innerHTML='<summary class="rm-rail-action-btn rm-rail-more-btn" title="More tools &amp; layers"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg><span class="rail-label">More</span></summary><div class="rm-rail-more-menu" role="menu"></div>';
      const menu=moreWrap.querySelector('.rm-rail-more-menu');
      secondary.forEach(btn=>menu.appendChild(btn));
      rail.appendChild(moreWrap);
@@ -140,7 +140,7 @@
    // Bottom-pinned Real-Time Notifications bell on the rail
    const notifWrap=document.createElement('details');
    notifWrap.className='rm-rail-notif';
-   notifWrap.innerHTML='<summary class="rail-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><span class="rm-notif-icon-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="rm-notif-badge" hidden>0</span></span><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><div class="rm-notif-head"><strong>Alerts</strong><button type="button" class="rm-notif-clear" data-notif-read-all>Mark all read</button></div><div class="rm-notif-list"><p class="rm-notif-empty">You\'re all caught up. Live alerts and support updates will appear here.</p></div></div>';
+   notifWrap.innerHTML='<summary class="rm-rail-action-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><span class="rm-notif-icon-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="rm-notif-badge" hidden>0</span></span><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><div class="rm-notif-head"><strong>Alerts</strong><button type="button" class="rm-notif-clear" data-notif-read-all>Mark all read</button></div><div class="rm-notif-list"><p class="rm-notif-empty">You\'re all caught up. Live alerts and support updates will appear here.</p></div></div>';
    rail.appendChild(notifWrap);
    notifWrap.addEventListener('toggle',()=>{if(notifWrap.open)positionRailFlyout(notifWrap.querySelector('summary'),notifWrap.querySelector('.rm-rail-notif-menu'));});
    document.addEventListener('click',e=>{if(!notifWrap.contains(e.target))notifWrap.open=false;});
