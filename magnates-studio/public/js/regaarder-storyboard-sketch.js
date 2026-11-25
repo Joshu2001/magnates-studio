@@ -269,23 +269,68 @@
         display: flex; flex-direction: column; padding: 12px; gap: 12px; overflow-y: auto; z-index: 10;
       }
       .rg-side-box {
-        background: var(--rg-bg-card, #181822);
+        background: var(--rg-bg-card, #14141B);
         border: 1px solid var(--rg-border-subtle, rgba(255,255,255,0.07));
-        border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;
+        border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;
       }
-      .rg-style-pills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+      .rg-side-box input[type="range"],
+      .rg-sb-inspector-pane input[type="range"] {
+        -webkit-appearance: none; appearance: none; accent-color: #E4E4EC;
+        height: 4px; border-radius: 999px; background: rgba(255,255,255,0.12);
+        outline: none; cursor: pointer;
+      }
+      .rg-side-box input[type="range"]::-webkit-slider-thumb,
+      .rg-sb-inspector-pane input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; appearance: none;
+        width: 12px; height: 12px; border-radius: 50%;
+        background: #F5F5F7; border: 1.5px solid rgba(17,17,22,0.9);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.5); transition: transform 0.12s ease;
+      }
+      .rg-side-box input[type="range"]::-webkit-slider-thumb:hover,
+      .rg-sb-inspector-pane input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      .rg-style-pills {
+        display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px;
+        background: var(--rg-bg-input, #0E0E13); padding: 3px; border-radius: 8px;
+        border: 1px solid var(--rg-border-subtle, rgba(255,255,255,0.06));
+      }
       .rg-style-pill {
         padding: 5px 4px; border-radius: 6px; font-size: 11px; font-weight: 600; text-align: center;
-        background: var(--rg-bg-input, #101017); border: 1px solid var(--rg-border-subtle, rgba(255,255,255,0.07));
-        color: var(--rg-text-secondary, #A1A1B0); cursor: pointer;
+        background: transparent; border: 1px solid transparent;
+        color: var(--rg-text-secondary, #A1A1B0); cursor: pointer; transition: 0.14s ease;
       }
-      .rg-style-pill.active { background: var(--rg-accent, #823CF0); color: #fff; border-color: var(--rg-accent-border, rgba(130,60,240,0.5)); }
+      .rg-style-pill:hover { color: var(--rg-text-primary, #F5F5F7); }
+      .rg-style-pill.active {
+        background: #23232F; color: #F5F5F7;
+        border-color: rgba(255,255,255,0.12); box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+      }
       .rg-layer-row {
-        display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 8px;
-        background: var(--rg-bg-card, #181822); border: 1px solid var(--rg-border-subtle, rgba(255,255,255,0.07));
-        cursor: pointer; position: relative;
+        display: flex; flex-direction: column; gap: 7px; padding: 9px 10px 9px 12px; border-radius: 9px;
+        background: #121218; border: 1px solid rgba(255,255,255,0.06);
+        cursor: pointer; position: relative; transition: background 0.15s ease, border-color 0.15s ease;
       }
-      .rg-layer-row.active { border-color: var(--rg-accent-border, rgba(130,60,240,0.5)); background: var(--rg-accent-soft, rgba(130,60,240,0.18)); }
+      .rg-layer-row:hover { background: #16161E; border-color: rgba(255,255,255,0.11); }
+      .rg-layer-row.active {
+        background: #191922; border-color: rgba(255,255,255,0.14);
+      }
+      .rg-layer-row.active::before {
+        content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2.5px;
+        border-radius: 0 3px 3px 0; background: rgba(167, 139, 250, 0.8);
+      }
+      .rg-layer-row .rg-sb-btn {
+        background: transparent; border-color: transparent; color: var(--rg-text-muted, #7A7A8C);
+        border-radius: 5px;
+      }
+      .rg-layer-row .rg-sb-btn:hover {
+        background: rgba(255,255,255,0.07); border-color: transparent; color: var(--rg-text-primary, #F5F5F7);
+      }
+      .rg-layer-row .rg-sb-btn[data-ref].active {
+        background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.16); color: #F5F5F7;
+      }
+      .rg-layer-row .rg-sb-btn[data-rm]:hover {
+        background: rgba(248,113,113,0.12); color: #fca5a5;
+      }
       .rg-layer-hover-actions { display: none; align-items: center; gap: 4px; justify-content: flex-end; }
       .rg-layer-row:hover .rg-layer-hover-actions { display: flex; }
       .rg-ctx-menu {
