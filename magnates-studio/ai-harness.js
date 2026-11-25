@@ -204,6 +204,124 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
     res.json({ ok: true, completedSteps: results.length, results });
   });
 
+  // Natural-chat Intro / Body / Outro sequence & template composer
+  function matchTemplateForClause(clause, catalog, fallbackId) {
+    const q = String(clause || '').toLowerCase();
+    if (!Array.isArray(catalog) || catalog.length === 0) return { id: fallbackId, title: fallbackId };
+    let best = null;
+    let bestScore = 0;
+    for (const item of catalog) {
+      if (!item || !item.id) continue;
+      const idLow = String(item.id).toLowerCase();
+      const titleLow = String(item.title || '').toLowerCase();
+      const catLow = String(item.category || '').toLowerCase();
+      const tagsLow = Array.isArray(item.tags) ? item.tags.join(' ').toLowerCase() : '';
+      let score = 0;
+      if (q.includes(idLow) && idLow.length >= 3) score += 12;
+      if (titleLow && q.includes(titleLow)) score += 15;
+      const words = titleLow.split(/[^a-z0-9]+/).filter((w) => w.length >= 3);
+      for (const w of words) {
+        if (q.includes(w)) score += 4;
+      }
+      if (catLow && q.includes(catLow)) score += 2;
+      if (tagsLow) {
+        for (const w of q.split(/[^a-z0-9]+/).filter((x) => x.length >= 3)) {
+          if (tagsLow.includes(w)) score += 1;
+        }
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        best = item;
+      }
+    }
+    if (best) return best;
+    return catalog.find((c) => c.id === fallbackId) || catalog[0];
+  }
+
+  function composeSequenceFromPrompt(prompt, availableTemplates) {
+    const raw = String(prompt || '').trim();
+    const low = raw.toLowerCase();
+    const catalog = Array.isArray(availableTemplates) && availableTemplates.length > 0
+      ? availableTemplates
+      : [
+          { id: 'map', title: 'Map Pin Drop', category: 'Animations' },
+          { id: 'balance', title: 'Balance Sheet', category: 'Finance' },
+          { id: 'kinetic', title: 'Kinetic Typography', category: 'Typography' },
+          { id: 'google', title: 'Google Search Typing', category: 'Animations' },
+          { id: 'candle', title: 'Candlestick Chart', category: 'Finance' },
+          { id: 'subscribe', title: 'Subscribe Button CTA', category: 'Animations' },
+        ];
+
+    const durMatch = low.match(/(\d+)\s*(?:s|sec|secs|second|seconds)\b/);
+    const totalDuration = durMatch ? Math.max(9, Math.min(180, parseInt(durMatch[1], 10))) : 30;
+    const introDur = Math.max(3, Math.round(totalDuration * 0.27));
+    const outroDur = Math.max(3, Math.round(totalDuration * 0.27));
+    const bodyDur = Math.max(3, totalDuration - introDur - outroDur);
+
+    const extractClause = (role) => {
+      const re = new RegExp(`([^,;.]*\\b${role}\\b[^,;.]*)`, 'i');
+      const m = raw.match(re);
+      return m ? m[1] : raw;
+    };
+
+    const introTpl = matchTemplateForClause(extractClause('intro'), catalog, 'map');
+    const bodyTpl = matchTemplateForClause(extractClause('body'), catalog, 'balance');
+    const outroTpl = matchTemplateForClause(extractClause('outro'), catalog, 'kinetic');
+
+    const isTemplateRequest = /\b(template|reusable|preset|save as)\b/i.test(raw);
+    const titleWords = raw.replace(/[^a-zA-Z0-9\s']/g, ' ').trim().split(/\s+/).slice(0, 5).join(' ');
+    const title = titleWords ? `${titleWords.slice(0, 36)}` : 'AI Directed Sequence';
+
+    const sections = [
+      {
+        role: 'intro',
+        label: 'INTRO',
+        start: 0,
+        duration: introDur,
+        sourceTplId: introTpl.id,
+        sourceTitle: introTpl.title || introTpl.id,
+        overrides: {},
+      },
+      {
+        role: 'body',
+        label: 'BODY',
+        start: introDur,
+        duration: bodyDur,
+        sourceTplId: bodyTpl.id,
+        sourceTitle: bodyTpl.title || bodyTpl.id,
+        overrides: {},
+      },
+      {
+        role: 'outro',
+        label: 'OUTRO',
+        start: introDur + bodyDur,
+        duration: outroDur,
+        sourceTplId: outroTpl.id,
+        sourceTitle: outroTpl.title || outroTpl.id,
+        overrides: {},
+      },
+    ];
+
+    return {
+      title,
+      totalDuration,
+      isTemplateRequest,
+      sections,
+    };
+  }
+
+  router.post('/compose-sequence', (req, res) => {
+    const prompt = String(req.body?.prompt || '').trim();
+    if (!prompt) return res.status(400).json({ ok: false, error: 'prompt is required' });
+    const availableTemplates = Array.isArray(req.body?.availableTemplates) ? req.body.availableTemplates : [];
+    const blueprint = composeSequenceFromPrompt(prompt, availableTemplates);
+    res.json({
+      ok: true,
+      blueprint,
+      summary: `Composed ${blueprint.totalDuration}s sequence with Intro (${blueprint.sections[0].sourceTitle}), Body (${blueprint.sections[1].sourceTitle}), and Outro (${blueprint.sections[2].sourceTitle}).`,
+    });
+  });
+
   // Browser client bridge endpoints
   router.get('/commands/pending', (req, res) => {
     const pending = commandQueue.filter((c) => c.status === 'queued');

@@ -35637,17 +35637,21 @@ function openTopTemplateCustomizer(tpl) {
   } else {
     topCustomizerState.duration = parseFloat(tpl.timeToApply) || 6;
   }
-  projectScenes = [
-    {
-      id: 'scene-1',
-      title: `Scene 1: ${(tpl.title || '').split('(')[0].trim()}`,
-      tplId: tpl.id,
-      start: 0,
-      duration: topCustomizerState.duration,
-      thumb: topCustomizerState.primaryUrl || tpl.defaultImage
-    }
-  ];
-  activeStoryboardSceneIndex = 0;
+  if (!window.__rgPreservingStoryboardScenes) {
+    projectScenes = [
+      {
+        id: 'scene-1',
+        title: `Scene 1: ${(tpl.title || '').split('(')[0].trim()}`,
+        tplId: tpl.id,
+        start: 0,
+        duration: topCustomizerState.duration,
+        thumb: topCustomizerState.primaryUrl || tpl.defaultImage
+      }
+    ];
+    activeStoryboardSceneIndex = 0;
+  } else if (projectScenes[activeStoryboardSceneIndex]?.duration) {
+    topCustomizerState.duration = projectScenes[activeStoryboardSceneIndex].duration;
+  }
   topCustomizerState.currentTime = 0;
   topCustomizerState.pausedElapsedMs = 0;
   topCustomizerState.startTime = performance.now();
@@ -45111,16 +45115,23 @@ function populateModalScenesStoryboard() {
     const isActive = (idx === activeStoryboardSceneIndex);
     const sceneTpl = EFFECT_TEMPLATES_DATA.find(t => t.id === sc.tplId);
     const thumbImg = sc.thumb || sceneTpl?.defaultImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
+    const roleColors = {
+      intro: { border: 'rgba(56, 189, 248, 0.55)', bg: 'rgba(14, 165, 233, 0.16)', text: '#38bdf8' },
+      body: { border: 'rgba(168, 85, 247, 0.55)', bg: 'rgba(139, 92, 246, 0.18)', text: '#c084fc' },
+      outro: { border: 'rgba(52, 211, 153, 0.55)', bg: 'rgba(16, 185, 129, 0.16)', text: '#34d399' }
+    };
+    const rc = sc.sectionRole ? roleColors[sc.sectionRole] : null;
+    const roleTag = sc.sectionRole ? `<span style="font-size:8.5px;font-weight:800;letter-spacing:0.05em;color:${rc.text};background:${rc.bg};border:1px solid ${rc.border};border-radius:4px;padding:1px 5px;margin-right:4px;">${String(sc.sectionRole).toUpperCase()}</span>` : '';
 
     return `
-      <div onclick="modalSelectStoryboardScene(${idx})" style="flex: 0 0 160px; height: 54px; min-height: 54px; background: ${isActive ? 'rgba(139, 92, 246, 0.12)' : '#08090e'}; border: 1px solid ${isActive ? 'rgba(139, 92, 246, 0.45)' : 'rgba(255, 255, 255, 0.05)'}; box-shadow: ${isActive ? '0 0 12px rgba(139, 92, 246, 0.15)' : 'none'}; border-radius: 8px; padding: 6px 10px; display: flex; gap: 8px; align-items: center; position: relative; cursor: pointer; transition: all 0.2s;" title="Scene ${idx + 1}">
+      <div onclick="modalSelectStoryboardScene(${idx})" style="flex: 0 0 176px; height: 54px; min-height: 54px; background: ${isActive ? 'rgba(139, 92, 246, 0.12)' : '#08090e'}; border: 1px solid ${isActive ? 'rgba(139, 92, 246, 0.45)' : (rc ? rc.border : 'rgba(255, 255, 255, 0.05)')}; box-shadow: ${isActive ? '0 0 12px rgba(139, 92, 246, 0.15)' : 'none'}; border-radius: 8px; padding: 6px 10px; display: flex; gap: 8px; align-items: center; position: relative; cursor: pointer; transition: all 0.2s;" title="Scene ${idx + 1}">
         <div style="width: 20px; height: 20px; border-radius: 50%; background: ${isActive ? '#8b5cf6' : 'rgba(255,255,255,0.08)'}; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           ${idx + 1}
         </div>
         <img src="${thumbImg}" alt="Scene" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400';" style="width: 38px; height: 38px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;" />
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-          <div style="font-size: 11px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${sc.title || 'Scene ' + (idx + 1)}</div>
-          <div style="font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${sceneTpl ? (sceneTpl.title.split('(')[0].trim()) : 'Parallax'}</div>
+          <div style="font-size: 11px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${roleTag}${sc.title || 'Scene ' + (idx + 1)}</div>
+          <div style="font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${sceneTpl ? (sceneTpl.title.split('(')[0].trim()) : 'Parallax'} · ${sc.duration || 6}s</div>
         </div>
         ${projectScenes.length > 1 ? `
           <button type="button" onclick="event.stopPropagation(); modalRemoveStoryboardScene(${idx})" style="background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 4px; position: absolute; top: 2px; right: 3px; line-height: 1;" title="Remove Scene" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#64748b';">\u2715</button>
@@ -45176,7 +45187,12 @@ function modalSelectStoryboardScene(index) {
     activeStoryboardSceneIndex = index;
     const sc = projectScenes[index];
     const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === sc.tplId) || EFFECT_TEMPLATES_DATA[0];
-    openTopTemplateCustomizer(tpl);
+    window.__rgPreservingStoryboardScenes = true;
+    try {
+      openTopTemplateCustomizer(tpl);
+    } finally {
+      window.__rgPreservingStoryboardScenes = false;
+    }
     if (sc.prim) topCustomizerState.primaryUrl = sc.prim;
     if (sc.sec) topCustomizerState.secondaryUrl = sc.sec;
     if (sc.bgRemoved !== undefined) topCustomizerState.bgRemoved = sc.bgRemoved;
@@ -45191,6 +45207,31 @@ function modalSelectStoryboardScene(index) {
     populateModalScenesStoryboard();
   }
 }
+
+window.selectStoryboardSceneByIndex = modalSelectStoryboardScene;
+
+window.composeProjectFromBlueprint = function(blueprint) {
+  if (!blueprint || !Array.isArray(blueprint.sections) || blueprint.sections.length === 0) return;
+  const nextScenes = blueprint.sections.map((sec, idx) => {
+    const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === sec.sourceTplId) || EFFECT_TEMPLATES_DATA[0];
+    if (sec.overrides && Object.keys(sec.overrides).length > 0 && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData(tpl.id, sec.overrides);
+    }
+    return {
+      id: `scene-${idx + 1}`,
+      sectionRole: sec.role || (idx === 0 ? 'intro' : (idx === blueprint.sections.length - 1 ? 'outro' : 'body')),
+      title: `${sec.label || 'SCENE'}: ${(tpl.title || '').split('(')[0].trim()}`,
+      tplId: tpl.id,
+      start: Number(sec.start) || 0,
+      duration: Math.max(2, Number(sec.duration) || 8),
+      thumb: tpl.defaultImage || ''
+    };
+  });
+  projectScenes = nextScenes;
+  activeStoryboardSceneIndex = 0;
+  modalSelectStoryboardScene(0);
+  if (typeof refreshTimelineScenesUI === 'function') refreshTimelineScenesUI();
+};
 
 function modalAddNextSceneAction() {
   window._modalInAddSceneMode = true;

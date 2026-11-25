@@ -30,6 +30,7 @@
     layers: '<svg viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>',
     effects: '<svg viewBox="0 0 24 24"><path d="m15 4-1 1 4 4 1-1a2.83 2.83 0 1 0-4-4Z"/><path d="m13 6-8.5 8.5a2.12 2.12 0 1 0 3 3L16 9"/><path d="M19 2v3"/><path d="M20.5 3.5h-3"/><path d="M6 3v3"/><path d="M7.5 4.5h-3"/></svg>',
     settings: '<svg viewBox="0 0 24 24"><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/><circle cx="8" cy="6" r="2" fill="#0B0B11"/><circle cx="16" cy="12" r="2" fill="#0B0B11"/><circle cx="10" cy="18" r="2" fill="#0B0B11"/></svg>',
+    aiDirector: '<svg viewBox="0 0 24 24"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z"/></svg>',
     bell: '<svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
     arrowLeft: '<svg viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
     chevronLeft: '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>',
@@ -171,13 +172,15 @@
       { id: 'text', label: 'Typography', icon: LUCIDE_ICONS.text },
       { id: 'layers', label: 'Scene Layers', icon: LUCIDE_ICONS.layers },
       { id: 'effects', label: 'AI & Visual Effects', icon: LUCIDE_ICONS.effects },
-      { id: 'settings', label: 'Controls & Settings', icon: LUCIDE_ICONS.settings }
+      { id: 'settings', label: 'Controls & Settings', icon: LUCIDE_ICONS.settings },
+      { id: 'ai', label: 'AI Director Chat', icon: LUCIDE_ICONS.aiDirector, isAI: true }
     ];
 
     let html = '';
     items.forEach((item) => {
+      if (item.isAI) html += '<div class="rg-rail-divider" aria-hidden="true"></div>';
       html += `
-        <button type="button" class="rg-rail-btn ${item.active ? 'is-active' : ''}" data-rail="${item.id}" data-tooltip="${item.label}" aria-label="${item.label}">
+        <button type="button" class="rg-rail-btn ${item.active ? 'is-active' : ''} ${item.isAI ? 'rg-rail-btn-ai' : ''}" data-rail="${item.id}" data-tooltip="${item.label}" aria-label="${item.label}">
           ${item.icon}
         </button>
       `;
@@ -193,6 +196,17 @@
           if (typeof window.deselectMagnatesBPLayer === 'function') window.deselectMagnatesBPLayer();
           if (options && typeof options.onClose === 'function') options.onClose();
           return;
+        }
+        if (id === 'ai') {
+          const shell = rail.closest('.rg-studio-body')?.querySelector('.rg-inspector-shell');
+          if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.toggle === 'function') {
+            window.RegaarderAIDirector.toggle(shell);
+          }
+          return;
+        }
+        if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.close === 'function') {
+          const shell = rail.closest('.rg-studio-body')?.querySelector('.rg-inspector-shell');
+          window.RegaarderAIDirector.close(shell);
         }
         rail.querySelectorAll('.rg-rail-btn').forEach((b) => b.classList.remove('is-active'));
         btn.classList.add('is-active');
@@ -2912,6 +2926,9 @@
 
     shell.querySelectorAll('.rg-inspector-tab').forEach((tabBtn) => {
       tabBtn.addEventListener('click', () => {
+        if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.close === 'function') {
+          window.RegaarderAIDirector.close(shell);
+        }
         const target = tabBtn.getAttribute('data-tab');
         shell.querySelectorAll('.rg-inspector-tab').forEach((b) => b.classList.remove('is-active'));
         tabBtn.classList.add('is-active');
@@ -3174,6 +3191,9 @@
 
     shell.querySelectorAll('.rg-inspector-tab').forEach((tabBtn) => {
       tabBtn.addEventListener('click', () => {
+        if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.close === 'function') {
+          window.RegaarderAIDirector.close(shell);
+        }
         const target = tabBtn.getAttribute('data-tab');
         shell.querySelectorAll('.rg-inspector-tab').forEach((b) => b.classList.remove('is-active'));
         tabBtn.classList.add('is-active');
