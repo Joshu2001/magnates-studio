@@ -1,11 +1,10 @@
 /* ============================================================================
-   REGAARDER STUDIO — AI DIRECTOR (GEMINI-STYLE COMPOSER + INTRO/BODY/OUTRO)
+   REGAARDER STUDIO — AI DIRECTOR (IMAGE 1 PARITY + INTRO/BODY/OUTRO)
    Toggled from the Left Nav Rail AI button; renders inside the Right Sidebar
    (.rg-inspector-shell) with:
+   - Centered empty state ("What are we making?" + 2 clean starter rows)
+   - Compact single-row composer (+, input, Model, Permission, Voice, Send)
    - Ctrl+V paste / drag-drop / "+" file attachments with hover "x" remove
-   - Local & Online Model selector
-   - Permission level selector (Turbo / Balanced / Ask)
-   - Voice dictation button
    ============================================================================ */
 (function () {
   'use strict';
@@ -42,13 +41,7 @@
     permission: savedPrefs.permission || 'turbo',
     attachments: [],
     lastBlueprint: null,
-    messages: [
-      {
-        role: 'assistant',
-        text: 'Describe a video or reusable template, paste images with Ctrl+V, or attach assets with +.',
-        blueprint: null
-      }
-    ]
+    messages: []
   };
 
   function getCatalogSummary() {
@@ -80,19 +73,19 @@
     if (!file) return;
     const isImage = /^image\//i.test(file.type || '');
     const isVideo = /^video\//i.test(file.type || '');
-    const reader = new FileReader();
-    reader.onload = () => {
-      state.attachments.push({
-        id: `att_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        name: file.name || (isImage ? 'Pasted image.png' : 'Attached file'),
-        type: file.type || 'application/octet-stream',
-        kind: isImage ? 'image' : (isVideo ? 'video' : 'file'),
-        previewUrl: (isImage || isVideo) ? String(reader.result || '') : ''
-      });
-      const panel = document.querySelector('.rg-ai-director-panel');
-      if (panel) renderAttachments(panel);
-    };
     if (isImage) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.attachments.push({
+          id: `att_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: file.name || 'Pasted image.png',
+          type: file.type || 'image/png',
+          kind: 'image',
+          previewUrl: String(reader.result || '')
+        });
+        const panel = document.querySelector('.rg-ai-director-panel');
+        if (panel) renderAttachments(panel);
+      };
       reader.readAsDataURL(file);
     } else {
       state.attachments.push({
@@ -200,7 +193,7 @@
       if (inp) {
         inp.value = (baseText ? `${baseText.trim()} ` : '') + transcript;
         inp.style.height = 'auto';
-        inp.style.height = Math.min(110, inp.scrollHeight) + 'px';
+        inp.style.height = Math.min(96, inp.scrollHeight) + 'px';
       }
     };
     const stopRecording = () => {
@@ -223,18 +216,37 @@
     panel.innerHTML = `
       <div class="rg-ai-director-header">
         <div class="rg-ai-director-title-wrap">
-          <span class="rg-ai-director-sparkle" aria-hidden="true">✦</span>
+          <svg class="rg-ai-director-sparkle-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z"/></svg>
           <span class="rg-ai-director-title">AI Director</span>
-          <span class="rg-ai-director-badge">Intro · Body · Outro</span>
         </div>
         <button type="button" class="rg-ai-director-close" title="Back to Inspector" aria-label="Back to Inspector">&times;</button>
       </div>
 
-      <div class="rg-ai-director-messages" data-role="messages"></div>
-
-      <div class="rg-ai-director-starters">
-        <button type="button" class="rg-ai-starter-chip" data-prompt="Create a 30s documentary video about Apple's rise: borrow Map Pin Drop for intro, Balance Sheet for Body, and Kinetic Typography for Outro">30s Doc: Map + Balance + Kinetic</button>
-        <button type="button" class="rg-ai-starter-chip" data-prompt="Build a 24s finance template: Glitch Reveal intro, Candlestick Chart body, Subscribe Button CTA outro">24s Finance Template</button>
+      <div class="rg-ai-director-body" data-role="body">
+        <div class="rg-ai-empty-state" data-role="empty-state">
+          <div class="rg-ai-empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#8B5CF6" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.1 5.2L19.3 10.3l-5.2 2.1L12 17.6l-2.1-5.2L4.7 10.3l5.2-2.1L12 3z"/></svg>
+          </div>
+          <h3 class="rg-ai-empty-title">What are we making?</h3>
+          <p class="rg-ai-empty-sub">Start with a scene or a reusable template.</p>
+          <div class="rg-ai-empty-actions">
+            <button type="button" class="rg-ai-empty-row" data-prompt="Create a 30s documentary intro using Map Pin Drop for Intro, Balance Sheet for Body, and Kinetic Typography for Outro">
+              <span class="rg-ai-empty-row-left">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#8B5CF6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="15" x="3" y="4.5" rx="2"/><path d="M3 9h18"/><path d="m8 4.5 2.5 4.5"/><path d="m14 4.5 2.5 4.5"/></svg>
+                <span>Build a documentary intro</span>
+              </span>
+              <span class="rg-ai-empty-chevron">&#8250;</span>
+            </button>
+            <button type="button" class="rg-ai-empty-row" data-prompt="Create a reusable 24s finance template: Glitch Reveal intro, Candlestick Chart body, Subscribe Button CTA outro">
+              <span class="rg-ai-empty-row-left">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#8B5CF6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg>
+                <span>Create a reusable template</span>
+              </span>
+              <span class="rg-ai-empty-chevron">&#8250;</span>
+            </button>
+          </div>
+        </div>
+        <div class="rg-ai-director-messages" data-role="messages" style="display:none;"></div>
       </div>
 
       <div class="rg-ai-composer-shell" data-role="composer-shell">
@@ -247,39 +259,32 @@
 
         <div class="rg-ai-attachments-strip" data-role="attachments" style="display:none;"></div>
 
-        <textarea class="rg-ai-director-input" data-role="input" rows="1" placeholder="Ask AI Director or paste media (Ctrl+V)..."></textarea>
-
-        <div class="rg-ai-composer-toolbar">
-          <div class="rg-ai-toolbar-left">
-            <button type="button" class="rg-ai-plus-btn" data-role="plus-btn" title="Add files, stage frame, or assets" aria-label="Add attachments">+</button>
+        <div class="rg-ai-composer-row">
+          <button type="button" class="rg-ai-plus-btn" data-role="plus-btn" title="Add files, stage frame, or assets" aria-label="Add attachments">+</button>
+          <textarea class="rg-ai-director-input" data-role="input" rows="1" placeholder="Describe a scene or template..."></textarea>
+          <div class="rg-ai-inline-controls">
             <select class="rg-ai-model-select" data-role="model-select" title="Select AI Model (Local or Online)">
               <optgroup label="Local Models">
-                <option value="local-studio-fast">Local · Studio Fast</option>
-                <option value="local-ollama-llama3">Local · Ollama Llama 3</option>
-                <option value="local-qwen-director">Local · Qwen 2.5</option>
+                <option value="local-studio-fast">Studio</option>
+                <option value="local-ollama-llama3">Ollama</option>
+                <option value="local-qwen-director">Qwen 2.5</option>
               </optgroup>
               <optgroup label="Online Models">
-                <option value="online-gemini-pro">Online · Gemini Pro</option>
-                <option value="online-gemini-flash">Online · Gemini Flash</option>
-                <option value="online-gpt4o">Online · GPT-4o</option>
+                <option value="online-gemini-pro">Gemini Pro</option>
+                <option value="online-gemini-flash">Gemini Flash</option>
+                <option value="online-gpt4o">GPT-4o</option>
               </optgroup>
             </select>
-          </div>
-
-          <div class="rg-ai-toolbar-right">
-            <label class="rg-ai-perm-wrap" title="AI Permission Level">
-              <span class="rg-ai-perm-shield" aria-hidden="true">🛡</span>
-              <select class="rg-ai-perm-select" data-role="perm-select" aria-label="Permission Level">
-                <option value="turbo">Turbo</option>
-                <option value="balanced">Balanced</option>
-                <option value="ask">Ask</option>
-              </select>
-            </label>
+            <select class="rg-ai-perm-select" data-role="perm-select" title="AI Permission Level" aria-label="Permission Level">
+              <option value="turbo">Turbo</option>
+              <option value="balanced">Balanced</option>
+              <option value="ask">Ask</option>
+            </select>
             <button type="button" class="rg-ai-voice-btn" data-role="voice" title="Voice Input" aria-label="Voice Input">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
             </button>
             <button type="button" class="rg-ai-director-send" data-role="send" title="Send" aria-label="Send">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
             </button>
           </div>
         </div>
@@ -351,7 +356,7 @@
 
     inp.addEventListener('input', () => {
       inp.style.height = 'auto';
-      inp.style.height = Math.min(110, inp.scrollHeight) + 'px';
+      inp.style.height = Math.min(96, inp.scrollHeight) + 'px';
     });
 
     inp.addEventListener('keydown', (e) => {
@@ -392,9 +397,9 @@
     panel.querySelector('[data-role="send"]').addEventListener('click', triggerSend);
     panel.querySelector('[data-role="voice"]').addEventListener('click', () => toggleVoiceDictation(panel));
 
-    panel.querySelectorAll('.rg-ai-starter-chip').forEach((chip) => {
-      chip.addEventListener('click', () => {
-        submitPrompt(shell, chip.getAttribute('data-prompt') || '');
+    panel.querySelectorAll('.rg-ai-empty-row').forEach((row) => {
+      row.addEventListener('click', () => {
+        submitPrompt(shell, row.getAttribute('data-prompt') || '');
       });
     });
 
@@ -404,8 +409,19 @@
   }
 
   function renderMessages(panel) {
+    const emptyEl = panel.querySelector('[data-role="empty-state"]');
     const feed = panel.querySelector('[data-role="messages"]');
     if (!feed) return;
+
+    if (state.messages.length === 0) {
+      if (emptyEl) emptyEl.style.display = 'flex';
+      feed.style.display = 'none';
+      feed.innerHTML = '';
+      return;
+    }
+
+    if (emptyEl) emptyEl.style.display = 'none';
+    feed.style.display = 'flex';
 
     feed.innerHTML = state.messages.map((msg, msgIdx) => {
       if (msg.role === 'user') {

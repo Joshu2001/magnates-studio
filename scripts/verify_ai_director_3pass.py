@@ -61,20 +61,34 @@ def run_pass_2():
 
     required_css = [
         '.rg-rail-btn-ai', '.rg-ai-director-panel', '.rg-inspector-shell.is-ai-director-open',
-        '.rg-ai-section-pill', '.rg-ai-director-send', '.rg-ai-composer-shell',
-        '.rg-ai-plus-btn', '.rg-ai-plus-menu', '.rg-ai-att-remove',
-        '.rg-ai-model-select', '.rg-ai-perm-select', '.rg-ai-voice-btn'
+        '.rg-ai-empty-state', '.rg-ai-empty-row', '.rg-ai-composer-shell', '.rg-ai-composer-row',
+        '.rg-inspector-shell .rg-ai-director-input', '.rg-inspector-shell .rg-ai-model-select',
+        '.rg-inspector-shell .rg-ai-perm-select', '.rg-ai-plus-btn', '.rg-ai-plus-menu',
+        '.rg-ai-att-remove', '.rg-ai-voice-btn', '.rg-ai-director-send'
     ]
     for sel in required_css:
         if sel not in css:
             ok = fail(f'Missing CSS selector in regaarder-redesign.css: {sel}')
 
     director_js = open(os.path.join(PUBLIC, 'js', 'regaarder-ai-director.js'), encoding='utf-8').read()
-    for feat in ["addEventListener('paste'", 'local-studio-fast', 'online-gemini-pro', 'toggleVoiceDictation', 'captureStageFrameAttachment']:
+    for feat in [
+        'What are we making?',
+        'Start with a scene or a reusable template.',
+        'Build a documentary intro',
+        'Create a reusable template',
+        'Describe a scene or template...',
+        "addEventListener('paste'",
+        'local-studio-fast',
+        'online-gemini-pro',
+        'toggleVoiceDictation',
+        'captureStageFrameAttachment'
+    ]:
         if feat not in director_js:
-            ok = fail(f'regaarder-ai-director.js missing feature: {feat}')
+            ok = fail(f'regaarder-ai-director.js missing Image 1 parity feature: {feat}')
+    if 'rg-ai-director-badge' in director_js:
+        ok = fail('Header should match Image 1 (no extra rg-ai-director-badge pill)')
     if ok:
-        print('  OK CSS tokens, composer controls (+, paste, model, permission, voice) & visual consistency')
+        print('  OK Image 1 parity: centered empty state, single-row composer, +, paste, model, permission, voice')
     return ok
 
 def run_pass_3():
