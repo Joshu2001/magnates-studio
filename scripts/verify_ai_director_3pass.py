@@ -77,6 +77,11 @@ def run_pass_2():
     else:
         print('  OK Click-to-Act Contextual Dropdown (image, doc, 3d, text, video, sketch, shape)')
 
+    if 'RegaarderTextControls' not in redesign or 'mountRegaarderTextControls' not in redesign or '.rg-text-ctrl-card' not in css:
+        ok = fail('Granular Text Animation & Style Controls (#6) missing')
+    else:
+        print('  OK Granular Text Animation & Style Controls (Motion + Look tabs)')
+
     required_css = [
         '.rg-rail-btn-ai', '.rg-ai-director-panel', '.rg-inspector-shell.is-ai-director-open',
         '.rg-ai-empty-state', '.rg-ai-empty-row', '.rg-ai-composer-shell', '.rg-ai-composer-row',

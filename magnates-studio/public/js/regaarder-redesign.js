@@ -3275,6 +3275,9 @@
       stagingPool,
       sceneToolbar
     };
+    if (typeof window.mountRegaarderTextControls === 'function') {
+      window.mountRegaarderTextControls(panes);
+    }
   }
 
   function cleanInspectorLabelText(raw) {
@@ -6447,5 +6450,179 @@ setInterval(() => {
     detectType,
     open,
     close: closeMenu
+  };
+})();
+
+/* ============================================================================
+   GRANULAR TEXT ANIMATION & TYPOGRAPHY CONTROLS (#6 — Motion & Look Tabs)
+   ============================================================================ */
+(function initRegaarderTextControls() {
+  const ANIM_PRESETS = [
+    { id: 'kinetic', label: 'Kinetic' },
+    { id: 'typewriter', label: 'Typewriter' },
+    { id: 'reveal', label: 'Reveal' },
+    { id: 'pop', label: 'Pop' },
+    { id: 'slide-up', label: 'Slide Up' },
+    { id: 'fade', label: 'Fade' }
+  ];
+  const SWATCHES = ['#F5F5F7', '#A78BFA', '#38BDF8', '#FBBF24', '#F87171'];
+
+  const textState = {
+    animationStyle: 'kinetic',
+    animationSpeed: 1.0,
+    color: '#F5F5F7',
+    fontSize: 42,
+    fontFamily: 'Inter',
+    fontWeight: '700',
+    letterSpacing: 0,
+    textAlign: 'center'
+  };
+
+  function applyTextStyleToStage() {
+    if (window.topCustomizerState) {
+      window.topCustomizerState.textStyle = { ...textState };
+    }
+    const stage = document.getElementById('tpl-modal-preview-stage-container');
+    if (stage) {
+      stage.querySelectorAll('.tpl-text-layer, [data-object-type="text"], .rg-stage-text').forEach((el) => {
+        el.style.color = textState.color;
+        el.style.fontSize = `${textState.fontSize}px`;
+        el.style.fontFamily = textState.fontFamily;
+        el.style.fontWeight = textState.fontWeight;
+        el.style.letterSpacing = `${textState.letterSpacing}px`;
+        el.style.textAlign = textState.textAlign;
+        el.setAttribute('data-text-anim', textState.animationStyle);
+        el.style.setProperty('--rg-text-anim-speed', `${textState.animationSpeed}`);
+      });
+    }
+    if (typeof window.renderCustomizerFrameAtTime === 'function') {
+      try { window.renderCustomizerFrameAtTime(0); } catch (_) {}
+    }
+  }
+
+  function mountRegaarderTextControls(panes) {
+    if (!panes) return;
+
+    if (panes.motion && !panes.motion.querySelector('.rg-text-motion-card')) {
+      const motionCard = document.createElement('div');
+      motionCard.className = 'rg-text-ctrl-card rg-text-motion-card rg-inspector-section';
+      motionCard.innerHTML = `
+        <div class="rg-text-ctrl-head">
+          <span>Text Animation</span>
+          <span style="font-size:11px;color:var(--rg-text-muted);" id="rg-txt-speed-val">${textState.animationSpeed.toFixed(2)}x</span>
+        </div>
+        <div class="rg-text-anim-grid">
+          ${ANIM_PRESETS.map((p) => `<button type="button" class="rg-text-anim-pill ${textState.animationStyle === p.id ? 'is-active' : ''}" data-txt-anim="${p.id}">${p.label}</button>`).join('')}
+        </div>
+        <div class="rg-text-row">
+          <span style="min-width:52px;">Speed</span>
+          <input type="range" id="rg-txt-speed" min="0.25" max="3" step="0.05" value="${textState.animationSpeed}" style="flex:1;" />
+        </div>
+      `;
+      panes.motion.prepend(motionCard);
+
+      motionCard.querySelectorAll('[data-txt-anim]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          textState.animationStyle = btn.getAttribute('data-txt-anim');
+          motionCard.querySelectorAll('[data-txt-anim]').forEach((b) => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+          applyTextStyleToStage();
+        });
+      });
+      const speedInp = motionCard.querySelector('#rg-txt-speed');
+      if (speedInp) {
+        speedInp.addEventListener('input', (e) => {
+          textState.animationSpeed = parseFloat(e.target.value) || 1;
+          const lbl = motionCard.querySelector('#rg-txt-speed-val');
+          if (lbl) lbl.textContent = `${textState.animationSpeed.toFixed(2)}x`;
+          applyTextStyleToStage();
+        });
+      }
+    }
+
+    if (panes.look && !panes.look.querySelector('.rg-text-look-card')) {
+      const lookCard = document.createElement('div');
+      lookCard.className = 'rg-text-ctrl-card rg-text-look-card rg-inspector-section';
+      lookCard.innerHTML = `
+        <div class="rg-text-ctrl-head">
+          <span>Text Style &amp; Typography</span>
+          <span style="font-size:11px;color:var(--rg-text-muted);" id="rg-txt-size-val">${textState.fontSize}px</span>
+        </div>
+        <div class="rg-text-row">
+          <span>Color</span>
+          <div class="rg-text-swatch-row">
+            ${SWATCHES.map((c) => `<span class="rg-text-swatch ${textState.color === c ? 'is-active' : ''}" data-txt-swatch="${c}" style="background:${c};"></span>`).join('')}
+            <input type="color" id="rg-txt-color" value="${textState.color}" style="width:24px;height:24px;border:none;background:none;cursor:pointer;" />
+          </div>
+        </div>
+        <div class="rg-text-row">
+          <span style="min-width:52px;">Size</span>
+          <input type="range" id="rg-txt-size" min="14" max="120" step="1" value="${textState.fontSize}" style="flex:1;" />
+        </div>
+        <div class="rg-text-row">
+          <span style="min-width:52px;">Font</span>
+          <select id="rg-txt-font" class="rg-text-select">
+            ${['Inter', 'Space Grotesk', 'Playfair Display', 'JetBrains Mono', 'Oswald'].map((f) => `<option value="${f}" ${textState.fontFamily === f ? 'selected' : ''}>${f}</option>`).join('')}
+          </select>
+        </div>
+        <div class="rg-text-row">
+          <span style="min-width:52px;">Weight</span>
+          <select id="rg-txt-weight" class="rg-text-select">
+            <option value="400">Regular (400)</option>
+            <option value="600">SemiBold (600)</option>
+            <option value="700" selected>Bold (700)</option>
+            <option value="800">ExtraBold (800)</option>
+          </select>
+        </div>
+        <div class="rg-text-row">
+          <span style="min-width:52px;">Tracking</span>
+          <input type="range" id="rg-txt-spacing" min="-2" max="12" step="0.5" value="${textState.letterSpacing}" style="flex:1;" />
+          <span style="min-width:30px;text-align:right;" id="rg-txt-spacing-val">${textState.letterSpacing}px</span>
+        </div>
+      `;
+      panes.look.prepend(lookCard);
+
+      lookCard.querySelectorAll('[data-txt-swatch]').forEach((sw) => {
+        sw.addEventListener('click', () => {
+          textState.color = sw.getAttribute('data-txt-swatch');
+          const picker = lookCard.querySelector('#rg-txt-color');
+          if (picker) picker.value = textState.color;
+          lookCard.querySelectorAll('[data-txt-swatch]').forEach((s) => s.classList.remove('is-active'));
+          sw.classList.add('is-active');
+          applyTextStyleToStage();
+        });
+      });
+      lookCard.querySelector('#rg-txt-color')?.addEventListener('input', (e) => {
+        textState.color = e.target.value;
+        applyTextStyleToStage();
+      });
+      lookCard.querySelector('#rg-txt-size')?.addEventListener('input', (e) => {
+        textState.fontSize = parseInt(e.target.value, 10) || 42;
+        const lbl = lookCard.querySelector('#rg-txt-size-val');
+        if (lbl) lbl.textContent = `${textState.fontSize}px`;
+        applyTextStyleToStage();
+      });
+      lookCard.querySelector('#rg-txt-font')?.addEventListener('change', (e) => {
+        textState.fontFamily = e.target.value;
+        applyTextStyleToStage();
+      });
+      lookCard.querySelector('#rg-txt-weight')?.addEventListener('change', (e) => {
+        textState.fontWeight = e.target.value;
+        applyTextStyleToStage();
+      });
+      lookCard.querySelector('#rg-txt-spacing')?.addEventListener('input', (e) => {
+        textState.letterSpacing = parseFloat(e.target.value) || 0;
+        const lbl = lookCard.querySelector('#rg-txt-spacing-val');
+        if (lbl) lbl.textContent = `${textState.letterSpacing}px`;
+        applyTextStyleToStage();
+      });
+    }
+  }
+
+  window.mountRegaarderTextControls = mountRegaarderTextControls;
+  window.RegaarderTextControls = {
+    getState: () => ({ ...textState }),
+    setState: (patch = {}) => { Object.assign(textState, patch); applyTextStyleToStage(); },
+    mount: mountRegaarderTextControls
   };
 })();
