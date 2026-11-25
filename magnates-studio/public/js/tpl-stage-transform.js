@@ -158,8 +158,14 @@
       }
     }
 
+    const tplRootDirect = stage.querySelector('.home-tpl-fx-container > div') || stageInner.firstElementChild;
+    if (tplRootDirect && tplId === 'zoom') {
+      tplRootDirect.style.transform = 'none';
+      stageInner.style.transform = 'none';
+    }
+
     // Universal 3D Stage Orbit for any general template when [ ⬡ 3D ] is active
-    if (isUniversal3DOrbitActive && !['google', 'checklist', 'progress', 'conspiracy-board', 'wire-transfer', 'envelope-open', 'money-stack', 'map-pin-drop', 'map', 'empire-map', 'empire-timeline', 'headline-fly', 'newspaper-3d', 'screen-blur', 'docheight'].includes(tplId)) {
+    if (isUniversal3DOrbitActive && !['zoom', 'google', 'checklist', 'progress', 'conspiracy-board', 'wire-transfer', 'envelope-open', 'money-stack', 'map-pin-drop', 'map', 'empire-map', 'empire-timeline', 'headline-fly', 'newspaper-3d', 'screen-blur', 'docheight'].includes(tplId)) {
       const tplRoot = stage.querySelector('.home-tpl-fx-container > div') || stageInner.firstElementChild;
       if (tplRoot && tplRoot.dataset.univ3dBound !== '1') {
         tplRoot.dataset.univ3dBound = '1';
@@ -292,7 +298,9 @@
         }
       }
       const tplRoot = stage.querySelector('.home-tpl-fx-container > div') || stageInner.firstElementChild;
-      if (tplRoot && topCustomizerState.is3DMode && !['google', 'spatial-3d-motion-suite', 'progress'].includes(activeTplId)) {
+      if (tplRoot && activeTplId === 'zoom') {
+        tplRoot.style.transform = 'none';
+      } else if (tplRoot && topCustomizerState.is3DMode && !['zoom', 'google', 'spatial-3d-motion-suite', 'progress'].includes(activeTplId)) {
         tplRoot.style.transform = `perspective(1150px) rotateX(${(topCustomizerState.univ3dRX || 0).toFixed(1)}deg) rotateY(${(topCustomizerState.univ3dRY || 0).toFixed(1)}deg)`;
       }
     };
@@ -385,8 +393,12 @@
     }
 
     function renderUniv3DRecorderHud() {
+      const mapTopbar = document.getElementById('map-preview-topbar-controls');
+      if (mapTopbar && tplId !== 'map') {
+        mapTopbar.style.display = 'none';
+      }
       if (!u3dHud) return;
-      if (!shouldShowUniv3DHud) {
+      if (!shouldShowUniv3DHud || tplId === 'map' || /^(?:zoom|.*product-zoom)$/i.test(String(tplId || ''))) {
         u3dHud.style.display = 'none';
         return;
       }
@@ -395,13 +407,17 @@
       const isRec = st.isRecording && st.tplId === tplId;
       const saved = window._universal3DRecordedPaths[tplId];
       const hasSaved = !!(saved && saved.frames && saved.frames.length >= 2);
+      u3dHud.style.background = 'rgba(20, 18, 32, 0.9)';
+      u3dHud.style.border = '1px solid rgba(155, 107, 255, 0.35)';
+      u3dHud.style.borderRadius = '10px';
+      u3dHud.style.padding = '4px 8px';
       u3dHud.innerHTML = `
-        <span style="color:#94a3b8;font-size:9.5px;">3D Motion:</span>
-        <button type="button" id="u3d-hud-rec-btn" style="background:${isRec ? 'rgba(239,68,68,0.92)' : 'rgba(239,68,68,0.22)'};border:1px solid ${isRec ? '#f87171' : 'rgba(239,68,68,0.55)'};color:${isRec ? '#fff' : '#fca5a5'};border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
-          <span>${isRec ? '\u25a0' : '\u25cf'}</span><span>${isRec ? 'Stop & Save Path' : 'Record 3D Motion'}</span>
+        <span style="color:#a89ec4;font-size:10px;font-weight:600;">3D Motion</span>
+        <button type="button" id="u3d-hud-rec-btn" style="background:${isRec ? 'linear-gradient(180deg,#dc2626,#b91c1c)' : 'rgba(130,60,240,0.22)'};border:1px solid ${isRec ? '#f87171' : 'rgba(155,107,255,0.5)'};color:${isRec ? '#fff' : '#e9d5ff'};border-radius:7px;padding:3px 10px;font-size:10.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+          <span style="color:${isRec ? '#fff' : '#c084fc'};font-size:9px;">${isRec ? '\u25a0' : '\u25cf'}</span><span>${isRec ? 'Stop & Save' : 'Record 3D'}</span>
         </button>
-        ${hasSaved && !isRec ? `<button type="button" id="u3d-hud-replay-btn" style="background:rgba(16,185,129,0.24);border:1px solid rgba(52,211,153,0.6);color:#6ee7b7;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;cursor:pointer;">\u25b6 Replay (${saved.frames.length} pts)</button>` : ''}
-        ${hasSaved && !isRec ? `<button type="button" id="u3d-hud-clear-btn" title="Clear Recorded 3D Path" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#cbd5e1;border-radius:999px;padding:2px 6px;font-size:9.5px;font-weight:700;cursor:pointer;">\u2715</button>` : ''}
+        ${hasSaved && !isRec ? `<button type="button" id="u3d-hud-replay-btn" style="background:rgba(130,60,240,0.18);border:1px solid rgba(155,107,255,0.45);color:#e9d5ff;border-radius:7px;padding:3px 9px;font-size:10.5px;font-weight:600;cursor:pointer;">Replay (${saved.frames.length})</button>` : ''}
+        ${hasSaved && !isRec ? `<button type="button" id="u3d-hud-clear-btn" title="Clear Recorded 3D Path" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#cbd5e1;border-radius:7px;padding:3px 7px;font-size:10px;font-weight:600;cursor:pointer;">&times;</button>` : ''}
       `;
       u3dHud.querySelector('#u3d-hud-rec-btn')?.addEventListener('click', (ev) => {
         ev.stopPropagation();

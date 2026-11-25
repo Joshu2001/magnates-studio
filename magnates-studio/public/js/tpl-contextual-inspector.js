@@ -2017,12 +2017,13 @@
     return null;
   }
 
-  function buildTransitVehicleSvg(mode, pathId, color, idx) {
+  function buildTransitVehicleSvg(mode, pathId, color, idx, brightness) {
     const dur = (2.8 + (idx % 3) * 0.45).toFixed(2) + 's';
-    const col = color || '#38bdf8';
+    const col = color || '#93c5fd';
+    const br = brightness !== undefined ? Math.max(0.15, Math.min(1, parseFloat(brightness))) : 0.75;
     if (mode === 'ship') {
       return `
-        <g filter="url(#mapGlowFilter)">
+        <g opacity="${br}">
           <g>
             <animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto">
               <mpath href="#${pathId}"/>
@@ -2037,7 +2038,7 @@
     }
     if (mode === 'train') {
       return `
-        <g filter="url(#mapGlowFilter)">
+        <g opacity="${br}">
           <g>
             <animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto">
               <mpath href="#${pathId}"/>
@@ -2052,7 +2053,7 @@
     }
     if (mode === 'line') {
       return `
-        <g filter="url(#mapGlowFilter)">
+        <g opacity="${br}">
           <circle r="3.2" fill="#ffffff" stroke="${col}" stroke-width="1.6">
             <animateMotion dur="${dur}" repeatCount="indefinite">
               <mpath href="#${pathId}"/>
@@ -2061,26 +2062,48 @@
         </g>
       `;
     }
-    // High-End Sleek Tactical Twin-Engine Jet Aircraft Silhouette (Vox / Hoyoverse Style)
+    // Crisp Sleek Twin-Engine Jet Aircraft Silhouette (No Gaussian blur washout)
     return `
-      <g filter="url(#arcGlowFilter)">
+      <g opacity="${br}">
         <g>
           <animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto">
             <mpath href="#${pathId}"/>
           </animateMotion>
-          <!-- Engine Jet Exhaust Trail -->
-          <line x1="-9" y1="0" x2="-22" y2="0" stroke="${col}" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
-          <circle cx="-9" cy="0" r="2.8" fill="${col}" opacity="0.95"/>
-          <!-- Crisp Pure White Aerodynamic Vector Aircraft -->
-          <path d="M 10 0 L 2.8 -1.6 L -2.8 -9.8 L -4.8 -9.8 L -2.2 -1.6 L -7.8 -1.4 L -10.2 -4.8 L -11.8 -4.8 L -10.5 0 L -11.8 4.8 L -10.2 4.8 L -7.8 1.4 L -2.2 1.6 L -4.8 9.8 L -2.8 9.8 L 2.8 1.6 Z" fill="#ffffff" stroke="${col}" stroke-width="0.8"/>
-          <!-- Cockpit & Wingtip Accents -->
-          <circle cx="4" cy="0" r="0.9" fill="${col}"/>
-          <circle cx="-3.8" cy="-9.2" r="0.8" fill="${col}"/>
-          <circle cx="-3.8" cy="9.2" r="0.8" fill="${col}"/>
+          <line x1="-8" y1="0" x2="-18" y2="0" stroke="${col}" stroke-width="1.4" stroke-linecap="round" opacity="0.65"/>
+          <path d="M 9 0 L 2.5 -1.4 L -2.5 -8.8 L -4.2 -8.8 L -2 -1.4 L -7 -1.2 L -9.2 -4.2 L -10.6 -4.2 L -9.4 0 L -10.6 4.2 L -9.2 4.2 L -7 1.2 L -2 1.4 L -4.2 8.8 L -2.5 8.8 L 2.5 1.4 Z" fill="#e2e8f0" stroke="${col}" stroke-width="0.6"/>
         </g>
       </g>
     `;
   }
+
+  // Undo history stack for Map Pin Drop route & trace edits
+  window._mapUndoStack = window._mapUndoStack || [];
+  window.tplMapPushUndo = function() {
+    if (typeof window.tplGetContextualData !== 'function') return;
+    const cur = window.tplGetContextualData('map') || {};
+    const snap = {
+      routes: Array.isArray(cur.routes) ? cur.routes.map(r => Object.assign({}, r)) : [],
+      customTracedRoutes: Array.isArray(cur.customTracedRoutes)
+        ? cur.customTracedRoutes.map(cr => Object.assign({}, cr, { points: Array.isArray(cr.points) ? cr.points.map(p => Object.assign({}, p)) : [] }))
+        : [],
+      location: cur.location,
+      coords: cur.coords,
+      lat: cur.lat,
+      lng: cur.lng
+    };
+    window._mapUndoStack.push(snap);
+    if (window._mapUndoStack.length > 30) window._mapUndoStack.shift();
+  };
+  window.tplMapCanUndo = function() {
+    return Array.isArray(window._mapUndoStack) && window._mapUndoStack.length > 0;
+  };
+  window.tplMapUndo = function() {
+    if (!window.tplMapCanUndo() || typeof window.tplSetContextualData !== 'function') return false;
+    const prev = window._mapUndoStack.pop();
+    window.tplSetContextualData('map', prev);
+    if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
+    return true;
+  };
 
   window.tplBuildInvestigativeGlobeHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('map') : {});
@@ -2089,30 +2112,33 @@
     const pinColor = d.pinColor || '#38bdf8';
     const zoomStart = Math.max(0, parseFloat(d.zoomStart !== undefined ? d.zoomStart : 0.8));
     const zoomDur = Math.max(0.5, parseFloat(d.zoomDuration !== undefined ? d.zoomDuration : 2.2));
-    const zoomLvl = Math.max(1.1, Math.min(5, parseFloat(d.zoomLevel !== undefined ? d.zoomLevel : 1.9)));
+    const zoomLvl = Math.max(1.0, Math.min(5, parseFloat(d.zoomLevel !== undefined ? d.zoomLevel : 1.9)));
     const totalCycle = (zoomStart + zoomDur + 3.0).toFixed(2);
     const showArc = d.showFlightPath !== false;
-    const is3D = !!d.is3DMode;
+    const is3D = d.is3DMode !== false;
     const isDrawing = !!d.drawOnScreenMode;
     const pitch3D = d.pitch3D !== undefined ? parseFloat(d.pitch3D) : 22;
     const yaw3D = d.yaw3D !== undefined ? parseFloat(d.yaw3D) : -10;
+    const spinSpeed = d.spinSpeed !== undefined ? Math.max(0, Math.min(3, parseFloat(d.spinSpeed))) : 0.35;
+    const spinDirection = d.spinDirection !== undefined ? (parseFloat(d.spinDirection) < 0 ? -1 : 1) : 1;
+    const planeBrightness = d.planeBrightness !== undefined ? Math.max(0.15, Math.min(1, parseFloat(d.planeBrightness))) : 0.75;
 
     const themes = {
       'harris-dark': {
-        bg: 'radial-gradient(circle at 50% 50%, #061324 0%, #01050d 100%)',
-        ocean: '#051325',
-        oceanLight: '#0d2745',
-        land: '#0a1c33',
-        landStroke: '#38bdf8',
-        landGlow: 'rgba(56, 189, 248, 0.45)',
-        borderStroke: 'rgba(56, 189, 248, 0.32)',
-        highlightCountry: '#fbbf24',
-        highlightGlow: 'rgba(251, 191, 36, 0.65)',
-        labelCol: 'rgba(226, 232, 240, 0.75)',
-        grid: 'rgba(56, 189, 248, 0.16)',
-        atmo: '#38bdf8',
-        atmoOuter: 'rgba(56, 189, 248, 0.55)',
-        fresnelRim: '#7dd3fc'
+        bg: 'radial-gradient(circle at 50% 48%, #091322 0%, #030712 100%)',
+        ocean: '#081326',
+        oceanLight: '#102442',
+        land: '#16243a',
+        landStroke: 'rgba(148, 163, 184, 0.24)',
+        landGlow: 'rgba(147, 197, 253, 0.2)',
+        borderStroke: 'rgba(148, 163, 184, 0.16)',
+        highlightCountry: '#93c5fd',
+        highlightGlow: 'rgba(147, 197, 253, 0.35)',
+        labelCol: 'rgba(226, 232, 240, 0.85)',
+        grid: 'rgba(148, 163, 184, 0.08)',
+        atmo: '#60a5fa',
+        atmoOuter: 'rgba(96, 165, 250, 0.2)',
+        fresnelRim: '#93c5fd'
       },
       'satellite': {
         bg: 'radial-gradient(circle at 50% 50%, #051a2e 0%, #010813 100%)',
@@ -2222,15 +2248,15 @@
       `;
     }
 
-    // Dynamic Country Highlighting: lookup exact polygon geometry of the active target country
+    // Dynamic Country Highlighting: restrained slate-blue highlight for the active destination
     const targetCountrySvgPath = getCountrySvgPath(targetName);
     const highlightedCountryMarkup = targetCountrySvgPath ? `
       <g class="tactical-highlight-country">
-        <path d="${targetCountrySvgPath}" fill="rgba(251, 191, 36, 0.16)" stroke="${th.highlightCountry}" stroke-width="1.3" filter="url(#activeCountryGlow)"/>
+        <path d="${targetCountrySvgPath}" fill="rgba(147, 197, 253, 0.14)" stroke="${th.highlightCountry}" stroke-width="0.9" stroke-opacity="0.65"/>
       </g>
     ` : `
       <g class="tactical-highlight-country">
-        <circle cx="${targetProj.x.toFixed(1)}" cy="${targetProj.y.toFixed(1)}" r="10" fill="rgba(251, 191, 36, 0.12)" stroke="${th.highlightCountry}" stroke-width="1.2" filter="url(#activeCountryGlow)"/>
+        <circle cx="${targetProj.x.toFixed(1)}" cy="${targetProj.y.toFixed(1)}" r="8" fill="rgba(147, 197, 253, 0.1)" stroke="${th.highlightCountry}" stroke-width="0.8" stroke-opacity="0.5"/>
       </g>
     `;
 
@@ -2288,15 +2314,15 @@
       if (r.to) activeRouteNames.add(r.to.trim().toUpperCase());
     });
 
-    // Filter country labels based on proximity to target and origin to avoid visual clutter
-    const filteredLabelsHtml = countryLabelsDb.map(lbl => {
-      if (activeRouteNames.has(lbl.name)) return "";
-      const dTarget = Math.hypot(lbl.x - targetProj.x, lbl.y - targetProj.y);
-      const dOrigin = Math.hypot(lbl.x - originProj.x, lbl.y - originProj.y);
-      if (dTarget < 16 || dOrigin < 14) return "";
-      const isSubtle = (dTarget < 26 || dOrigin < 22);
-      return `<text x="${lbl.x}" y="${lbl.y}" fill="${th.labelCol}" opacity="${isSubtle ? 0.35 : 0.82}">${lbl.name}</text>`;
-    }).join("");
+    // Clear non-active background country labels so only active departure/destination markers lead the eye
+    const filteredLabelsHtml = "";
+
+    const formatPlaceLabel = (raw) => {
+      const s = String(raw || '').trim();
+      if (!s) return 'Origin';
+      if (/^(usa|us|uk|uae)$/i.test(s)) return s.toUpperCase();
+      return s.replace(/\b\w/g, (c) => c.toUpperCase());
+    };
 
     // Decluttered Waypoints Registry: render unique, non-overlapping waypoints and HUD tags
     const renderedNodes = new Map();
@@ -2318,8 +2344,8 @@
       const cx = (p1.x + p2.x) / 2;
       const cy = (p1.y + p2.y) / 2 - arcLift;
       const pathId = `map-route-path-${idx}`;
-      const col = rt.color || "#38bdf8";
       const isLastLeg = (idx === activeRoutes.length - 1);
+      const col = isLastLeg ? "#bae6fd" : "#7dd3fc";
 
       // Unique node tracking for Waypoint 1 (Origin)
       const p1Key = `${Math.round(p1.x / 8)}_${Math.round(p1.y / 8)}`;
@@ -2328,13 +2354,11 @@
         renderedNodes.set(p1Key, true);
         originNodeHtml = `
           <!-- Waypoint Origin Node -->
-          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2.4" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
-          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
+          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2" fill="#93c5fd" stroke="#081326" stroke-width="0.6"/>
           ${idx === 0 ? `
             <g class="map-waypoint-hud" transform="translate(${p1.x.toFixed(1)}, ${p1.y.toFixed(1)})">
-              <path d="M 0 -2.4 L 0 -10 L 16 -10" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
-              <text x="18" y="-13" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900" letter-spacing="0.06em">${(rt.from || "ORIGIN").toUpperCase()}</text>
-              <text x="18" y="-8.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${originCoordsStr}</text>
+              <path d="M 0 -2.2 L 0 -9 L 13 -9" fill="none" stroke="rgba(147, 197, 253, 0.7)" stroke-width="0.6"/>
+              <text x="15" y="-10.5" fill="#f1f5f9" font-family="'Space Grotesk',sans-serif" font-size="4" font-weight="600" letter-spacing="0.02em">${formatPlaceLabel(rt.from || "Origin")}</text>
             </g>
           ` : ""}
         `;
@@ -2344,62 +2368,53 @@
       const p2Key = `${Math.round(p2.x / 8)}_${Math.round(p2.y / 8)}`;
       let destNodeHtml = "";
       if (isLastLeg) {
-        // Multi-Ring Concentric Tactical HUD Reticle matching Image 2 for the Primary Destination
+        const destDisplay = (rt.to || "").trim().toUpperCase() === "UK" ? "London, UK" : formatPlaceLabel(targetName);
         destNodeHtml = `
           <g class="map-target-reticle" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
-            <!-- Expanding Radar Pulse Ring -->
-            <circle cx="0" cy="0" r="6" fill="none" stroke="${col}" stroke-width="1" class="hud-radar-pulse"/>
-            <!-- Outer Dashed Reticle Ring -->
-            <circle cx="0" cy="0" r="15" fill="none" stroke="${col}" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
-            <!-- Inner Solid Reticle Ring -->
-            <circle cx="0" cy="0" r="9.5" fill="none" stroke="${col}" stroke-width="1.2" opacity="0.95"/>
-            <!-- 4-Corner Crosshair Ticks -->
-            <path d="M -12 -12 L -9 -12 M -12 -12 L -12 -9 M 12 -12 L 9 -12 M 12 -12 L 12 -9 M -12 12 L -9 12 M -12 12 L -12 9 M 12 12 L 9 12 M 12 12 L 12 9" stroke="${col}" stroke-width="0.8" fill="none"/>
-            <!-- Center Glowing Target Node -->
-            <circle cx="0" cy="0" r="3.2" fill="${th.highlightCountry}" stroke="#ffffff" stroke-width="0.8"/>
-            <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
+            <!-- Single Arrival Pulse -->
+            <circle cx="0" cy="0" r="4" fill="none" stroke="#bae6fd" stroke-width="0.9" class="hud-radar-pulse"/>
+            <!-- Sharp Destination Marker -->
+            <circle cx="0" cy="0" r="5.5" fill="none" stroke="rgba(186, 230, 253, 0.55)" stroke-width="0.75"/>
+            <circle cx="0" cy="0" r="2.6" fill="#bae6fd" stroke="#081326" stroke-width="0.8"/>
+            <circle cx="0" cy="0" r="1" fill="#ffffff"/>
 
-            <!-- Tactical Leader Line + Target HUD Tag -->
-            <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="${col}" stroke-width="0.75" opacity="0.85"/>
-            <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">${targetName.toUpperCase()}</text>
-            <text x="26" y="-14.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700" letter-spacing="0.05em">${targetCoordsStr}</text>
+            <!-- Clean Leader Line + Destination Label -->
+            <path d="M 0 -5.5 L 0 -13 L 16 -13" fill="none" stroke="rgba(186, 230, 253, 0.75)" stroke-width="0.7"/>
+            <text x="18" y="-15" fill="#f8fafc" font-family="'Space Grotesk',sans-serif" font-size="4.6" font-weight="600" letter-spacing="0.02em">${destDisplay}</text>
+            <text x="18" y="-10.2" fill="rgba(147, 197, 253, 0.8)" font-family="'JetBrains Mono',monospace" font-size="2.8" font-weight="500" letter-spacing="0.04em">${targetCoordsStr}</text>
           </g>
         `;
         renderedNodes.set(p2Key, true);
       } else if (!renderedNodes.has(p2Key)) {
         renderedNodes.set(p2Key, true);
-        const intermediateName = (rt.to || "").toUpperCase() === "UK" ? "LONDON" : (rt.to || "WAYPOINT").toUpperCase();
-        const intermediateCoords = (rt.to || "").toUpperCase() === "UK" ? "51.50°N 0.12°W" : `${Math.abs(tGeo.lat).toFixed(2)}°${tGeo.lat >= 0 ? "N" : "S"} ${Math.abs(tGeo.lng).toFixed(2)}°${tGeo.lng >= 0 ? "E" : "W"}`;
+        const intermediateName = (rt.to || "").trim().toUpperCase() === "UK" ? "London, UK" : formatPlaceLabel(rt.to || "Waypoint");
         destNodeHtml = `
-          <!-- Intermediate Transfer Node & Waypoint HUD (e.g. London / UK in Image 2) -->
           <g class="map-intermediate-hud" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
-            <circle cx="0" cy="0" r="2.6" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
-            <circle cx="0" cy="0" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
-            <path d="M 0 -2.6 L 0 -11 L 18 -11" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
-            <text x="20" y="-14" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.4" font-weight="900" letter-spacing="0.06em">${intermediateName}</text>
-            <text x="20" y="-9" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${intermediateCoords}</text>
+            <circle cx="0" cy="0" r="2" fill="#93c5fd" stroke="#081326" stroke-width="0.6"/>
+            <path d="M 0 -2.2 L 0 -9 L 13 -9" fill="none" stroke="rgba(147, 197, 253, 0.6)" stroke-width="0.55"/>
+            <text x="15" y="-10.5" fill="rgba(241, 245, 249, 0.88)" font-family="'Space Grotesk',sans-serif" font-size="3.9" font-weight="500" letter-spacing="0.02em">${intermediateName}</text>
           </g>
         `;
       } else {
         destNodeHtml = `
-          <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="2.2" fill="${col}" stroke="#ffffff" stroke-width="0.7" opacity="0.85"/>
+          <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="1.8" fill="#93c5fd" stroke="#081326" stroke-width="0.6" opacity="0.85"/>
         `;
       }
 
       return `
         <g class="map-route-group" data-route-idx="${idx}">
-          <!-- Glowing Parabolic Under-Stroke -->
-          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="4.8" opacity="0.28" filter="url(#arcGlowFilter)"/>
-          <!-- Core Luminous Arc Path -->
-          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.8" opacity="0.95"/>
-          <!-- Dynamic Animated Dash-Array Motion Trail -->
-          <path id="${pathId}" class="map-animated-arc" d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="8 4 2 4" opacity="0.9"/>
+          <!-- Soft Luminous Under-Stroke -->
+          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="3.6" opacity="${isLastLeg ? '0.32' : '0.16'}" filter="url(#arcGlowFilter)"/>
+          <!-- Core Route Arc -->
+          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="${isLastLeg ? '1.8' : '1.2'}" opacity="${isLastLeg ? '0.98' : '0.55'}"/>
+          <!-- Animated Motion Trail -->
+          <path id="${pathId}" class="map-animated-arc" d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="${isLastLeg ? '1.3' : '0.9'}" stroke-dasharray="8 4 2 4" opacity="${isLastLeg ? '0.92' : '0.45'}"/>
 
           ${originNodeHtml}
           ${destNodeHtml}
 
           <!-- Moving Transit Vehicle (Jet / Train / Ship) along Great-Circle Arc -->
-          ${buildTransitVehicleSvg(rt.mode || "plane", pathId, col, idx)}
+          ${buildTransitVehicleSvg(rt.mode || "plane", pathId, col, idx, planeBrightness)}
         </g>
       `;
     }).join("") : "";
@@ -2410,14 +2425,14 @@
       if (pts.length < 2) return '';
       const dStr = pts.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`).join(' ');
       const cPathId = `map-custom-trace-${cIdx}`;
-      const col = cr.color || '#2effc6';
+      const col = cr.color || '#7dd3fc';
       return `
         <g class="map-custom-trace-group">
-          <path d="${dStr}" fill="none" stroke="${col}" stroke-width="3" opacity="0.25" stroke-linecap="round" stroke-linejoin="round"/>
-          <path id="${cPathId}" d="${dStr}" fill="none" stroke="${col}" stroke-width="1.6" stroke-dasharray="3 2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="${pts[0].x.toFixed(1)}" cy="${pts[0].y.toFixed(1)}" r="2.6" fill="${col}" stroke="#fff" stroke-width="0.8"/>
-          <circle cx="${pts[pts.length - 1].x.toFixed(1)}" cy="${pts[pts.length - 1].y.toFixed(1)}" r="3" fill="#ef4444" stroke="#fff" stroke-width="0.9"/>
-          ${buildTransitVehicleSvg(cr.mode || 'plane', cPathId, col, cIdx + 3)}
+          <path d="${dStr}" fill="none" stroke="${col}" stroke-width="2" opacity="0.22" stroke-linecap="round" stroke-linejoin="round"/>
+          <path id="${cPathId}" d="${dStr}" fill="none" stroke="${col}" stroke-width="1.3" stroke-dasharray="3 2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="${pts[0].x.toFixed(1)}" cy="${pts[0].y.toFixed(1)}" r="2" fill="${col}" stroke="#081326" stroke-width="0.6"/>
+          <circle cx="${pts[pts.length - 1].x.toFixed(1)}" cy="${pts[pts.length - 1].y.toFixed(1)}" r="2.4" fill="#bae6fd" stroke="#081326" stroke-width="0.7"/>
+          ${buildTransitVehicleSvg(cr.mode || 'plane', cPathId, col, cIdx + 3, planeBrightness)}
         </g>
       `;
     }).join('');
@@ -2436,21 +2451,26 @@
             <stop offset="100%" stop-color="#01040a" stop-opacity="1"/>
           </radialGradient>
 
-          <!-- Sci-Fi 3D Fresnel Atmosphere Rim Glow (Authentic Earth Limb Brightening) -->
-          <radialGradient id="globeFresnelGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="78%" stop-color="${th.atmo}" stop-opacity="0"/>
-            <stop offset="89%" stop-color="${th.atmo}" stop-opacity="0.25"/>
-            <stop offset="96%" stop-color="${th.fresnelRim}" stop-opacity="0.7"/>
-            <stop offset="99%" stop-color="#ffffff" stop-opacity="0.95"/>
-            <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
+          <!-- Subtle Lit-Side Fresnel Atmosphere Highlight (No blown-out white ring) -->
+          <radialGradient id="globeFresnelGrad" cx="38%" cy="32%" r="64%">
+            <stop offset="80%" stop-color="${th.atmo}" stop-opacity="0"/>
+            <stop offset="93%" stop-color="${th.fresnelRim}" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="${th.fresnelRim}" stop-opacity="0.28"/>
           </radialGradient>
+
+          <!-- Directional Lit-Side Rim Arc Gradient -->
+          <linearGradient id="globeLitRimArc" x1="12%" y1="12%" x2="88%" y2="88%">
+            <stop offset="0%" stop-color="#bae6fd" stop-opacity="0.52"/>
+            <stop offset="45%" stop-color="${th.fresnelRim}" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="${th.atmo}" stop-opacity="0.02"/>
+          </linearGradient>
 
           <!-- Volumetric Terminator Depth Shadow Overlay -->
           <radialGradient id="globeDepthShadow" cx="28%" cy="24%" r="80%">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.04"/>
             <stop offset="55%" stop-color="#000000" stop-opacity="0"/>
-            <stop offset="85%" stop-color="#010611" stop-opacity="0.6"/>
-            <stop offset="100%" stop-color="#000308" stop-opacity="0.88"/>
+            <stop offset="85%" stop-color="#010611" stop-opacity="0.62"/>
+            <stop offset="100%" stop-color="#000308" stop-opacity="0.9"/>
           </radialGradient>
 
           <clipPath id="globeClipCircle">
@@ -2458,7 +2478,7 @@
           </clipPath>
 
           <filter id="outerAtmoGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4"/>
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
           </filter>
           <filter id="arcGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
@@ -2471,60 +2491,55 @@
           </filter>
         </defs>
 
-        <!-- Outer Space Deep Stars & Telemetry Grid -->
-        <g stroke="${th.grid}" stroke-width="0.45" opacity="0.32">
+        <!-- Subtle Background Grid (faded into deep space) -->
+        <g stroke="${th.grid}" stroke-width="0.4" opacity="0.22">
           <line x1="0" y1="45" x2="400" y2="45"/><line x1="0" y1="112" x2="400" y2="112"/><line x1="0" y1="180" x2="400" y2="180"/>
           <line x1="80" y1="0" x2="80" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="320" y1="0" x2="320" y2="225"/>
         </g>
 
-        <!-- Multi-Layer 3D Atmosphere Rim Lighting Halo (Fresnel Glow along Earth Curve) -->
-        <circle cx="200" cy="114" r="102" fill="none" stroke="${th.atmo}" stroke-width="2.5" opacity="0.95" filter="url(#outerAtmoGlow)"/>
-        <circle cx="200" cy="114" r="106" fill="none" stroke="#0ea5e9" stroke-width="5" opacity="0.45" filter="url(#outerAtmoGlow)"/>
-        <circle cx="200" cy="114" r="111" fill="none" stroke="${th.atmo}" stroke-width="9" opacity="0.18" filter="url(#outerAtmoGlow)"/>
+        <!-- Pull camera back slightly (0.88x) so globe has breathing room inside frame -->
+        <g transform="translate(200, 114) scale(0.88) translate(-200, -114)">
+          <!-- Restrained Atmospheric Halo (single soft outer glow) -->
+          <circle cx="200" cy="114" r="103" fill="none" stroke="${th.atmo}" stroke-width="3.5" opacity="0.16" filter="url(#outerAtmoGlow)"/>
 
-        <!-- Circumference Telemetry Degree Marks -->
-        <circle cx="200" cy="114" r="102" fill="url(#globeSphereGrad)" stroke="rgba(56,189,248,0.7)" stroke-width="1.2"/>
+          <!-- Globe Sphere Base & Thin Lit-Side Rim -->
+          <circle cx="200" cy="114" r="102" fill="url(#globeSphereGrad)" stroke="url(#globeLitRimArc)" stroke-width="0.9"/>
 
-        <!-- Clipped 3D Orthographic Globe Body -->
-        <g clip-path="url(#globeClipCircle)">
-          <!-- Curved 3D Spherical Graticules (Latitude Parallels & Longitude Meridians) -->
-          <g stroke="${th.grid}" stroke-width="0.55" fill="none" opacity="0.85">
-            <!-- Parallels (Latitudes) -->
-            <ellipse cx="200" cy="62" rx="74" ry="22"/>
-            <ellipse cx="200" cy="78" rx="88" ry="26"/>
-            <ellipse cx="200" cy="95" rx="98" ry="30"/>
-            <ellipse cx="200" cy="105" rx="101" ry="31"/>
-            <ellipse cx="200" cy="114" rx="102" ry="32"/>
-            <line x1="98" y1="114" x2="302" y2="114"/>
-            <ellipse cx="200" cy="123" rx="101" ry="31"/>
-            <ellipse cx="200" cy="133" rx="98" ry="30"/>
-            <ellipse cx="200" cy="150" rx="88" ry="26"/>
-            <ellipse cx="200" cy="166" rx="74" ry="22"/>
-
-            <!-- Meridians (Longitudes) -->
-            <ellipse cx="200" cy="114" rx="28" ry="102"/>
-            <ellipse cx="200" cy="114" rx="58" ry="102"/>
-            <ellipse cx="200" cy="114" rx="85" ry="102"/>
-            <line x1="200" y1="12" x2="200" y2="216"/>
-          </g>
-
-          <!-- Interactive Transformed Coordinate Plane -->
-          <g class="map-interactive-coord-plane" transform="translate(${globeShiftX}, ${globeShiftY})">
-            ${highPrecisionWorldVectors}
-            ${highlightedCountryMarkup}
-            ${bathymetricContoursMarkup}
-            <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
-              ${filteredLabelsHtml}
+          <!-- Clipped 3D Orthographic Globe Body -->
+          <g clip-path="url(#globeClipCircle)">
+            <!-- Curved 3D Spherical Graticules (faded into ocean) -->
+            <g stroke="${th.grid}" stroke-width="0.45" fill="none" opacity="0.55">
+              <ellipse cx="200" cy="62" rx="74" ry="22"/>
+              <ellipse cx="200" cy="78" rx="88" ry="26"/>
+              <ellipse cx="200" cy="95" rx="98" ry="30"/>
+              <ellipse cx="200" cy="105" rx="101" ry="31"/>
+              <ellipse cx="200" cy="114" rx="102" ry="32"/>
+              <line x1="98" y1="114" x2="302" y2="114"/>
+              <ellipse cx="200" cy="123" rx="101" ry="31"/>
+              <ellipse cx="200" cy="133" rx="98" ry="30"/>
+              <ellipse cx="200" cy="150" rx="88" ry="26"/>
+              <ellipse cx="200" cy="166" rx="74" ry="22"/>
+              <ellipse cx="200" cy="114" rx="28" ry="102"/>
+              <ellipse cx="200" cy="114" rx="58" ry="102"/>
+              <ellipse cx="200" cy="114" rx="85" ry="102"/>
+              <line x1="200" y1="12" x2="200" y2="216"/>
             </g>
-            ${routeElementsHtml}
-            ${customTraceHtml}
+
+            <!-- Interactive Transformed Coordinate Plane -->
+            <g class="map-interactive-coord-plane" transform="translate(${globeShiftX}, ${globeShiftY})">
+              ${highPrecisionWorldVectors}
+              ${highlightedCountryMarkup}
+              ${bathymetricContoursMarkup}
+              ${routeElementsHtml}
+              ${customTraceHtml}
+            </g>
+
+            <!-- 3D Volumetric Terminator Depth Shadow Overlay -->
+            <circle cx="200" cy="114" r="102" fill="url(#globeDepthShadow)" pointer-events="none"/>
+
+            <!-- Subtle Lit-Side Fresnel Highlight -->
+            <circle cx="200" cy="114" r="102" fill="url(#globeFresnelGrad)" pointer-events="none"/>
           </g>
-
-          <!-- 3D Volumetric Terminator Depth Shadow Overlay -->
-          <circle cx="200" cy="114" r="102" fill="url(#globeDepthShadow)" pointer-events="none"/>
-
-          <!-- 3D Fresnel Limb Rim Glow Overlay (Inner Edge Highlight) -->
-          <circle cx="200" cy="114" r="102" fill="url(#globeFresnelGrad)" pointer-events="none"/>
         </g>
       </svg>
     ` : `
@@ -2558,66 +2573,51 @@
       </svg>
     `;
 
-    const rig3DStyle = is3D
+    const useThreeGlobe = (proj === 'globe' && typeof THREE !== 'undefined');
+    const rig3DStyle = (!useThreeGlobe && is3D)
       ? `animation: none !important; transform: perspective(1000px) rotateX(${pitch3D}deg) rotateY(${yaw3D}deg) scale(${Math.min(1.35, Math.max(1.0, zoomLvl * 0.65))}); transform-style: preserve-3d; transition: transform 0.15s ease-out;`
       : '';
 
-    const stage3DControlsHtml = `
-      <div class="map-3d-stage-toolbar" style="position:absolute; top:10px; right:12px; z-index:35; display:flex; align-items:center; gap:6px; background:rgba(7,13,25,0.92); backdrop-filter:blur(10px); border:1px solid rgba(56,189,248,0.45); border-radius:20px; padding:4px 10px; box-shadow:0 8px 24px rgba(0,0,0,0.75); pointer-events:auto;">
-        <button type="button" id="map-stage-btn-toggle-3d" style="background:${is3D ? "rgba(56,189,248,0.25)" : "rgba(255,255,255,0.08)"}; border:1px solid ${is3D ? "#38bdf8" : "rgba(255,255,255,0.18)"}; color:${is3D ? "#38bdf8" : "#94a3b8"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:800; cursor:pointer;" title="Toggle 3D Orbit / Camera Mode">
-          ${is3D ? "🌐 3D Orbit ON" : "🌐 3D Orbit"}
-        </button>
-        <div style="display:flex; align-items:center; gap:2px; background:rgba(0,0,0,0.5); border-radius:12px; border:1px solid rgba(255,255,255,0.12); padding:1px 4px;">
-          <button type="button" id="map-stage-btn-zoom-in" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom In (+)">+</button>
-          <span id="map-stage-zoom-badge" style="font-family:monospace; font-size:8.5px; color:#e2e8f0; min-width:24px; text-align:center;">${zoomLvl.toFixed(1)}x</span>
-          <button type="button" id="map-stage-btn-zoom-out" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom Out (−)">−</button>
-        </div>
-        <button type="button" id="map-stage-btn-draw" style="background:${isDrawing ? "rgba(46,255,198,0.22)" : "rgba(255,255,255,0.08)"}; border:1px solid ${isDrawing ? "#2effc6" : "rgba(255,255,255,0.18)"}; color:${isDrawing ? "#2effc6" : "#e2e8f0"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:700; cursor:pointer;" title="Direct Route Tracing Mode">
-          ${isDrawing ? "✏️ Tracing Route" : "✏️ Trace"}
-        </button>
-        <select id="map-stage-sel-transit" style="background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:#fff; font-size:9.5px; font-weight:700; padding:2px 5px; cursor:pointer;" title="Transit Mode for On-Screen Trace">
-          <option value="plane" ${(d.activeTraceTransit || "plane") === "plane" ? "selected" : ""}>✈️ Plane</option>
-          <option value="ship" ${d.activeTraceTransit === "ship" ? "selected" : ""}>🚢 Ship</option>
-          <option value="train" ${d.activeTraceTransit === "train" ? "selected" : ""}>🚆 Train</option>
-          <option value="line" ${d.activeTraceTransit === "line" ? "selected" : ""}>⚡ Line</option>
-        </select>
-        <button type="button" id="map-stage-btn-clear-trace" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; border-radius:10px; padding:2px 7px; font-size:9px; font-weight:700; cursor:pointer;" title="Clear On-Screen Drawn Traces">Clear</button>
-      </div>
-    `;
+    const formatCardPlace = (raw) => {
+      const s = String(raw || '').trim();
+      if (!s) return 'Origin';
+      if (s.toUpperCase() === 'UK') return 'London, UK';
+      if (/^(usa|us|uae)$/i.test(s)) return s.toUpperCase();
+      return s.replace(/\b\w/g, (c) => c.toUpperCase());
+    };
 
     return `
       <div class="tpl-map globe-viewport ${is3D ? 'is-3d-mode' : ''} ${isDrawing ? 'is-drawing-route' : ''}" style="background:${th.bg}; --focus-x:${normX.toFixed(1)}%; --focus-y:${normY.toFixed(1)}%; --zoom-scale:${zoomLvl}; --zoom-delay:${zoomStart}s; --cam-cycle:${totalCycle}s; --pan-x:${panX}; --pan-y:${panY}; --pin-color:${pinColor}; cursor:${isDrawing ? 'crosshair' : (is3D ? 'grab' : 'default')};">
-        ${stage3DControlsHtml}
-        <div class="globe-camera-rig" style="${rig3DStyle}">
-          ${globeSvg}
-        </div>
+        ${useThreeGlobe ? `
+          <div class="globe-3d-stage" style="position:absolute; inset:0; width:100%; height:100%; overflow:hidden;">
+            <canvas class="globe-3d-canvas" style="position:absolute; inset:0; width:100%; height:100%; display:block;"></canvas>
+            <div class="globe-3d-labels" style="position:absolute; inset:0; pointer-events:none; overflow:hidden;"></div>
+          </div>
+        ` : `
+          <div class="globe-camera-rig" style="${rig3DStyle}">
+            ${globeSvg}
+          </div>
+        `}
 
-        <!-- Floating Glassmorphic HUD Route Card matching Image 2 -->
+        <!-- Clean Charcoal Route Summary Card -->
         <div class="location-hud">
           <div class="hud-top-meta">
-            <span class="hud-badge-tag">[MULTI-VECTOR TRANSIT 01]</span>
-            <span class="hud-badge-tag">[ACTIVE LEGS: ${activeRoutes.length}]</span>
+            <span class="hud-badge-title">Route summary</span>
+            <span class="hud-badge-count">${activeRoutes.length} ${activeRoutes.length === 1 ? 'leg' : 'legs'}</span>
           </div>
           <div class="hud-route-legs">
             ${activeRoutes.map((rt, i) => {
               const isLast = (i === activeRoutes.length - 1);
-              const fromFlag = getCountryFlag(rt.from);
               return `
                 <div class="hud-route-item ${isLast ? 'active-leg' : ''}">
-                  ${i === 0 ? `<span class="hud-flag">${fromFlag}</span>` : `<span class="hud-arrow-down">\u2794</span>`}
-                  <span class="hud-country">${(rt.from || 'ORIGIN').toUpperCase()}</span>
+                  <span class="hud-route-dot" aria-hidden="true"></span>
+                  <span class="hud-country">${formatCardPlace(rt.from || 'Origin')}</span>
                   <span class="hud-arrow">\u2192</span>
-                  <span class="hud-country ${isLast ? 'highlight' : ''}">${(rt.to || 'TARGET').toUpperCase()}</span>
+                  <span class="hud-country ${isLast ? 'highlight' : ''}">${formatCardPlace(rt.to || 'Target')}</span>
                 </div>
               `;
             }).join('')}
           </div>
-        </div>
-
-        <!-- High-Tech Bottom Telemetry Bar -->
-        <div class="telemetry-bar">
-          <span>SAT-LOCK // ${proj === 'globe' ? '3D ORTHOGRAPHIC GLOBE' : '2D GRANULAR WORLD MAP'} ${is3D ? '\u00b7 [3D INTERACTIVE]' : ''}</span>
-          <span>${activeRoutes.length} ROUTE${activeRoutes.length > 1 ? 'S' : ''} \u00b7 ZOOM @ ${zoomStart}s \u00b7 ${zoomLvl}x</span>
         </div>
       </div>
     `;
@@ -2854,43 +2854,619 @@
   window.tplBindInteractiveMapStage = function(stageEl) {
     if (!stageEl) return;
     const viewport = stageEl.querySelector(".tpl-map.globe-viewport");
-    if (!viewport) return;
-
-    // Wire up 3D Orbit Toggle
-    const btnToggle3D = viewport.querySelector("#map-stage-btn-toggle-3d");
-    if (btnToggle3D) {
-      btnToggle3D.onclick = (e) => {
-        e.stopPropagation();
-        const cur = window.tplGetContextualData("map");
-        window.tplSetContextualData("map", { is3DMode: !cur.is3DMode });
-        if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
-      };
+    const topbarControls = document.getElementById("map-preview-topbar-controls");
+    if (!viewport) {
+      if (topbarControls) topbarControls.style.display = "none";
+      return;
     }
 
-    // Wire up Zoom In and Zoom Out controls
-    const btnZoomIn = viewport.querySelector("#map-stage-btn-zoom-in");
-    if (btnZoomIn) {
-      btnZoomIn.onclick = (e) => {
-        e.stopPropagation();
-        const cur = window.tplGetContextualData("map");
-        const newZ = Math.min(5, (cur.zoomLevel !== undefined ? parseFloat(cur.zoomLevel) : 1.9) + 0.35);
-        window.tplSetContextualData("map", { zoomLevel: parseFloat(newZ.toFixed(2)), is3DMode: true });
-        if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
-      };
+    const renderMapTopbarControls = () => {
+      if (!topbarControls) return;
+      const cur = window.tplGetContextualData("map") || {};
+      const is3D = !!cur.is3DMode;
+      const zoomLvl = cur.zoomLevel !== undefined ? parseFloat(cur.zoomLevel) : 1.9;
+      const u3dSt = window._univ3dRecordState || {};
+      const isRec = !!(u3dSt.isRecording && u3dSt.tplId === "map");
+      const saved = (window._universal3DRecordedPaths && window._universal3DRecordedPaths["map"]) || null;
+      const hasSaved = !!(saved && saved.frames && saved.frames.length >= 2);
+      const tbGlobeIcon = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+
+      const canUndo = typeof window.tplMapCanUndo === "function" && window.tplMapCanUndo();
+      topbarControls.style.display = "inline-flex";
+      topbarControls.innerHTML = `
+        <button type="button" id="map-stage-btn-toggle-3d" style="display:inline-flex; align-items:center; gap:5px; background:${is3D ? "linear-gradient(180deg,#9353F5,#823CF0)" : "rgba(255,255,255,0.06)"}; border:1px solid ${is3D ? "#9B6BFF" : "rgba(255,255,255,0.14)"}; color:${is3D ? "#fff" : "#cbd5e1"}; border-radius:7px; padding:3px 9px; font-size:10.5px; font-weight:600; cursor:pointer;" title="Toggle 3D Orbit / Camera Mode">
+          ${tbGlobeIcon}<span>${is3D ? "3D Orbit" : "2D View"}</span>
+        </button>
+        <div style="display:inline-flex; align-items:center; gap:2px; background:rgba(0,0,0,0.35); border-radius:7px; border:1px solid rgba(255,255,255,0.12); padding:2px 4px;">
+          <button type="button" id="map-stage-btn-zoom-out" style="background:none; border:none; color:#e2e8f0; font-weight:700; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom Out (−)">−</button>
+          <span id="map-stage-zoom-badge" style="font-family:monospace; font-size:10px; color:#cbd5e1; min-width:28px; text-align:center;">${zoomLvl.toFixed(1)}x</span>
+          <button type="button" id="map-stage-btn-zoom-in" style="background:none; border:none; color:#e2e8f0; font-weight:700; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom In (+)">+</button>
+        </div>
+        <button type="button" id="map-topbar-rec-3d" style="display:inline-flex; align-items:center; gap:5px; background:${isRec ? "linear-gradient(180deg,#dc2626,#b91c1c)" : "rgba(130,60,240,0.18)"}; border:1px solid ${isRec ? "#f87171" : "rgba(155,107,255,0.45)"}; color:${isRec ? "#fff" : "#e9d5ff"}; border-radius:7px; padding:3px 9px; font-size:10.5px; font-weight:600; cursor:pointer;" title="Record 3D Orbit & Motion Path">
+          <span style="color:${isRec ? "#fff" : "#c084fc"}; font-size:9px;">${isRec ? "\u25a0" : "\u25cf"}</span><span>${isRec ? "Stop & Save" : "Record 3D"}</span>
+        </button>
+        ${hasSaved && !isRec ? `<button type="button" id="map-topbar-replay-3d" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#e2e8f0; border-radius:7px; padding:3px 8px; font-size:10.5px; font-weight:600; cursor:pointer;">Replay</button>` : ""}
+        <button type="button" id="map-topbar-undo" ${canUndo ? "" : "disabled"} style="display:inline-flex; align-items:center; gap:4px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:${canUndo ? "#e2e8f0" : "rgba(148,163,184,0.4)"}; border-radius:7px; padding:3px 8px; font-size:10.5px; font-weight:600; cursor:${canUndo ? "pointer" : "not-allowed"}; opacity:${canUndo ? "1" : "0.55"};" title="Undo last route or trace change">\u21a9 Undo</button>
+      `;
+
+      const btnToggle3D = topbarControls.querySelector("#map-stage-btn-toggle-3d");
+      if (btnToggle3D) {
+        btnToggle3D.onclick = (e) => {
+          e.stopPropagation();
+          const c = window.tplGetContextualData("map");
+          window.tplSetContextualData("map", { is3DMode: !c.is3DMode });
+          if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+        };
+      }
+
+      const btnZoomIn = topbarControls.querySelector("#map-stage-btn-zoom-in");
+      if (btnZoomIn) {
+        btnZoomIn.onclick = (e) => {
+          e.stopPropagation();
+          const c = window.tplGetContextualData("map");
+          const newZ = Math.min(5, (c.zoomLevel !== undefined ? parseFloat(c.zoomLevel) : 1.9) + 0.35);
+          window.tplSetContextualData("map", { zoomLevel: parseFloat(newZ.toFixed(2)), is3DMode: true });
+          if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+        };
+      }
+
+      const btnZoomOut = topbarControls.querySelector("#map-stage-btn-zoom-out");
+      if (btnZoomOut) {
+        btnZoomOut.onclick = (e) => {
+          e.stopPropagation();
+          const c = window.tplGetContextualData("map");
+          const newZ = Math.max(1.0, (c.zoomLevel !== undefined ? parseFloat(c.zoomLevel) : 1.9) - 0.35);
+          window.tplSetContextualData("map", { zoomLevel: parseFloat(newZ.toFixed(2)), is3DMode: true });
+          if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+        };
+      }
+
+      const btnRec = topbarControls.querySelector("#map-topbar-rec-3d");
+      if (btnRec) {
+        btnRec.onclick = (e) => {
+          e.stopPropagation();
+          if (typeof window.tplToggleUniversal3DMotionRecord === "function") {
+            window.tplToggleUniversal3DMotionRecord("map");
+            renderMapTopbarControls();
+          }
+        };
+      }
+
+      const btnReplay = topbarControls.querySelector("#map-topbar-replay-3d");
+      if (btnReplay) {
+        btnReplay.onclick = (e) => {
+          e.stopPropagation();
+          if (typeof window.tplReplayUniversal3DMotion === "function") {
+            window.tplReplayUniversal3DMotion("map");
+          }
+        };
+      }
+
+      const btnUndoTop = topbarControls.querySelector("#map-topbar-undo");
+      if (btnUndoTop) {
+        btnUndoTop.onclick = (e) => {
+          e.stopPropagation();
+          if (typeof window.tplMapUndo === "function") window.tplMapUndo();
+        };
+      }
+    };
+
+    renderMapTopbarControls();
+
+    // Cleanup any previous Three.js globe loop
+    if (typeof window._activeMap3DGlobeCleanup === "function") {
+      try { window._activeMap3DGlobeCleanup(); } catch (e) {}
+      window._activeMap3DGlobeCleanup = null;
     }
 
-    const btnZoomOut = viewport.querySelector("#map-stage-btn-zoom-out");
-    if (btnZoomOut) {
-      btnZoomOut.onclick = (e) => {
-        e.stopPropagation();
-        const cur = window.tplGetContextualData("map");
-        const newZ = Math.max(1.0, (cur.zoomLevel !== undefined ? parseFloat(cur.zoomLevel) : 1.9) - 0.35);
-        window.tplSetContextualData("map", { zoomLevel: parseFloat(newZ.toFixed(2)), is3DMode: true });
-        if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+    const globe3DHost = viewport.querySelector(".globe-3d-stage");
+    if (globe3DHost && typeof THREE !== "undefined") {
+      const canvas = globe3DHost.querySelector(".globe-3d-canvas");
+      const labelsLayer = globe3DHost.querySelector(".globe-3d-labels");
+      const curData = window.tplGetContextualData("map") || {};
+      const activeRoutes = Array.isArray(curData.routes) && curData.routes.length > 0 ? curData.routes : [
+        { from: "USA", to: "UK", fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: "plane" },
+        { from: "UK", to: "Ukraine", fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: "plane" }
+      ];
+      const customRoutes = Array.isArray(curData.customTracedRoutes) ? curData.customTracedRoutes : [];
+      const styleKey = curData.mapStyle || "harris-dark";
+      const themePalettes = {
+        "harris-dark": { ocean: "#081326", land: "#16243a", landStroke: "rgba(148,163,184,0.26)", grid: "rgba(148,163,184,0.08)", atmo: 0x60a5fa },
+        "satellite": { ocean: "#041527", land: "#0e2d22", landStroke: "rgba(116,198,157,0.28)", grid: "rgba(82,183,136,0.10)", atmo: 0x38bdf8 },
+        "vox-archival": { ocean: "#15110d", land: "#3a3023", landStroke: "rgba(244,236,216,0.26)", grid: "rgba(244,236,216,0.08)", atmo: 0xf59e0b },
+        "radar-amber": { ocean: "#100802", land: "#2b1506", landStroke: "rgba(245,158,11,0.28)", grid: "rgba(245,158,11,0.09)", atmo: 0xf59e0b }
       };
+      const pal = themePalettes[styleKey] || themePalettes["harris-dark"];
+
+      const width = Math.max(320, globe3DHost.clientWidth || viewport.clientWidth || 640);
+      const height = Math.max(180, globe3DHost.clientHeight || viewport.clientHeight || 360);
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(width, height, false);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+      const getCamDist = (z) => Math.max(1.75, Math.min(4.6, 3.6 - (Math.max(1.0, z) - 1.0) * 0.42));
+      let zoomVal = curData.zoomLevel !== undefined ? parseFloat(curData.zoomLevel) : 1.9;
+      camera.position.set(0, 0.12, getCamDist(zoomVal));
+
+      // Directional lighting for true 3D sphere depth
+      const ambient = new THREE.AmbientLight(0xbcd0ea, 0.72);
+      scene.add(ambient);
+      const sun = new THREE.DirectionalLight(0xe0f2fe, 1.15);
+      sun.position.set(-2.5, 2.0, 2.6);
+      scene.add(sun);
+      const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.25);
+      rimLight.position.set(2.2, -1.2, -1.5);
+      scene.add(rimLight);
+
+      // Build equirectangular world texture from ACCURATE_WORLD_MAP
+      const texCanvas = document.createElement("canvas");
+      texCanvas.width = 2048;
+      texCanvas.height = 1024;
+      const tCtx = texCanvas.getContext("2d");
+      tCtx.fillStyle = pal.ocean;
+      tCtx.fillRect(0, 0, 2048, 1024);
+
+      // Subtle lat/lng grid on sphere texture
+      tCtx.strokeStyle = pal.grid;
+      tCtx.lineWidth = 1;
+      for (let gx = 0; gx <= 2048; gx += 2048 / 12) {
+        tCtx.beginPath(); tCtx.moveTo(gx, 0); tCtx.lineTo(gx, 1024); tCtx.stroke();
+      }
+      for (let gy = 0; gy <= 1024; gy += 1024 / 6) {
+        tCtx.beginPath(); tCtx.moveTo(0, gy); tCtx.lineTo(2048, gy); tCtx.stroke();
+      }
+
+      if (window.ACCURATE_WORLD_MAP && window.ACCURATE_WORLD_MAP.land) {
+        tCtx.save();
+        tCtx.translate(-32 * (2048 / 336), -32 * (1024 / 172));
+        tCtx.scale(2048 / 336, 1024 / 172);
+        const landPath = new Path2D(window.ACCURATE_WORLD_MAP.land);
+        tCtx.fillStyle = pal.land;
+        tCtx.fill(landPath);
+        tCtx.strokeStyle = pal.landStroke;
+        tCtx.lineWidth = 0.32;
+        tCtx.stroke(landPath);
+
+        // Subtle highlight for active destination country
+        const lastRt = activeRoutes[activeRoutes.length - 1];
+        const destSvgPath = lastRt && lastRt.to ? getCountrySvgPath(lastRt.to) : null;
+        if (destSvgPath) {
+          const dPath = new Path2D(destSvgPath);
+          tCtx.fillStyle = "rgba(147, 197, 253, 0.22)";
+          tCtx.fill(dPath);
+          tCtx.strokeStyle = "rgba(186, 230, 253, 0.65)";
+          tCtx.lineWidth = 0.55;
+          tCtx.stroke(dPath);
+        }
+        tCtx.restore();
+      }
+
+      const earthTex = new THREE.CanvasTexture(texCanvas);
+      earthTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+
+      const globeGroup = new THREE.Group();
+      scene.add(globeGroup);
+
+      const sphereGeo = new THREE.SphereGeometry(1, 64, 64);
+      const sphereMat = new THREE.MeshPhongMaterial({
+        map: earthTex,
+        specular: new THREE.Color(0x1e3a5f),
+        shininess: 14
+      });
+      const earthMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      globeGroup.add(earthMesh);
+
+      // Thin lit-side atmospheric Fresnel highlight (no blown-out white ring)
+      const atmoGeo = new THREE.SphereGeometry(1.018, 64, 64);
+      const atmoMat = new THREE.ShaderMaterial({
+        uniforms: { uColor: { value: new THREE.Color(pal.atmo) } },
+        vertexShader: `
+          varying vec3 vNormal;
+          varying vec3 vViewDir;
+          void main() {
+            vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+            vNormal = normalize(normalMatrix * normal);
+            vViewDir = normalize(-mvPos.xyz);
+            gl_Position = projectionMatrix * mvPos;
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 uColor;
+          varying vec3 vNormal;
+          varying vec3 vViewDir;
+          void main() {
+            float fresnel = pow(1.0 - max(0.0, dot(vNormal, vViewDir)), 4.5);
+            float litSide = smoothstep(-0.3, 0.85, dot(vNormal, normalize(vec3(-0.6, 0.5, 0.65))));
+            float alpha = fresnel * (0.08 + 0.34 * litSide);
+            gl_FragColor = vec4(uColor, alpha);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending
+      });
+      const atmoMesh = new THREE.Mesh(atmoGeo, atmoMat);
+      scene.add(atmoMesh);
+
+      const latLngToVec3 = (lat, lng, r = 1.006) => {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lng + 180) * (Math.PI / 180);
+        return new THREE.Vector3(
+          -r * Math.sin(phi) * Math.cos(theta),
+          r * Math.cos(phi),
+          r * Math.sin(phi) * Math.sin(theta)
+        );
+      };
+
+      const vec3ToLatLng = (v) => {
+        const n = v.clone().normalize();
+        const lat = 90 - Math.acos(Math.max(-1, Math.min(1, n.y))) * (180 / Math.PI);
+        let theta = Math.atan2(n.z, -n.x);
+        if (theta < 0) theta += Math.PI * 2;
+        const lng = theta * (180 / Math.PI) - 180;
+        return { lat: parseFloat(lat.toFixed(2)), lng: parseFloat(lng.toFixed(2)) };
+      };
+
+      const formatPlace3D = (raw) => {
+        const s = String(raw || "").trim();
+        if (!s) return "Origin";
+        if (s.toUpperCase() === "UK") return "London, UK";
+        if (/^(usa|us|uae)$/i.test(s)) return s.toUpperCase();
+        return s.replace(/\b\w/g, (c) => c.toUpperCase());
+      };
+
+      // Build crisp 3D Plane shape
+      const createPlaneMesh = (colorHex, brightness) => {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0.032);
+        shape.lineTo(0.005, 0.009);
+        shape.lineTo(0.030, -0.008);
+        shape.lineTo(0.030, -0.014);
+        shape.lineTo(0.005, -0.006);
+        shape.lineTo(0.004, -0.024);
+        shape.lineTo(0.014, -0.032);
+        shape.lineTo(0.014, -0.036);
+        shape.lineTo(0, -0.031);
+        shape.lineTo(-0.014, -0.036);
+        shape.lineTo(-0.014, -0.032);
+        shape.lineTo(-0.004, -0.024);
+        shape.lineTo(-0.005, -0.006);
+        shape.lineTo(-0.030, -0.014);
+        shape.lineTo(-0.030, -0.008);
+        shape.lineTo(-0.005, 0.009);
+        shape.closePath();
+        const geo = new THREE.ShapeGeometry(shape);
+        const mat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(colorHex),
+          transparent: true,
+          opacity: brightness,
+          side: THREE.DoubleSide
+        });
+        return new THREE.Mesh(geo, mat);
+      };
+
+      const animatedVehicles = [];
+      const labelAnchors = [];
+      const seenLabelKeys = new Set();
+      let destPulseRing = null;
+
+      const planeBright = curData.planeBrightness !== undefined
+        ? Math.max(0.15, Math.min(1, parseFloat(curData.planeBrightness)))
+        : 0.75;
+
+      if (curData.showFlightPath !== false) {
+        activeRoutes.forEach((rt, idx) => {
+          const fGeo = (rt.fromLat !== undefined && rt.fromLng !== undefined)
+            ? { lat: rt.fromLat, lng: rt.fromLng }
+            : (window.tplResolveGeoLocation(rt.from) || { lat: 39.8, lng: -98.5 });
+          const tGeo = (rt.toLat !== undefined && rt.toLng !== undefined)
+            ? { lat: rt.toLat, lng: rt.toLng }
+            : (window.tplResolveGeoLocation(rt.to) || { lat: 48.37, lng: 31.16 });
+
+          const v1 = latLngToVec3(fGeo.lat, fGeo.lng, 1.006);
+          const v2 = latLngToVec3(tGeo.lat, tGeo.lng, 1.006);
+          const angle = v1.angleTo(v2);
+          const arcLift = Math.min(0.28, Math.max(0.06, angle * 0.16));
+          const isLastLeg = (idx === activeRoutes.length - 1);
+
+          const arcPts = [];
+          const segs = 48;
+          for (let s = 0; s <= segs; s++) {
+            const t = s / segs;
+            const p = new THREE.Vector3().lerpVectors(v1, v2, t).normalize();
+            const r = 1.006 + arcLift * Math.sin(Math.PI * t);
+            p.multiplyScalar(r);
+            arcPts.push(p);
+          }
+
+          const curve = new THREE.CatmullRomCurve3(arcPts);
+          const lineGeo = new THREE.BufferGeometry().setFromPoints(arcPts);
+          const lineMat = new THREE.LineBasicMaterial({
+            color: isLastLeg ? 0xbae6fd : 0x7dd3fc,
+            transparent: true,
+            opacity: isLastLeg ? 0.92 : 0.45
+          });
+          globeGroup.add(new THREE.Line(lineGeo, lineMat));
+
+          // Origin & destination markers
+          const dotGeo = new THREE.SphereGeometry(isLastLeg ? 0.015 : 0.011, 14, 14);
+          const oDot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: 0x93c5fd }));
+          oDot.position.copy(v1);
+          globeGroup.add(oDot);
+
+          const dDot = new THREE.Mesh(dotGeo, new THREE.MeshBasicMaterial({ color: isLastLeg ? 0xbae6fd : 0x93c5fd }));
+          dDot.position.copy(v2);
+          globeGroup.add(dDot);
+
+          if (isLastLeg) {
+            const ringGeo = new THREE.RingGeometry(0.018, 0.025, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.75, side: THREE.DoubleSide });
+            destPulseRing = new THREE.Mesh(ringGeo, ringMat);
+            destPulseRing.position.copy(v2.clone().normalize().multiplyScalar(1.009));
+            destPulseRing.lookAt(v2.clone().multiplyScalar(2));
+            globeGroup.add(destPulseRing);
+          }
+
+          // Label anchors
+          const oKey = `${Math.round(fGeo.lat)}_${Math.round(fGeo.lng)}`;
+          if (!seenLabelKeys.has(oKey)) {
+            seenLabelKeys.add(oKey);
+            labelAnchors.push({ pos: v1.clone(), text: formatPlace3D(rt.from), isTarget: false });
+          }
+          const dKey = `${Math.round(tGeo.lat)}_${Math.round(tGeo.lng)}`;
+          if (!seenLabelKeys.has(dKey) || isLastLeg) {
+            seenLabelKeys.add(dKey);
+            labelAnchors.push({ pos: v2.clone(), text: formatPlace3D(rt.to), isTarget: isLastLeg });
+          }
+
+          // Crisp 3D vehicle
+          const vColor = isLastLeg ? 0xe0f2fe : 0x93c5fd;
+          const vMesh = (rt.mode === "line")
+            ? new THREE.Mesh(new THREE.SphereGeometry(0.014, 12, 12), new THREE.MeshBasicMaterial({ color: vColor, transparent: true, opacity: planeBright }))
+            : createPlaneMesh(vColor, planeBright);
+          globeGroup.add(vMesh);
+          animatedVehicles.push({ mesh: vMesh, curve, speed: 0.24 + (idx % 3) * 0.04, offset: (idx * 0.27) % 1 });
+        });
+      }
+
+      // Render custom traced routes directly on the 3D sphere
+      customRoutes.forEach((cr, cIdx) => {
+        const pts = Array.isArray(cr.points) ? cr.points : [];
+        if (pts.length < 2) return;
+        const vecs = pts.map((pt) => {
+          const ll = (pt.lat !== undefined && pt.lng !== undefined)
+            ? { lat: pt.lat, lng: pt.lng }
+            : window.tplSvgPointToLatLng(pt.x, pt.y);
+          return latLngToVec3(ll.lat, ll.lng, 1.012);
+        });
+        const cCurve = new THREE.CatmullRomCurve3(vecs);
+        const cGeo = new THREE.BufferGeometry().setFromPoints(cCurve.getPoints(40));
+        const cMat = new THREE.LineBasicMaterial({ color: cr.color || 0x7dd3fc, transparent: true, opacity: 0.85 });
+        globeGroup.add(new THREE.Line(cGeo, cMat));
+        const cPlane = createPlaneMesh(cr.color || 0xbae6fd, planeBright);
+        globeGroup.add(cPlane);
+        animatedVehicles.push({ mesh: cPlane, curve: cCurve, speed: 0.28, offset: (cIdx * 0.19) % 1 });
+      });
+
+      // Center initial globe orientation on active route
+      const focusRoute = activeRoutes[activeRoutes.length - 1];
+      const focusGeo = (focusRoute && focusRoute.toLat !== undefined)
+        ? { lat: focusRoute.toLat, lng: focusRoute.toLng }
+        : (window.tplResolveGeoLocation(focusRoute?.to || "UK") || { lat: 48.37, lng: 31.16 });
+      const initYaw = (curData.yaw3D !== undefined && curData._userOrbited)
+        ? (parseFloat(curData.yaw3D) * Math.PI) / 180
+        : -((focusGeo.lng + 90) * Math.PI) / 180;
+      const initPitch = (curData.pitch3D !== undefined && curData._userOrbited)
+        ? (parseFloat(curData.pitch3D) * Math.PI) / 180
+        : Math.max(-0.8, Math.min(0.8, (focusGeo.lat * Math.PI) / 180 * 0.45));
+      globeGroup.rotation.y = initYaw;
+      globeGroup.rotation.x = initPitch;
+
+      // Build label DOM elements
+      if (labelsLayer) {
+        labelsLayer.innerHTML = "";
+        labelAnchors.forEach((la) => {
+          const el = document.createElement("div");
+          el.textContent = la.text;
+          el.style.cssText = `position:absolute; transform:translate(-50%, -135%); padding:2px 6px; border-radius:4px; background:rgba(8,14,26,0.72); border:1px solid ${la.isTarget ? "rgba(186,230,253,0.45)" : "rgba(255,255,255,0.12)"}; color:${la.isTarget ? "#f8fafc" : "rgba(226,232,240,0.88)"}; font-family:'Space Grotesk',sans-serif; font-size:${la.isTarget ? "10.5px" : "9.5px"}; font-weight:${la.isTarget ? "600" : "500"}; white-space:nowrap; pointer-events:none; transition:opacity 0.12s;`;
+          labelsLayer.appendChild(el);
+          la.el = el;
+        });
+      }
+
+      // Pointer drag for 3D Orbit & 3D Raycast Tracing
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let startRotY = globeGroup.rotation.y;
+      let startRotX = globeGroup.rotation.x;
+      const raycaster = new THREE.Raycaster();
+      let activeTracePts = [];
+      let activeTraceLine = null;
+
+      const getHitLatLng = (clientX, clientY) => {
+        const rect = canvas.getBoundingClientRect();
+        const ndc = new THREE.Vector2(
+          ((clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1,
+          -((clientY - rect.top) / Math.max(1, rect.height)) * 2 + 1
+        );
+        raycaster.setFromCamera(ndc, camera);
+        const hits = raycaster.intersectObject(earthMesh, false);
+        if (!hits || !hits.length) return null;
+        const localPt = globeGroup.worldToLocal(hits[0].point.clone());
+        return vec3ToLatLng(localPt);
+      };
+
+      viewport.onpointerdown = (e) => {
+        if (e.target.closest("button") || e.target.closest("select") || e.target.closest("input")) return;
+        const latest = window.tplGetContextualData("map") || {};
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startRotY = globeGroup.rotation.y;
+        startRotX = globeGroup.rotation.x;
+        if (latest.drawOnScreenMode) {
+          const hit = getHitLatLng(e.clientX, e.clientY);
+          if (hit) activeTracePts = [hit];
+        } else {
+          viewport.style.cursor = "grabbing";
+        }
+        e.stopPropagation();
+      };
+
+      viewport.onpointermove = (e) => {
+        if (!isDragging) return;
+        const latest = window.tplGetContextualData("map") || {};
+        if (latest.drawOnScreenMode) {
+          const hit = getHitLatLng(e.clientX, e.clientY);
+          if (hit) {
+            const last = activeTracePts[activeTracePts.length - 1];
+            if (!last || Math.hypot(hit.lat - last.lat, hit.lng - last.lng) > 1.8) {
+              activeTracePts.push(hit);
+              if (activeTraceLine) globeGroup.remove(activeTraceLine);
+              const lGeo = new THREE.BufferGeometry().setFromPoints(activeTracePts.map(p => latLngToVec3(p.lat, p.lng, 1.014)));
+              activeTraceLine = new THREE.Line(lGeo, new THREE.LineBasicMaterial({ color: 0x7dd3fc }));
+              globeGroup.add(activeTraceLine);
+            }
+          }
+        } else {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          globeGroup.rotation.y = startRotY + dx * 0.008;
+          globeGroup.rotation.x = Math.max(-1.1, Math.min(1.1, startRotX + dy * 0.008));
+        }
+      };
+
+      viewport.onpointerup = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        const latest = window.tplGetContextualData("map") || {};
+        viewport.style.cursor = latest.drawOnScreenMode ? "crosshair" : "grab";
+        if (latest.drawOnScreenMode) {
+          if (activeTraceLine) {
+            globeGroup.remove(activeTraceLine);
+            activeTraceLine = null;
+          }
+          if (activeTracePts.length >= 2) {
+            if (typeof window.tplMapPushUndo === "function") window.tplMapPushUndo();
+            const traced = Array.isArray(latest.customTracedRoutes) ? latest.customTracedRoutes.slice() : [];
+            traced.push({
+              mode: latest.activeTraceTransit || "plane",
+              color: "#7dd3fc",
+              points: activeTracePts.map(p => Object.assign({}, p))
+            });
+            window.tplSetContextualData("map", { customTracedRoutes: traced });
+            if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+          }
+          activeTracePts = [];
+        } else {
+          window.tplSetContextualData("map", {
+            yaw3D: parseFloat(((globeGroup.rotation.y * 180) / Math.PI).toFixed(1)),
+            pitch3D: parseFloat(((globeGroup.rotation.x * 180) / Math.PI).toFixed(1)),
+            _userOrbited: true
+          });
+        }
+      };
+
+      viewport.onwheel = (e) => {
+        e.preventDefault();
+        const cur = window.tplGetContextualData("map") || {};
+        const curZ = cur.zoomLevel !== undefined ? parseFloat(cur.zoomLevel) : 1.9;
+        const newZ = Math.max(1.0, Math.min(5.0, curZ + (e.deltaY < 0 ? 0.25 : -0.25)));
+        zoomVal = parseFloat(newZ.toFixed(2));
+        camera.position.z = getCamDist(zoomVal);
+        window.tplSetContextualData("map", { zoomLevel: zoomVal, is3DMode: true });
+        const badge = document.getElementById("map-stage-zoom-badge");
+        if (badge) badge.textContent = zoomVal.toFixed(1) + "x";
+      };
+
+      let rafId = 0;
+      let lastTs = performance.now();
+      let pulseAge = 0;
+      const animateGlobe = (now) => {
+        rafId = requestAnimationFrame(animateGlobe);
+        const dt = Math.min(0.05, (now - lastTs) / 1000);
+        lastTs = now;
+
+        const latest = window.tplGetContextualData("map") || {};
+        const sSpeed = latest.spinSpeed !== undefined ? Math.max(0, Math.min(3, parseFloat(latest.spinSpeed))) : 0.35;
+        const sDir = latest.spinDirection !== undefined ? (parseFloat(latest.spinDirection) < 0 ? -1 : 1) : 1;
+        const pBright = latest.planeBrightness !== undefined ? Math.max(0.15, Math.min(1, parseFloat(latest.planeBrightness))) : 0.75;
+
+        if (!isDragging && sSpeed > 0) {
+          globeGroup.rotation.y += sSpeed * sDir * 0.22 * dt;
+        }
+
+        // Update animated 3D vehicles along great-circle arcs
+        const elapsedSec = now / 1000;
+        animatedVehicles.forEach((av) => {
+          const t = (elapsedSec * av.speed + av.offset) % 1;
+          const pos = av.curve.getPointAt(t);
+          const nextPos = av.curve.getPointAt(Math.min(1, t + 0.01));
+          av.mesh.position.copy(pos);
+          if (av.mesh.material) av.mesh.material.opacity = pBright;
+          const up = pos.clone().normalize();
+          const tangent = nextPos.clone().sub(pos).normalize();
+          const right = new THREE.Vector3().crossVectors(tangent, up).normalize();
+          const correctedUp = new THREE.Vector3().crossVectors(right, tangent).normalize();
+          const m = new THREE.Matrix4().makeBasis(right, tangent, correctedUp);
+          av.mesh.quaternion.setFromRotationMatrix(m);
+        });
+
+        // One-shot arrival pulse on destination marker
+        if (destPulseRing) {
+          pulseAge += dt;
+          if (pulseAge < 1.6) {
+            const pT = pulseAge / 1.6;
+            const sc = 1 + pT * 2.1;
+            destPulseRing.scale.set(sc, sc, 1);
+            destPulseRing.material.opacity = Math.max(0, 0.8 * (1 - pT));
+          } else {
+            destPulseRing.material.opacity = 0;
+          }
+        }
+
+        // Project 3D labels to 2D overlay and hide back-hemisphere labels
+        globeGroup.updateMatrixWorld(true);
+        const camDir = camera.position.clone().normalize();
+        const cw = globe3DHost.clientWidth || width;
+        const ch = globe3DHost.clientHeight || height;
+        labelAnchors.forEach((la) => {
+          if (!la.el) return;
+          const worldPos = la.pos.clone().applyMatrix4(globeGroup.matrixWorld);
+          const worldNormal = worldPos.clone().normalize();
+          const facing = worldNormal.dot(camDir);
+          if (facing <= 0.14) {
+            la.el.style.opacity = "0";
+            return;
+          }
+          const projPt = worldPos.project(camera);
+          const sx = (projPt.x * 0.5 + 0.5) * cw;
+          const sy = (-projPt.y * 0.5 + 0.5) * ch;
+          la.el.style.left = `${sx.toFixed(1)}px`;
+          la.el.style.top = `${sy.toFixed(1)}px`;
+          la.el.style.opacity = facing < 0.3 ? ((facing - 0.14) / 0.16).toFixed(2) : "1";
+        });
+
+        renderer.render(scene, camera);
+      };
+      rafId = requestAnimationFrame(animateGlobe);
+
+      window._activeMap3DGlobeCleanup = () => {
+        cancelAnimationFrame(rafId);
+        renderer.dispose();
+        earthTex.dispose();
+        sphereGeo.dispose();
+        sphereMat.dispose();
+        atmoGeo.dispose();
+        atmoMat.dispose();
+      };
+      return;
     }
 
-    // Wire up Wheel Zoom on viewport
+    // Wire up Wheel Zoom on 2D flat map viewport
     viewport.onwheel = (e) => {
       e.preventDefault();
       const cur = window.tplGetContextualData("map");
@@ -2904,36 +3480,9 @@
         const yaw = cur.yaw3D !== undefined ? parseFloat(cur.yaw3D) : -10;
         rig.style.transform = `perspective(1000px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(${newZ.toFixed(2)})`;
       }
-      const badge = viewport.querySelector("#map-stage-zoom-badge");
+      const badge = document.getElementById("map-stage-zoom-badge");
       if (badge) badge.textContent = newZ.toFixed(1) + "x";
     };
-
-    const btnDraw = viewport.querySelector('#map-stage-btn-draw');
-    if (btnDraw) {
-      btnDraw.onclick = (e) => {
-        e.stopPropagation();
-        const cur = window.tplGetContextualData('map');
-        window.tplSetContextualData('map', { drawOnScreenMode: !cur.drawOnScreenMode, is3DMode: true });
-        if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
-      };
-    }
-
-    const selTransit = viewport.querySelector('#map-stage-sel-transit');
-    if (selTransit) {
-      selTransit.onchange = (e) => {
-        e.stopPropagation();
-        window.tplSetContextualData('map', { activeTraceTransit: e.target.value });
-      };
-    }
-
-    const btnClear = viewport.querySelector('#map-stage-btn-clear-trace');
-    if (btnClear) {
-      btnClear.onclick = (e) => {
-        e.stopPropagation();
-        window.tplSetContextualData('map', { customTracedRoutes: [] });
-        if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
-      };
-    }
 
     const svgEl = viewport.querySelector('.globe-svg');
     const rigEl = viewport.querySelector('.globe-camera-rig');
@@ -8722,35 +9271,67 @@
           <!-- Projection Mode Toggle: 3D Globe vs 2D Granular World Map -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
             <button type="button" class="map-proj-btn" data-proj="globe" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${(data.projection || 'globe') === 'globe' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${(data.projection || 'globe') === 'globe' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">\ud83c\udf10 3D Globe</button>
-            <button type="button" class="map-proj-btn" data-proj="flat" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${data.projection === 'flat' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${data.projection === 'flat' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">\ud83d\uddfa\ufe0f 2D Granular Map</button>
+            <button type="button" class="map-proj-btn" data-proj="flat" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 600; cursor: pointer; border: 1px solid ${data.projection === 'flat' ? '#8b5cf6' : 'rgba(255,255,255,0.1)'}; background: ${data.projection === 'flat' ? 'rgba(139,92,246,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">2D Map</button>
           </div>
 
           <!-- MULTI-ROUTE COUNTRY-TO-COUNTRY BUILDER -->
-          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 9px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(139,92,246,0.25); border-radius: 8px; padding: 9px; display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">\u2708\ufe0f\ud83d\udea2\ud83d\ude86 Country-to-Country Routes</span>
-              <button type="button" id="map-btn-add-route" style="background: rgba(46,255,198,0.16); border: 1px solid rgba(46,255,198,0.45); color: #2effc6; border-radius: 5px; padding: 2px 8px; font-size: 9.5px; font-weight: 800; cursor: pointer;">+ Add Route Leg</button>
+              <span style="display:inline-flex; align-items:center; gap:5px; font-size: 10px; font-weight: 700; color: #c084fc; text-transform: uppercase;"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Country-to-Country Routes</span>
+              <button type="button" id="map-btn-add-route" style="background: rgba(139,92,246,0.2); border: 1px solid rgba(168,85,247,0.45); color: #e9d5ff; border-radius: 5px; padding: 2px 8px; font-size: 9.5px; font-weight: 700; cursor: pointer;">+ Add Leg</button>
             </div>
             <div style="font-size: 9px; color: #94a3b8; line-height: 1.35;">Type any country or city (e.g. <strong>USA</strong> to <strong>Canada</strong>, <strong>UK</strong> to <strong>Japan</strong>) and pick a transit vehicle.</div>
 
             <!-- Quick Multi-Route Presets -->
             <select id="map-route-preset-select" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #cbd5e1; font-size: 10px; font-weight: 600; outline: none; cursor: pointer;">
-              <option value="">\u26a1 Load Multi-Route Preset...</option>
+              <option value="">Load Multi-Route Preset...</option>
               ${routePresets.map((rp, i) => `<option value="${i}">${rp.label}</option>`).join('')}
             </select>
+
+            <!-- On-Screen Route Tracing Controls (Docked in Route Editor) -->
+            <div style="display: flex; align-items: center; gap: 5px; padding: 5px 6px; background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;">
+              <button type="button" id="map-stage-btn-draw" style="flex: 1; display:inline-flex; align-items:center; justify-content:center; gap:5px; background:${data.drawOnScreenMode ? "linear-gradient(180deg,#9353F5,#823CF0)" : "rgba(255,255,255,0.06)"}; border:1px solid ${data.drawOnScreenMode ? "#9B6BFF" : "rgba(255,255,255,0.14)"}; color:${data.drawOnScreenMode ? "#fff" : "#e2e8f0"}; border-radius:5px; padding:4px 7px; font-size:10px; font-weight:600; cursor:pointer;" title="Draw custom route directly on the globe">
+                <span>${data.drawOnScreenMode ? "Tracing Active" : "Trace on Globe"}</span>
+              </button>
+              <select id="map-stage-sel-transit" style="background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.14); border-radius:5px; color:#e2e8f0; font-size:10px; font-weight:600; padding:4px 5px; cursor:pointer;" title="Transit Mode for On-Screen Trace">
+                <option value="plane" ${(data.activeTraceTransit || "plane") === "plane" ? "selected" : ""}>Plane</option>
+                <option value="ship" ${data.activeTraceTransit === "ship" ? "selected" : ""}>Ship</option>
+                <option value="train" ${data.activeTraceTransit === "train" ? "selected" : ""}>Train</option>
+                <option value="line" ${data.activeTraceTransit === "line" ? "selected" : ""}>Line</option>
+              </select>
+              <button type="button" id="map-insp-btn-undo" ${(typeof window.tplMapCanUndo === 'function' && window.tplMapCanUndo()) ? '' : 'disabled'} style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:${(typeof window.tplMapCanUndo === 'function' && window.tplMapCanUndo()) ? '#e2e8f0' : 'rgba(148,163,184,0.4)'}; border-radius:5px; padding:4px 7px; font-size:10px; font-weight:600; cursor:${(typeof window.tplMapCanUndo === 'function' && window.tplMapCanUndo()) ? 'pointer' : 'not-allowed'};" title="Undo last route or trace edit">\u21a9</button>
+              <button type="button" id="map-stage-btn-clear-trace" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.14); color:#cbd5e1; border-radius:5px; padding:4px 7px; font-size:10px; font-weight:600; cursor:pointer;" title="Clear On-Screen Drawn Traces">Clear</button>
+            </div>
+
+            <!-- 3D Globe Spin Speed, Direction & Plane Brightness -->
+            <div style="display: flex; flex-direction: column; gap: 6px; padding: 7px 8px; background: rgba(15,23,42,0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 9.5px; font-weight: 600; color: #cbd5e1;">Globe Spin</span>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <button type="button" id="map-spin-dir-btn" style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14); color:#93c5fd; border-radius:5px; padding:2px 7px; font-size:9.5px; font-weight:600; cursor:pointer;" title="Toggle Globe Spin Direction">${(data.spinDirection !== undefined && parseFloat(data.spinDirection) < 0) ? "\u2190 East\u2013West" : "West\u2013East \u2192"}</button>
+                  <span id="map-spin-speed-lbl" style="font-family:monospace; font-size:9.5px; color:#94a3b8; min-width:28px; text-align:right;">${(data.spinSpeed !== undefined ? parseFloat(data.spinSpeed) : 0.35).toFixed(2)}x</span>
+                </div>
+              </div>
+              <input type="range" id="map-rng-spin-speed" min="0" max="2.5" step="0.05" value="${data.spinSpeed !== undefined ? data.spinSpeed : 0.35}" style="width: 100%; accent-color: #93c5fd; cursor: pointer;" />
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px;">
+                <span style="font-size: 9.5px; font-weight: 600; color: #cbd5e1;">Plane Brightness</span>
+                <span id="map-plane-bright-lbl" style="font-family:monospace; font-size:9.5px; color:#94a3b8;">${Math.round((data.planeBrightness !== undefined ? parseFloat(data.planeBrightness) : 0.75) * 100)}%</span>
+              </div>
+              <input type="range" id="map-rng-plane-bright" min="0.15" max="1" step="0.05" value="${data.planeBrightness !== undefined ? data.planeBrightness : 0.75}" style="width: 100%; accent-color: #93c5fd; cursor: pointer;" />
+            </div>
 
             <!-- Dynamic Route Legs List -->
             <div id="map-routes-list" style="display: flex; flex-direction: column; gap: 7px; max-height: 230px; overflow-y: auto; padding-right: 2px;">
               ${activeRoutes.map((rt, idx) => `
-                <div class="map-route-row" data-idx="${idx}" style="background: rgba(15,23,42,0.75); border: 1px solid rgba(255,255,255,0.1); border-left: 3px solid ${rt.color || '#38bdf8'}; border-radius: 6px; padding: 7px; display: flex; flex-direction: column; gap: 5px;">
+                <div class="map-route-row" data-idx="${idx}" style="background: rgba(15,23,42,0.75); border: 1px solid rgba(255,255,255,0.1); border-left: 3px solid ${rt.color || '#8b5cf6'}; border-radius: 6px; padding: 7px; display: flex; flex-direction: column; gap: 5px;">
                   <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span style="font-size: 9px; font-weight: 800; color: #94a3b8; font-family: monospace;">ROUTE LEG #${idx + 1}</span>
+                    <span style="font-size: 9px; font-weight: 700; color: #94a3b8; font-family: monospace;">ROUTE LEG #${idx + 1}</span>
                     <div style="display: flex; align-items: center; gap: 5px;">
-                      <select class="map-rt-mode" data-idx="${idx}" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 700; padding: 2px 4px; cursor: pointer;">
-                        <option value="plane" ${(rt.mode || 'plane') === 'plane' ? 'selected' : ''}>\u2708\ufe0f Plane</option>
-                        <option value="ship" ${rt.mode === 'ship' ? 'selected' : ''}>\ud83d\udea2 Ship</option>
-                        <option value="train" ${rt.mode === 'train' ? 'selected' : ''}>\ud83d\ude86 Train</option>
-                        <option value="line" ${rt.mode === 'line' ? 'selected' : ''}>\u26a1 Line</option>
+                      <select class="map-rt-mode" data-idx="${idx}" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 600; padding: 2px 4px; cursor: pointer;">
+                        <option value="plane" ${(rt.mode || 'plane') === 'plane' ? 'selected' : ''}>Plane</option>
+                        <option value="ship" ${rt.mode === 'ship' ? 'selected' : ''}>Ship</option>
+                        <option value="train" ${rt.mode === 'train' ? 'selected' : ''}>Train</option>
+                        <option value="line" ${rt.mode === 'line' ? 'selected' : ''}>Line</option>
                       </select>
                       <input type="color" class="map-rt-color" data-idx="${idx}" value="${rt.color || '#38bdf8'}" style="width: 18px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Route Arc Color"/>
                       ${activeRoutes.length > 1 ? `<button type="button" class="map-rt-del" data-idx="${idx}" style="background: none; border: none; color: #f87171; font-size: 11px; font-weight: 800; cursor: pointer; padding: 0 3px;" title="Remove Route">\u2715</button>` : ''}
@@ -8883,10 +9464,68 @@
         };
       }
 
+      // On-Screen Trace controls docked in Route Editor
+      const btnDrawInsp = container.querySelector('#map-stage-btn-draw');
+      if (btnDrawInsp) {
+        btnDrawInsp.onclick = () => {
+          const cur = window.tplGetContextualData('map');
+          window.tplSetContextualData('map', { drawOnScreenMode: !cur.drawOnScreenMode, is3DMode: true });
+          window.tplRenderContextualInspector('map');
+        };
+      }
+      const selTransitInsp = container.querySelector('#map-stage-sel-transit');
+      if (selTransitInsp) {
+        selTransitInsp.onchange = (e) => {
+          window.tplSetContextualData('map', { activeTraceTransit: e.target.value });
+        };
+      }
+      const btnUndoInsp = container.querySelector('#map-insp-btn-undo');
+      if (btnUndoInsp) {
+        btnUndoInsp.onclick = () => {
+          if (typeof window.tplMapUndo === 'function') window.tplMapUndo();
+        };
+      }
+      const btnClearTraceInsp = container.querySelector('#map-stage-btn-clear-trace');
+      if (btnClearTraceInsp) {
+        btnClearTraceInsp.onclick = () => {
+          if (typeof window.tplMapPushUndo === 'function') window.tplMapPushUndo();
+          window.tplSetContextualData('map', { customTracedRoutes: [] });
+          window.tplRenderContextualInspector('map');
+        };
+      }
+      const btnSpinDir = container.querySelector('#map-spin-dir-btn');
+      if (btnSpinDir) {
+        btnSpinDir.onclick = () => {
+          const cur = window.tplGetContextualData('map') || {};
+          const nextDir = (cur.spinDirection !== undefined && parseFloat(cur.spinDirection) < 0) ? 1 : -1;
+          window.tplSetContextualData('map', { spinDirection: nextDir });
+          btnSpinDir.textContent = nextDir < 0 ? '\u2190 East\u2013West' : 'West\u2013East \u2192';
+        };
+      }
+      const rngSpinSpeed = container.querySelector('#map-rng-spin-speed');
+      if (rngSpinSpeed) {
+        rngSpinSpeed.oninput = (e) => {
+          const val = parseFloat(e.target.value);
+          window.tplSetContextualData('map', { spinSpeed: val });
+          const lbl = container.querySelector('#map-spin-speed-lbl');
+          if (lbl) lbl.textContent = val.toFixed(2) + 'x';
+        };
+      }
+      const rngPlaneBright = container.querySelector('#map-rng-plane-bright');
+      if (rngPlaneBright) {
+        rngPlaneBright.oninput = (e) => {
+          const val = parseFloat(e.target.value);
+          window.tplSetContextualData('map', { planeBrightness: val });
+          const lbl = container.querySelector('#map-plane-bright-lbl');
+          if (lbl) lbl.textContent = Math.round(val * 100) + '%';
+        };
+      }
+
       // Add Route Leg button
       const btnAddRoute = container.querySelector('#map-btn-add-route');
       if (btnAddRoute) {
         btnAddRoute.onclick = () => {
+          if (typeof window.tplMapPushUndo === 'function') window.tplMapPushUndo();
           const routes = activeRoutes.map(r => Object.assign({}, r));
           const prev = routes[routes.length - 1] || { to: 'USA', toLat: 39.8, toLng: -98.5 };
           const defaultNext = prev.to === 'Canada' ? 'UK' : (prev.to === 'UK' ? 'Japan' : 'Canada');
@@ -10500,74 +11139,132 @@
     // =========================================================================
     if (tplId === 'zoom') {
       if (wrapSec) wrapSec.style.display = 'none';
+      const activeModel = data.productModel || 'phone';
+      const activeBackdrop = data.backdropPreset || 'dark-studio';
+      const prodChoices = [
+        { id: 'phone', label: 'Smartphone', svg: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="6" y="2" width="12" height="20" rx="2.5"/><line x1="11" y1="18" x2="13" y2="18"/></svg>' },
+        { id: 'laptop', label: 'Laptop', svg: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 19h20"/></svg>' },
+        { id: 'camera', label: 'Camera', svg: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>' },
+        { id: 'custom', label: 'Custom', svg: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>' },
+      ];
+      const bgChoices = [
+        { id: 'dark-studio', label: 'Dark Studio', sw: 'radial-gradient(circle at 50% 40%, #1e293b, #05070d)' },
+        { id: 'white-cyclorama', label: 'White Cyc', sw: 'radial-gradient(circle at 50% 40%, #ffffff, #cbd5e1)' },
+        { id: 'warm-editorial', label: 'Warm Studio', sw: 'radial-gradient(circle at 50% 40%, #78350f, #0c0908)' },
+        { id: 'tech-grid', label: 'Violet Tech', sw: 'radial-gradient(circle at 50% 40%, #4c1d95, #04050a)' },
+        { id: 'neon-rim', label: 'Neon Rim', sw: 'radial-gradient(circle at 50% 40%, #831843, #05040d)' },
+      ];
+      const prodThumb = data.productImg || '/product_scan_3d.jpg';
+      const bgThumb = data.customBgUrl || '';
+
       container.innerHTML = `
-        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(56,189,248,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">\u2b21 3D Product Studio &amp; Typography</span>
-            <span style="font-size: 9px; color: #c084fc; font-weight: 700; background: rgba(168,85,247,0.18); padding: 2px 6px; border-radius: 4px;">DRAGGABLE HUD</span>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Product Headline</span>
-              <input type="text" id="zm-inp-name" value="${data.productName || 'TITAN VELOX X1'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Spec Badge / Subtitle</span>
-              <input type="text" id="zm-inp-sub" value="${data.productSub || 'GRADE-5 TITANIUM'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fbbf24; font-size: 11px; font-weight: 700; outline: none;" />
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="background:rgba(17,19,30,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:10px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:0.04em;">3D Product Model</span>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;">
+              ${prodChoices.map((p) => `
+                <button type="button" class="zm-model-btn" data-model="${p.id}" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:8px;border:1px solid ${activeModel === p.id ? '#8b5cf6' : 'rgba(255,255,255,0.1)'};background:${activeModel === p.id ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.03)'};color:${activeModel === p.id ? '#fff' : '#9ca3b8'};cursor:pointer;">
+                  ${p.svg}
+                  <span style="font-size:9.5px;font-weight:600;">${p.label}</span>
+                </button>
+              `).join('')}
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr auto auto; gap: 6px; align-items: end;">
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Font Family</span>
-              <select id="zm-inp-font" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 6px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;">
-                ${fontOptionsHtml(data.titleFont || "'Space Grotesk', sans-serif")}
-              </select>
+          <div style="background:rgba(17,19,30,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:10px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:0.04em;">Studio Background</span>
+              <label style="font-size:9.5px;font-weight:600;color:#e9d5ff;background:rgba(139,92,246,0.2);border:1px solid rgba(168,85,247,0.45);padding:2px 8px;border-radius:6px;cursor:pointer;">
+                Custom Image
+                <input type="file" id="zm-inp-bg" accept="image/*" style="display:none;" />
+              </label>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Size: <b id="zm-lbl-sz" style="color:#38bdf8;">${data.titleSize || 26}px</b></span>
-              <input type="range" id="zm-inp-size" min="14" max="54" step="1" value="${data.titleSize || 26}" style="width:100%; accent-color:#38bdf8;" />
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
-              <span style="font-size: 8.5px; color: #94a3b8;">Title</span>
-              <input type="color" id="zm-inp-tcol" value="${data.titleColor || '#f8fafc'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
-              <span style="font-size: 8.5px; color: #94a3b8;">Spec</span>
-              <input type="color" id="zm-inp-scol" value="${data.subColor || '#fbbf24'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;">
+              ${bgChoices.map((b) => `
+                <button type="button" class="zm-bg-btn" data-bg="${b.id}" title="${b.label}" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border-radius:8px;border:1px solid ${!bgThumb && activeBackdrop === b.id ? '#8b5cf6' : 'rgba(255,255,255,0.1)'};background:${!bgThumb && activeBackdrop === b.id ? 'rgba(139,92,246,0.18)' : 'transparent'};cursor:pointer;">
+                  <span style="width:100%;height:24px;border-radius:5px;background:${b.sw};border:1px solid rgba(255,255,255,0.15);"></span>
+                  <span style="font-size:8.5px;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">${b.label}</span>
+                </button>
+              `).join('')}
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 7px 10px;">
-            <div style="display: flex; flex-direction: column;">
-              <span style="font-size: 10px; font-weight: 700; color: #fff;">3D Product Render Asset</span>
-              <span style="font-size: 8.5px; color: #94a3b8;">Drag title or product directly on stage</span>
+          <div class="rg-inspector-section" style="margin:0;">
+            <div class="rg-section-header"><span class="rg-section-title">Scene Layers (2)</span></div>
+            <div class="rg-section-body">
+              <div class="rg-layer-visual-grid">
+                <div class="rg-layer-card is-active">
+                  <div class="rg-layer-card-thumb">
+                    <img src="${prodThumb}" alt="Product Texture" style="object-fit:cover;">
+                    <label class="rg-layer-replace-btn" style="cursor:pointer;">Replace
+                      <input type="file" id="zm-inp-img" accept="image/*" style="display:none;" />
+                    </label>
+                  </div>
+                  <div class="rg-layer-card-name">Product Texture</div>
+                </div>
+                <div class="rg-layer-card">
+                  <div class="rg-layer-card-thumb" style="${bgThumb ? '' : `background:${(bgChoices.find(b => b.id === activeBackdrop) || bgChoices[0]).sw};`}">
+                    ${bgThumb ? `<img src="${bgThumb}" alt="Studio Backdrop" style="object-fit:cover;">` : `<span class="rg-layer-card-empty">Studio Backdrop</span>`}
+                    <label class="rg-layer-replace-btn" style="cursor:pointer;">Replace
+                      <input type="file" id="zm-inp-bg-card" accept="image/*" style="display:none;" />
+                    </label>
+                  </div>
+                  <div class="rg-layer-card-name">Studio Backdrop</div>
+                </div>
+              </div>
             </div>
-            <label style="font-size: 9.5px; font-weight: 700; color: #fff; background: rgba(168,85,247,0.28); border: 1px solid #c084fc; padding: 4px 10px; border-radius: 5px; cursor: pointer;">
-              Swap Product
-              <input type="file" id="zm-inp-img" accept="image/*" style="display:none;" />
-            </label>
           </div>
-
-          ${window.tplBuildUniversalBgHtml(data)}
         </div>
       `;
-      container.querySelector('#zm-inp-name')?.addEventListener('input', e => window.tplSetContextualData('zoom', { productName: e.target.value }));
-      container.querySelector('#zm-inp-sub')?.addEventListener('input', e => window.tplSetContextualData('zoom', { productSub: e.target.value }));
-      container.querySelector('#zm-inp-font')?.addEventListener('change', e => window.tplSetContextualData('zoom', { titleFont: e.target.value }));
-      container.querySelector('#zm-inp-size')?.addEventListener('input', e => {
-        const v = parseInt(e.target.value, 10);
-        const l = container.querySelector('#zm-lbl-sz'); if (l) l.textContent = v + 'px';
-        window.tplSetContextualData('zoom', { titleSize: v });
+
+      const syncZoomLive = (patch) => {
+        window.tplSetContextualData('zoom', patch);
+        const host = document.querySelector('#tpl-modal-preview-stage .tpl-zoom');
+        if (host && host._rgZoom3D) {
+          if (patch.productModel) host._rgZoom3D.setProductModel(patch.productModel);
+          if ('backdropPreset' in patch || 'customBgUrl' in patch) {
+            const cur = window.tplGetContextualData('zoom') || {};
+            host._rgZoom3D.setBackdrop(cur.backdropPreset || 'dark-studio', cur.customBgUrl || '');
+          }
+          if (patch.productImg) host._rgZoom3D.setCustomTexture(patch.productImg);
+        }
+      };
+
+      container.querySelectorAll('.zm-model-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const model = btn.getAttribute('data-model');
+          syncZoomLive({ productModel: model });
+          container.querySelectorAll('.zm-model-btn').forEach((b) => {
+            const on = b === btn;
+            b.style.borderColor = on ? '#8b5cf6' : 'rgba(255,255,255,0.1)';
+            b.style.background = on ? 'rgba(139,92,246,0.2)' : 'rgba(255,255,255,0.03)';
+            b.style.color = on ? '#fff' : '#9ca3b8';
+          });
+        });
       });
-      container.querySelector('#zm-inp-tcol')?.addEventListener('input', e => window.tplSetContextualData('zoom', { titleColor: e.target.value }));
-      container.querySelector('#zm-inp-scol')?.addEventListener('input', e => window.tplSetContextualData('zoom', { subColor: e.target.value }));
-      container.querySelector('#zm-inp-img')?.addEventListener('change', e => {
+
+      container.querySelectorAll('.zm-bg-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const bg = btn.getAttribute('data-bg');
+          syncZoomLive({ backdropPreset: bg, customBgUrl: '' });
+          container.querySelectorAll('.zm-bg-btn').forEach((b) => {
+            const on = b === btn;
+            b.style.borderColor = on ? '#8b5cf6' : 'rgba(255,255,255,0.1)';
+            b.style.background = on ? 'rgba(139,92,246,0.18)' : 'transparent';
+          });
+        });
+      });
+
+      container.querySelector('#zm-inp-img')?.addEventListener('change', (e) => {
         const f = e.target.files && e.target.files[0];
-        if (f) window.tplSetContextualData('zoom', { productImg: URL.createObjectURL(f) });
+        if (f) syncZoomLive({ productImg: URL.createObjectURL(f) });
       });
-      window.tplWireUniversalBgControls('zoom', container);
+      const onBgFile = (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (f) syncZoomLive({ customBgUrl: URL.createObjectURL(f) });
+      };
+      container.querySelector('#zm-inp-bg')?.addEventListener('change', onBgFile);
+      container.querySelector('#zm-inp-bg-card')?.addEventListener('change', onBgFile);
       return;
     }
 
