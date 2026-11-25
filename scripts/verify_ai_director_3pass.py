@@ -72,6 +72,11 @@ def run_pass_2():
     else:
         print('  OK right sidebar toggle & 4-tab inspector restore')
 
+    if 'RegaarderClickToAct' not in redesign or 'CLICK_TO_ACT_MENUS' not in redesign or '.rg-cta-dropdown' not in css:
+        ok = fail('Click-to-Act Contextual Dropdown (#4) missing')
+    else:
+        print('  OK Click-to-Act Contextual Dropdown (image, doc, 3d, text, video, sketch, shape)')
+
     required_css = [
         '.rg-rail-btn-ai', '.rg-ai-director-panel', '.rg-inspector-shell.is-ai-director-open',
         '.rg-ai-empty-state', '.rg-ai-empty-row', '.rg-ai-composer-shell', '.rg-ai-composer-row',

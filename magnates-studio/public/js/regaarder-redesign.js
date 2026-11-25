@@ -6203,3 +6203,249 @@ setInterval(() => {
   const p = document.getElementById('tpl-modal-layers-panel');
   if (p) upgradeGenericMediaSlotsToVisualGrid(p);
 }, 600);
+
+/* ============================================================================
+   CLICK-TO-ACT CONTEXTUAL DROPDOWN (#4 — Stage & Storyboard)
+   ============================================================================ */
+(function initRegaarderClickToAct() {
+  const CLICK_TO_ACT_MENUS = {
+    media: {
+      badge: 'Image',
+      items: [
+        { id: 'set-background', label: 'Set as Background' },
+        { id: 'set-foreground', label: 'Set as Foreground' },
+        { id: 'cutout-bg', label: 'Cutout / Remove Background', ai: true },
+        { id: 'apply-effects', label: 'Apply Effects' },
+        { id: 'animate-item', label: 'Animate (Pan / Dolly / Float)', ai: true },
+        { id: 'crop', label: 'Crop' },
+        { id: 'replace', label: 'Replace Image' },
+        { id: 'leave-comment', label: 'Leave AI Comment', ai: true },
+        { sep: true },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'delete', label: 'Delete', danger: true }
+      ]
+    },
+    doc: {
+      badge: 'Doc',
+      items: [
+        { id: 'edit-content', label: 'Edit Copy / Headline' },
+        { id: 'highlight-line', label: 'Highlight Key Line', ai: true },
+        { id: 'set-foreground', label: 'Float Above Background' },
+        { id: 'animate-item', label: 'Animate (Slide-In / Paper Tilt)', ai: true },
+        { id: 'ai-rewrite', label: 'Summarize or Rewrite via AI', ai: true },
+        { id: 'leave-comment', label: 'Leave AI Comment', ai: true },
+        { sep: true },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'delete', label: 'Delete', danger: true }
+      ]
+    },
+    object3d: {
+      badge: '3D',
+      items: [
+        { id: 'orbit-3d', label: 'Orbit / Tilt 3D Angle' },
+        { id: 'change-texture', label: 'Change Texture / Material' },
+        { id: 'toggle-rim-light', label: 'Toggle Rim Light / Shadow' },
+        { id: 'animate-item', label: 'Animate (3D Spin / Dolly)', ai: true },
+        { id: 'ai-sculpt', label: 'Regenerate / Sculpt via AI', ai: true },
+        { id: 'leave-comment', label: 'Leave AI Comment', ai: true },
+        { sep: true },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'delete', label: 'Delete', danger: true }
+      ]
+    },
+    text: {
+      badge: 'Text',
+      items: [
+        { id: 'edit-content', label: 'Edit Text' },
+        { id: 'style-presets', label: 'Font, Size & Aa Style' },
+        { id: 'animate-item', label: 'Animate (Kinetic / Typewriter)', ai: true },
+        { id: 'ai-rewrite', label: 'Rewrite / Punch Up Copy', ai: true },
+        { id: 'leave-comment', label: 'Leave AI Comment', ai: true },
+        { sep: true },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'delete', label: 'Delete', danger: true }
+      ]
+    },
+    video: {
+      badge: 'Video',
+      items: [
+        { id: 'trim-clip', label: 'Trim / Slip Clip' },
+        { id: 'speed-clip', label: 'Speed (0.5x – 2x)' },
+        { id: 'set-background', label: 'Set as Background' },
+        { id: 'set-foreground', label: 'Set as PiP / Foreground' },
+        { id: 'apply-effects', label: 'Apply Effects' },
+        { id: 'leave-comment', label: 'Leave AI Comment', ai: true },
+        { sep: true },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'delete', label: 'Delete', danger: true }
+      ]
+    },
+    sketch: {
+      badge: 'Sketch',
+      items: [
+        { id: 'toggle-reference', label: 'Toggle Reference Trace' },
+        { id: 'ai-render-sketch', label: 'AI Render from Sketch', ai: true },
+        { id: 'animate-item', label: 'Animate Path (Draw-On)', ai: true },
+        { id: 'apply-effects', label: 'Apply Effects' },
+        { id: 'leave-comment', label: 'Leave AI Comment', ai: true },
+        { sep: true },
+        { id: 'save-template', label: 'Save as Template' },
+        { id: 'duplicate', label: 'Duplicate Layer' },
+        { id: 'delete', label: 'Delete Layer', danger: true }
+      ]
+    },
+    shape: {
+      badge: 'Shape',
+      items: [
+        { id: 'style-presets', label: 'Fill & Stroke Color' },
+        { id: 'apply-effects', label: 'Apply Effects' },
+        { id: 'animate-item', label: 'Animate Shape', ai: true },
+        { id: 'leave-comment', label: 'Leave AI Comment', ai: true },
+        { sep: true },
+        { id: 'duplicate', label: 'Duplicate' },
+        { id: 'delete', label: 'Delete', danger: true }
+      ]
+    }
+  };
+
+  let activeMenuEl = null;
+
+  function closeMenu() {
+    if (activeMenuEl) {
+      activeMenuEl.remove();
+      activeMenuEl = null;
+    }
+  }
+
+  function switchInspectorTab(tabKey) {
+    const shell = document.querySelector('#modal-top-template-customizer .rg-inspector-shell');
+    if (!shell) return;
+    if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.close === 'function') {
+      window.RegaarderAIDirector.close(shell);
+    }
+    const tabBtn = shell.querySelector(`.rg-inspector-tab[data-tab="${tabKey}"]`);
+    if (tabBtn) tabBtn.click();
+  }
+
+  function promptAIDirector(promptText) {
+    const shell = document.querySelector('#modal-top-template-customizer .rg-inspector-shell');
+    if (shell && window.RegaarderAIDirector && typeof window.RegaarderAIDirector.open === 'function') {
+      window.RegaarderAIDirector.open(shell);
+    }
+    const input = document.querySelector('#rg-ai-director-input');
+    if (input) {
+      input.value = promptText;
+      input.focus();
+    }
+  }
+
+  function defaultExecute(actionId, ctx) {
+    const label = ctx.label || 'selected item';
+    const toolbar = window.RegaarderContextualToolbar;
+    if (actionId === 'apply-effects') return switchInspectorTab('effects');
+    if (actionId === 'edit-content' || actionId === 'change-texture') return switchInspectorTab('content');
+    if (actionId === 'style-presets' || actionId === 'toggle-rim-light') return switchInspectorTab('look');
+    if (actionId === 'orbit-3d' || actionId === 'trim-clip' || actionId === 'speed-clip') return switchInspectorTab('motion');
+    if (actionId === 'leave-comment') {
+      const stageEl = document.getElementById('tpl-modal-preview-stage-container');
+      if (window.RegaarderCommentPins && typeof window.RegaarderCommentPins.togglePinMode === 'function' && stageEl) {
+        window.RegaarderCommentPins.togglePinMode(stageEl);
+        return;
+      }
+      return promptAIDirector(`Comment on ${label}: `);
+    }
+    if (actionId === 'cutout-bg') return promptAIDirector(`Cut out and isolate ${label} (remove background)`);
+    if (actionId === 'animate-item') return promptAIDirector(`Animate ${label} smoothly`);
+    if (actionId === 'ai-rewrite') return promptAIDirector(`Rewrite and tighten ${label}`);
+    if (actionId === 'highlight-line') return promptAIDirector(`Highlight the key line in ${label}`);
+    if (actionId === 'ai-sculpt') return promptAIDirector(`Sculpt and refine 3D geometry for ${label}`);
+    if (actionId === 'ai-render-sketch') return promptAIDirector(`Render ${label} into a polished visual asset`);
+    if (actionId === 'set-background' && ctx.targetEl) { ctx.targetEl.style.zIndex = '1'; return; }
+    if (actionId === 'set-foreground' && ctx.targetEl) { ctx.targetEl.style.zIndex = '40'; return; }
+    if (toolbar && typeof toolbar.executeCommand === 'function') {
+      if (actionId === 'duplicate') return toolbar.executeCommand('duplicate');
+      if (actionId === 'delete') return toolbar.executeCommand('delete');
+      if (actionId === 'crop') return toolbar.executeCommand('crop');
+      if (actionId === 'replace') return toolbar.executeCommand('replace');
+    }
+  }
+
+  function detectType(el, fallback) {
+    if (!el) return fallback || 'media';
+    const explicit = (el.getAttribute && (el.getAttribute('data-object-type') || el.getAttribute('data-rg-type'))) || '';
+    if (explicit && CLICK_TO_ACT_MENUS[explicit]) return explicit;
+    const tag = (el.tagName || '').toLowerCase();
+    const cls = String(el.className || '').toLowerCase();
+    if (tag === 'video' || cls.includes('video')) return 'video';
+    if (cls.includes('3d') || cls.includes('three') || el.getAttribute('data-3d')) return 'object3d';
+    if (cls.includes('doc') || cls.includes('article') || cls.includes('editorial') || cls.includes('paper')) return 'doc';
+    if (/^h[1-6]$|^p$|^span$/.test(tag) || cls.includes('text') || cls.includes('title') || cls.includes('caption')) return 'text';
+    if (tag === 'svg' || cls.includes('shape') || cls.includes('badge')) return 'shape';
+    return fallback || 'media';
+  }
+
+  function open(opts = {}) {
+    closeMenu();
+    const type = CLICK_TO_ACT_MENUS[opts.type] ? opts.type : detectType(opts.targetEl, 'media');
+    const schema = CLICK_TO_ACT_MENUS[type] || CLICK_TO_ACT_MENUS.media;
+    const label = opts.label || (opts.targetEl && (opts.targetEl.getAttribute('aria-label') || opts.targetEl.getAttribute('alt'))) || schema.badge;
+
+    const menu = document.createElement('div');
+    menu.className = 'rg-cta-dropdown';
+    menu.innerHTML = `
+      <div class="rg-cta-header">
+        <span class="rg-cta-title">${String(label).replace(/[<>&"]/g, '')}</span>
+        <span class="rg-cta-badge">${schema.badge}</span>
+      </div>
+      ${schema.items.map((it) => it.sep
+        ? '<div class="rg-cta-sep"></div>'
+        : `<button type="button" class="rg-cta-item ${it.ai ? 'is-ai' : ''} ${it.danger ? 'is-danger' : ''}" data-cta-id="${it.id}">${it.label}</button>`
+      ).join('')}
+    `;
+    document.body.appendChild(menu);
+    activeMenuEl = menu;
+
+    const rect = menu.getBoundingClientRect();
+    const x = Math.min(window.innerWidth - rect.width - 12, Math.max(12, opts.x || 120));
+    const y = Math.min(window.innerHeight - rect.height - 12, Math.max(12, opts.y || 120));
+    menu.style.left = `${Math.round(x)}px`;
+    menu.style.top = `${Math.round(y)}px`;
+
+    menu.querySelectorAll('[data-cta-id]').forEach((btn) => {
+      btn.onclick = (ev) => {
+        ev.stopPropagation();
+        const actionId = btn.getAttribute('data-cta-id');
+        closeMenu();
+        if (typeof opts.onAction === 'function') {
+          const handled = opts.onAction(actionId, opts);
+          if (handled === true) return;
+        }
+        defaultExecute(actionId, opts);
+      };
+    });
+  }
+
+  document.addEventListener('mousedown', (e) => {
+    if (activeMenuEl && !activeMenuEl.contains(e.target)) closeMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  // Wire Preview Stage click-to-act (right-click or click on tagged stage items)
+  document.addEventListener('contextmenu', (e) => {
+    const stage = e.target.closest('#tpl-modal-preview-stage-container');
+    if (!stage || e.target.closest('.rg-ed-root, .rg-comment-pin-badge, .rg-cta-dropdown')) return;
+    e.preventDefault();
+    const item = e.target.closest('[data-object-type], [data-layer-id], img, video, h1, h2, h3, p, svg, canvas') || stage;
+    const type = detectType(item, 'media');
+    open({ type, targetEl: item, x: e.clientX, y: e.clientY });
+  });
+
+  window.RegaarderClickToAct = {
+    MENUS: CLICK_TO_ACT_MENUS,
+    detectType,
+    open,
+    close: closeMenu
+  };
+})();

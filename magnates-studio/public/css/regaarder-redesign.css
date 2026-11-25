@@ -4047,3 +4047,91 @@ body.rg-cutout-editor-active #stage-tf-box {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ============================================================================
+   CLICK-TO-ACT CONTEXTUAL DROPDOWN (#4 — Stage & Storyboard)
+   ============================================================================ */
+.rg-cta-dropdown {
+  position: fixed;
+  z-index: 99998;
+  min-width: 224px;
+  max-width: 268px;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(20, 20, 28, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(130, 60, 240, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+.rg-cta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 8px 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.rg-cta-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #F5F5F7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rg-cta-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #A1A1B0;
+  flex-shrink: 0;
+}
+.rg-cta-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 9px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: #E4E4EC;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.rg-cta-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+.rg-cta-item.is-ai {
+  color: #D8B4FE;
+}
+.rg-cta-item.is-ai:hover {
+  background: rgba(130, 60, 240, 0.22);
+  color: #F3E8FF;
+}
+.rg-cta-item.is-danger {
+  color: #FCA5A5;
+}
+.rg-cta-item.is-danger:hover {
+  background: rgba(239, 68, 68, 0.16);
+  color: #FEE2E2;
+}
+.rg-cta-sep {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 3px 4px;
+}

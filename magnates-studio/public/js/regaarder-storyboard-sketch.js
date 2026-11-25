@@ -1101,6 +1101,42 @@
 
     function showLayerContextMenu(x, y, layerId) {
       closeContextMenu();
+      const fr = getActiveFrame();
+      const ly = fr.layers.find((l) => l.id === layerId);
+      if (ly && window.RegaarderClickToAct && typeof window.RegaarderClickToAct.open === 'function') {
+        window.RegaarderClickToAct.open({
+          type: ly.type === 'image' ? 'media' : 'sketch',
+          label: ly.name || 'Sketch Layer',
+          x,
+          y,
+          onAction: (actionId) => {
+            if (actionId === 'toggle-reference') {
+              ly.isReference = !ly.isReference;
+              if (ly.isReference && ly.opacity === 1) ly.opacity = 0.35;
+              saveState(); compositeAllLayers(); renderLayersPanel();
+              return true;
+            }
+            if (actionId === 'save-template') { saveLayerAsTemplate(layerId); return true; }
+            if (actionId === 'duplicate') { copyLayerById(layerId); pasteCopiedLayer(); return true; }
+            if (actionId === 'delete') {
+              if (fr.layers.length > 1) {
+                fr.layers = fr.layers.filter((l) => l.id !== layerId);
+                activeLayerId = fr.layers[0].id;
+                saveState(); loadActiveLayerToBuffer(); renderLayersPanel();
+              }
+              return true;
+            }
+            if (actionId === 'leave-comment') {
+              if (window.RegaarderCommentPins && typeof window.RegaarderCommentPins.togglePinMode === 'function') {
+                window.RegaarderCommentPins.togglePinMode(canvasWrap);
+              }
+              return true;
+            }
+            return false;
+          }
+        });
+        return;
+      }
       contextMenuEl = document.createElement('div');
       contextMenuEl.className = 'rg-ctx-menu';
       contextMenuEl.style.left = Math.min(x, window.innerWidth - 190) + 'px';
