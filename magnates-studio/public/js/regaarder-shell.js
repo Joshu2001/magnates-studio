@@ -137,23 +137,129 @@
      document.addEventListener('keydown',e=>{if(e.key==='Escape')moreWrap.open=false;});
    }
 
-   // Bottom-pinned Notifications bell on the rail
+   // Bottom-pinned Real-Time Notifications bell on the rail
    const notifWrap=document.createElement('details');
    notifWrap.className='rm-rail-notif';
-   notifWrap.innerHTML='<summary class="rail-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><strong>Notifications</strong><p>You\'re all caught up. New template drops and render updates will appear here.</p></div>';
+   notifWrap.innerHTML='<summary class="rail-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><span class="rm-notif-icon-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="rm-notif-badge" hidden>0</span></span><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><div class="rm-notif-head"><strong>Alerts</strong><button type="button" class="rm-notif-clear" data-notif-read-all>Mark all read</button></div><div class="rm-notif-list"><p class="rm-notif-empty">You\'re all caught up. Live alerts and support updates will appear here.</p></div></div>';
    rail.appendChild(notifWrap);
    notifWrap.addEventListener('toggle',()=>{if(notifWrap.open)positionRailFlyout(notifWrap.querySelector('summary'),notifWrap.querySelector('.rm-rail-notif-menu'));});
    document.addEventListener('click',e=>{if(!notifWrap.contains(e.target))notifWrap.open=false;});
    document.addEventListener('keydown',e=>{if(e.key==='Escape')notifWrap.open=false;});
+
+   const notifBadge=notifWrap.querySelector('.rm-notif-badge');
+   const notifListEl=notifWrap.querySelector('.rm-notif-list');
+   let notifItems=[];
+   const esc=(s)=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+   const renderNotifs=(items,unreadCount)=>{
+     notifItems=Array.isArray(items)?items:[];
+     const count=typeof unreadCount==='number'?unreadCount:notifItems.filter(n=>!n.read).length;
+     if(notifBadge){
+       notifBadge.textContent=count>9?'9+':String(count);
+       notifBadge.hidden=count<=0;
+     }
+     if(!notifListEl)return;
+     if(!notifItems.length){
+       notifListEl.innerHTML='<p class="rm-notif-empty">You\'re all caught up. Live alerts and support updates will appear here.</p>';
+       return;
+     }
+     notifListEl.innerHTML=notifItems.slice(0,15).map(n=>{
+       const t=n.createdAt?new Date(n.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+       return `<button type="button" class="rm-notif-item ${n.read?'':'is-unread'}" data-notif-id="${esc(n.id)}"><span class="rm-notif-dot"></span><span class="rm-notif-copy"><strong>${esc(n.title)}</strong><span>${esc(n.message)}</span><em>${esc(t)}</em></span></button>`;
+     }).join('');
+   };
+   const markNotifRead=(id)=>{
+     fetch('/api/notifications/read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(id?{id}:{})})
+       .then(r=>r.json()).then(d=>{if(d?.ok)renderNotifs(d.notifications,d.unreadCount);}).catch(()=>{});
+   };
+   notifWrap.querySelector('[data-notif-read-all]')?.addEventListener('click',()=>markNotifRead(null));
+   notifListEl?.addEventListener('click',e=>{const btn=e.target.closest('[data-notif-id]');if(btn)markNotifRead(btn.dataset.notifId);});
+   if(typeof EventSource!=='undefined'){
+     const es=new EventSource('/api/notifications/stream');
+     es.addEventListener('init',e=>{try{const d=JSON.parse(e.data);renderNotifs(d.notifications,d.unreadCount);}catch(_){}});
+     es.addEventListener('notification',e=>{try{const d=JSON.parse(e.data);if(d.item)renderNotifs([d.item,...notifItems.filter(x=>x.id!==d.item.id)],d.unreadCount);}catch(_){}});
+     es.addEventListener('sync',e=>{try{const d=JSON.parse(e.data);renderNotifs(d.notifications,d.unreadCount);}catch(_){}});
+   }else{
+     fetch('/api/notifications').then(r=>r.json()).then(d=>{if(d?.ok)renderNotifs(d.notifications,d.unreadCount);}).catch(()=>{});
+   }
  }
 
- // Floating bottom-right Help (?) button (Canva-style)
+ // Floating bottom-right Customer Support Module (?)
  if(!document.getElementById('rm-floating-help')){
    const helpWrap=document.createElement('details');
    helpWrap.id='rm-floating-help';
    helpWrap.className='rm-floating-help';
-   helpWrap.innerHTML='<summary class="rm-help-fab" title="Help &amp; Shortcuts" aria-label="Help &amp; Shortcuts">?</summary><div class="rm-help-popover"><strong>Regaarder Motion</strong><ul><li><span>+ Create</span><em>New project, Blank Comp, Storyboard</em></li><li><span>More (•••)</span><em>Elements, Animate, Text, Icons, Layers</em></li><li><span>Ctrl+S</span><em>Save current studio project</em></li></ul></div>';
+   helpWrap.innerHTML=`
+     <summary class="rm-help-fab" title="Customer Support" aria-label="Customer Support">?</summary>
+     <div class="rm-help-popover rm-support-card">
+       <div class="rm-support-head">
+         <div><strong>Customer Support</strong><span>Send a ticket with files or screenshots</span></div>
+         <button type="button" class="rm-support-close" data-support-close aria-label="Close">&times;</button>
+       </div>
+       <form class="rm-support-form" data-support-form novalidate>
+         <label class="rm-support-field"><span>Title</span><input type="text" id="rm-support-title" name="title" placeholder="Short summary of your issue…" required></label>
+         <div class="rm-support-row">
+           <label class="rm-support-field"><span>Category</span><select id="rm-support-category" name="category"><option value="Bug Report">Bug Report</option><option value="Feature Request">Feature Request</option><option value="Render &amp; Export">Render &amp; Export</option><option value="Account">Account</option></select></label>
+           <label class="rm-support-field"><span>Email (optional)</span><input type="email" id="rm-support-email" name="email" placeholder="you@studio.com"></label>
+         </div>
+         <label class="rm-support-field"><span>Details</span><textarea id="rm-support-message" name="message" rows="3" placeholder="Tell us what happened or what you need…"></textarea></label>
+         <div class="rm-support-dropzone" data-support-drop>
+           <input type="file" id="rm-support-files" multiple accept="image/*,.pdf,.txt,.log,.json,.zip,.mp4,.mov" hidden>
+           <button type="button" class="rm-support-attach-btn" data-support-pick>+ Attach images or files</button>
+           <div class="rm-support-files" data-support-file-list></div>
+         </div>
+         <p class="rm-support-status" data-support-status hidden></p>
+         <button type="submit" class="rm-support-submit">Submit Ticket</button>
+       </form>
+     </div>`;
    document.body.appendChild(helpWrap);
+   const form=helpWrap.querySelector('[data-support-form]');
+   const fileInput=helpWrap.querySelector('#rm-support-files');
+   const fileListEl=helpWrap.querySelector('[data-support-file-list]');
+   const dropzone=helpWrap.querySelector('[data-support-drop]');
+   const statusEl=helpWrap.querySelector('[data-support-status]');
+   let supportFiles=[];
+   const renderFiles=()=>{
+     if(!fileListEl)return;
+     fileListEl.innerHTML=supportFiles.map((f,idx)=>{
+       const isImg=/^image\//i.test(f.type||'');
+       const thumb=isImg?`<img src="${URL.createObjectURL(f)}" alt="">`:'';
+       return `<span class="rm-support-file-chip">${thumb}<span>${f.name.replace(/[<>&"]/g,'')}</span><button type="button" data-remove-file="${idx}" aria-label="Remove">&times;</button></span>`;
+     }).join('');
+   };
+   const addFiles=(files)=>{for(const f of files)if(supportFiles.length<10)supportFiles.push(f);renderFiles();};
+   helpWrap.querySelector('[data-support-close]')?.addEventListener('click',()=>{helpWrap.open=false;});
+   helpWrap.querySelector('[data-support-pick]')?.addEventListener('click',()=>fileInput?.click());
+   fileInput?.addEventListener('change',()=>{addFiles(Array.from(fileInput.files||[]));fileInput.value='';});
+   fileListEl?.addEventListener('click',e=>{const rm=e.target.closest('[data-remove-file]');if(rm){supportFiles.splice(Number(rm.dataset.removeFile),1);renderFiles();}});
+   dropzone?.addEventListener('dragover',e=>{e.preventDefault();dropzone.classList.add('is-dragover');});
+   dropzone?.addEventListener('dragleave',()=>dropzone.classList.remove('is-dragover'));
+   dropzone?.addEventListener('drop',e=>{e.preventDefault();dropzone.classList.remove('is-dragover');addFiles(Array.from(e.dataTransfer?.files||[]));});
+   form?.addEventListener('submit',async e=>{
+     e.preventDefault();
+     const title=helpWrap.querySelector('#rm-support-title')?.value.trim()||'';
+     const category=helpWrap.querySelector('#rm-support-category')?.value||'General';
+     const email=helpWrap.querySelector('#rm-support-email')?.value.trim()||'';
+     const message=helpWrap.querySelector('#rm-support-message')?.value.trim()||'';
+     if(!title){statusEl.textContent='Please enter a title first.';statusEl.className='rm-support-status is-err';statusEl.hidden=false;return;}
+     const submitBtn=form.querySelector('.rm-support-submit');
+     submitBtn.disabled=true;submitBtn.textContent='Sending…';
+     try{
+       const fd=new FormData();
+       fd.append('title',title);fd.append('category',category);fd.append('email',email);fd.append('message',message);
+       supportFiles.forEach(f=>fd.append('attachments',f));
+       const res=await fetch('/api/support/tickets',{method:'POST',body:fd});
+       const data=await res.json();
+       if(!res.ok||!data.ok)throw new Error(data.error||'Failed to submit ticket');
+       statusEl.textContent=`Ticket ${data.ticket.id} sent! Live alert added.`;
+       statusEl.className='rm-support-status is-ok';statusEl.hidden=false;
+       form.reset();supportFiles=[];renderFiles();
+     }catch(err){
+       statusEl.textContent=err.message||'Could not submit ticket.';
+       statusEl.className='rm-support-status is-err';statusEl.hidden=false;
+     }finally{
+       submitBtn.disabled=false;submitBtn.textContent='Submit Ticket';
+     }
+   });
    document.addEventListener('click',e=>{if(!helpWrap.contains(e.target))helpWrap.open=false;});
    document.addEventListener('keydown',e=>{if(e.key==='Escape')helpWrap.open=false;});
  }

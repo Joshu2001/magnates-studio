@@ -400,6 +400,13 @@ app.use('/api/ai', createAIHarnessRouter({
   userDownloads,
 }));
 
+// Customer Support Tickets & Real-Time Notifications (SSE)
+const { createSupportAndNotificationsRouter } = require('./support-notifications');
+app.use('/api', createSupportAndNotificationsRouter({
+  dataDir: aiDataDir,
+  uploadsDir,
+}));
+
 function startServer(port) {
   const server = app.listen(port, '0.0.0.0');
   
