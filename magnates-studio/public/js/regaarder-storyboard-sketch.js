@@ -16,6 +16,7 @@
 
   const STORAGE_KEY = 'regaarder-storyboard-v2';
   const TEMPLATES_KEY = 'regaarder-sketch-templates-v1';
+  const SB_HISTORY_KEY = 'regaarder-storyboard-history-v1';
 
   const ASPECT_RATIOS = {
     '16:9': { label: '16:9 YouTube', w: 960, h: 540 },
@@ -59,6 +60,7 @@
 
   let state = loadJson(STORAGE_KEY, { aspectRatio: '16:9', scenes: [] });
   let savedTemplates = loadJson(TEMPLATES_KEY, []);
+  let sbHistory = loadJson(SB_HISTORY_KEY, []);
 
   function loadJson(key, fallback) {
     try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
@@ -66,6 +68,21 @@
   }
   function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
   function saveTemplates() { try { localStorage.setItem(TEMPLATES_KEY, JSON.stringify(savedTemplates)); } catch (e) {} }
+  function saveSbHistory() { try { localStorage.setItem(SB_HISTORY_KEY, JSON.stringify(sbHistory)); } catch (e) {} }
+  function archiveCurrentStoryboard() {
+    if (!state || !Array.isArray(state.scenes) || state.scenes.length === 0) return;
+    const first = state.scenes[0];
+    sbHistory.unshift({
+      id: uid('sbh_'),
+      title: (first && first.title) || 'Storyboard',
+      savedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      sceneCount: state.scenes.length,
+      thumbUrl: (first && first.thumbUrl) || '',
+      snapshot: JSON.parse(JSON.stringify(state))
+    });
+    if (sbHistory.length > 20) sbHistory = sbHistory.slice(0, 20);
+    saveSbHistory();
+  }
   function uid(prefix) { return (prefix || 'id_') + Math.random().toString(36).slice(2, 9); }
   function escapeHtml(str) {
     return String(str || '').replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
@@ -678,6 +695,9 @@
         <span>${escapeHtml(scene.title)}</span>
         <span class="rg-sb-pill">${scene.aspectRatio || state.aspectRatio}</span>
         <span id="rg-coord-readout" style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;">0, 0</span>
+        <span class="rg-sb-divider"></span>
+        <button type="button" class="rg-sb-flat-btn" id="rg-sb-new-btn" title="Archive current storyboard &amp; start a fresh blank Scene 1">+ New</button>
+        <button type="button" class="rg-sb-flat-btn" id="rg-sb-history-btn" title="Restore a previous storyboard from history">History</button>
       </div>
       <div class="rg-sb-flat-group">
         <button type="button" class="rg-sb-flat-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">${commentPinSvg} Pin Comment</button>
@@ -975,6 +995,52 @@
 
     if (overviewBtn) {
       overviewBtn.onclick = () => setOverviewMode(!overviewMode);
+    }
+    const sbNewBtn = q('#rg-sb-new-btn');
+    if (sbNewBtn) {
+      sbNewBtn.onclick = () => {
+        commitBufferToActiveLayer();
+        compositeAllLayers(true);
+        scene.thumbUrl = canvas.toDataURL('image/png');
+        saveState();
+        archiveCurrentStoryboard();
+        state.scenes = [];
+        const fresh = addBlankScene(false);
+        openSceneEditor(fresh.id, opts);
+      };
+    }
+    const sbHistoryBtn = q('#rg-sb-history-btn');
+    if (sbHistoryBtn) {
+      sbHistoryBtn.onclick = (e) => {
+        e.stopPropagation();
+        closeContextMenu();
+        contextMenuEl = document.createElement('div');
+        contextMenuEl.className = 'rg-ctx-menu';
+        const r = sbHistoryBtn.getBoundingClientRect();
+        contextMenuEl.style.left = `${Math.min(r.left, window.innerWidth - 240)}px`;
+        contextMenuEl.style.top = `${r.bottom + 6}px`;
+        contextMenuEl.style.minWidth = '220px';
+        contextMenuEl.innerHTML = sbHistory.length === 0
+          ? '<div style="padding:8px 10px;font-size:11.5px;color:var(--rg-text-muted);">No saved storyboards yet. Click + New to archive & start fresh.</div>'
+          : sbHistory.map((h) => `
+              <button type="button" class="rg-ctx-item" data-sbh-id="${h.id}" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(h.title)} (${h.sceneCount}sc)</span>
+                <span style="font-size:10px;color:var(--rg-text-muted);flex-shrink:0;">${escapeHtml(h.savedAt)}</span>
+              </button>
+            `).join('');
+        document.body.appendChild(contextMenuEl);
+        contextMenuEl.querySelectorAll('[data-sbh-id]').forEach((b) => {
+          b.onclick = () => {
+            const item = sbHistory.find((x) => x.id === b.getAttribute('data-sbh-id'));
+            closeContextMenu();
+            if (item && item.snapshot && Array.isArray(item.snapshot.scenes) && item.snapshot.scenes.length) {
+              state = JSON.parse(JSON.stringify(item.snapshot));
+              saveState();
+              openSceneEditor(state.scenes[0].id, opts);
+            }
+          };
+        });
+      };
     }
     stage.addEventListener('wheel', (e) => {
       if (!overviewMode || !(e.ctrlKey || e.metaKey)) return;

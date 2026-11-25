@@ -219,8 +219,13 @@
           <svg class="rg-ai-director-sparkle-svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z"/></svg>
           <span class="rg-ai-director-title">AI Director</span>
         </div>
-        <button type="button" class="rg-ai-director-close" title="Back to Inspector" aria-label="Back to Inspector">&times;</button>
+        <div class="rg-ai-header-actions">
+          <button type="button" class="rg-ai-header-btn" id="rg-ai-new-btn" title="Archive current chat &amp; start a new conversation">+ New</button>
+          <button type="button" class="rg-ai-header-btn" id="rg-ai-history-btn" title="View past AI Director conversations">History</button>
+          <button type="button" class="rg-ai-director-close" title="Back to Inspector" aria-label="Back to Inspector">&times;</button>
+        </div>
       </div>
+      <div class="rg-ai-history-menu" id="rg-ai-history-menu" style="display:none;"></div>
 
       <div class="rg-ai-director-body" data-role="body">
         <div class="rg-ai-empty-state" data-role="empty-state">
@@ -403,6 +408,66 @@
       });
     });
 
+    const CHAT_HISTORY_KEY = 'regaarder-ai-chat-history-v1';
+    const historyMenu = panel.querySelector('#rg-ai-history-menu');
+    const getChatHistory = () => {
+      try { return JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '[]'); } catch (_) { return []; }
+    };
+    const saveChatHistory = (arr) => {
+      try { localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(arr.slice(0, 20))); } catch (_) {}
+    };
+    const archiveCurrentChat = () => {
+      if (!state.messages || state.messages.length === 0) return;
+      const firstUser = state.messages.find((m) => m.role === 'user');
+      const hist = getChatHistory();
+      hist.unshift({
+        id: `chat_${Date.now()}`,
+        title: (firstUser && firstUser.text ? firstUser.text : 'AI Director Session').slice(0, 42),
+        savedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        messages: state.messages.map((m) => ({ role: m.role, text: m.text || '', blueprint: m.blueprint || null, cutout: m.cutout || null, meshBlueprint: m.meshBlueprint || null }))
+      });
+      saveChatHistory(hist);
+    };
+
+    panel.querySelector('#rg-ai-new-btn')?.addEventListener('click', () => {
+      archiveCurrentChat();
+      state.messages = [];
+      state.attachments = [];
+      state.lastBlueprint = null;
+      if (historyMenu) historyMenu.style.display = 'none';
+      renderAttachments(panel);
+      renderMessages(panel);
+    });
+
+    panel.querySelector('#rg-ai-history-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!historyMenu) return;
+      if (historyMenu.style.display !== 'none') {
+        historyMenu.style.display = 'none';
+        return;
+      }
+      const hist = getChatHistory();
+      historyMenu.innerHTML = hist.length === 0
+        ? '<div class="rg-ai-history-empty">No past chats yet. Click + New to archive & start fresh.</div>'
+        : hist.map((h) => `
+            <button type="button" class="rg-ai-history-item" data-chat-hist="${escapeHtml(h.id)}">
+              <span class="rg-ai-history-title">${escapeHtml(h.title)}</span>
+              <span class="rg-ai-history-time">${escapeHtml(h.savedAt)}</span>
+            </button>
+          `).join('');
+      historyMenu.style.display = 'flex';
+      historyMenu.querySelectorAll('[data-chat-hist]').forEach((b) => {
+        b.addEventListener('click', () => {
+          const item = getChatHistory().find((x) => x.id === b.getAttribute('data-chat-hist'));
+          if (item && Array.isArray(item.messages)) {
+            state.messages = item.messages;
+            renderMessages(panel);
+          }
+          historyMenu.style.display = 'none';
+        });
+      });
+    });
+
     renderAttachments(panel);
     renderMessages(panel);
     return panel;
@@ -580,6 +645,15 @@
     }
   }
 
+  async function parseApiJson(res) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch (_) {
+      throw new Error(`Server returned HTTP ${res.status} (non-JSON). Please restart the server & refresh.`);
+    }
+  }
+
   async function submitPrompt(shell, prompt) {
     const panel = ensurePanelInShell(shell);
     if (!panel || state.isSending) return;
@@ -605,7 +679,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt, vectorHistory })
         });
-        const data = await res.json();
+        const data = await parseApiJson(res);
         if (!res.ok || !data.ok || !data.meshBlueprint) {
           throw new Error(data.error || 'Failed to build 3D mesh');
         }
@@ -632,7 +706,7 @@
             attachments: sentAttachments.map((a) => ({ name: a.name, type: a.type, kind: a.kind }))
           })
         });
-        const data = await res.json();
+        const data = await parseApiJson(res);
         if (!res.ok || !data.ok || !data.cutout) {
           throw new Error(data.error || 'Failed to isolate object');
         }
@@ -660,7 +734,7 @@
           availableTemplates: getCatalogSummary()
         })
       });
-      const data = await res.json();
+      const data = await parseApiJson(res);
       if (!res.ok || !data.ok || !data.blueprint) {
         throw new Error(data.error || 'Failed to compose sequence');
       }

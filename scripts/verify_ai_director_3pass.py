@@ -62,11 +62,11 @@ def run_pass_2():
         print('  OK left rail AI Director + Storyboard Mode buttons & stage/sidebar handoff')
 
     sb_js = open(os.path.join(PUBLIC, 'js', 'regaarder-storyboard-sketch.js'), encoding='utf-8').read()
-    for sb_feat in ['is-hover-wheel', 'rg-sb-inline-topbar', 'rg-sb-inspector-pane', 'is-storyboard-inspector', 'inlineCleanup', 'rg-sb-overview-btn', 'rg-sb-overview', 'setOverviewMode', 'applyOverviewZoom', 'rg-ov-card']:
+    for sb_feat in ['is-hover-wheel', 'rg-sb-inline-topbar', 'rg-sb-inspector-pane', 'is-storyboard-inspector', 'inlineCleanup', 'rg-sb-overview-btn', 'rg-sb-overview', 'setOverviewMode', 'applyOverviewZoom', 'rg-ov-card', 'rg-sb-new-btn', 'rg-sb-history-btn']:
         if sb_feat not in sb_js:
             ok = fail(f'regaarder-storyboard-sketch.js missing unified layout feature: {sb_feat}')
     if ok:
-        print('  OK Storyboard hover radial wheel, single unified topbar, right-sidebar Brush/Layers & Zoomable Overview')
+        print('  OK Storyboard hover radial wheel, single unified topbar, + New/History, Brush/Layers & Zoomable Overview')
 
     if 'window.RegaarderAIDirector.toggle(shell)' not in redesign or 'window.RegaarderAIDirector.close(shell)' not in redesign:
         ok = fail('Left rail / inspector tab toggle integration missing')
@@ -88,6 +88,12 @@ def run_pass_2():
         ok = fail('Regaarder3DMeshStudio (#7) missing')
     else:
         print('  OK AI Sketch -> 3D Mesh Studio (Texturing, Holes & Sculpting)')
+
+    director_src = open(os.path.join(PUBLIC, 'js', 'regaarder-ai-director.js'), encoding='utf-8').read()
+    if 'rg-ai-new-btn' not in director_src or 'rg-ai-history-btn' not in director_src or 'parseApiJson' not in director_src:
+        ok = fail('AI Director + New / History / parseApiJson missing')
+    else:
+        print('  OK AI Director + New / History & safe JSON response handling')
 
     required_css = [
         '.rg-rail-btn-ai', '.rg-ai-director-panel', '.rg-inspector-shell.is-ai-director-open',
