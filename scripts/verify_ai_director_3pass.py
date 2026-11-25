@@ -59,12 +59,22 @@ def run_pass_2():
     else:
         print('  OK right sidebar toggle & 4-tab inspector restore')
 
-    required_css = ['.rg-rail-btn-ai', '.rg-ai-director-panel', '.rg-inspector-shell.is-ai-director-open', '.rg-ai-section-pill', '.rg-ai-director-send']
+    required_css = [
+        '.rg-rail-btn-ai', '.rg-ai-director-panel', '.rg-inspector-shell.is-ai-director-open',
+        '.rg-ai-section-pill', '.rg-ai-director-send', '.rg-ai-composer-shell',
+        '.rg-ai-plus-btn', '.rg-ai-plus-menu', '.rg-ai-att-remove',
+        '.rg-ai-model-select', '.rg-ai-perm-select', '.rg-ai-voice-btn'
+    ]
     for sel in required_css:
         if sel not in css:
             ok = fail(f'Missing CSS selector in regaarder-redesign.css: {sel}')
+
+    director_js = open(os.path.join(PUBLIC, 'js', 'regaarder-ai-director.js'), encoding='utf-8').read()
+    for feat in ["addEventListener('paste'", 'local-studio-fast', 'online-gemini-pro', 'toggleVoiceDictation', 'captureStageFrameAttachment']:
+        if feat not in director_js:
+            ok = fail(f'regaarder-ai-director.js missing feature: {feat}')
     if ok:
-        print('  OK CSS tokens & visual consistency in regaarder-redesign.css')
+        print('  OK CSS tokens, composer controls (+, paste, model, permission, voice) & visual consistency')
     return ok
 
 def run_pass_3():
@@ -93,6 +103,9 @@ const server = app.listen(0, '127.0.0.1', () => {
   const port = server.address().port;
   const payload = JSON.stringify({
     prompt: "Create a 30s documentary video about Apple's rise: borrow Map Pin Drop for intro, Balance Sheet for Body, and Kinetic Typography for Outro",
+    model: 'online-gemini-pro',
+    permission: 'ask',
+    attachments: [{ name: 'ref.png', type: 'image/png', kind: 'image' }],
     availableTemplates: [
       { id: 'map', title: 'Map Pin Drop', category: 'Animations' },
       { id: 'balance', title: 'Balance Sheet', category: 'Finance' },
@@ -125,9 +138,9 @@ const server = app.listen(0, '127.0.0.1', () => {
         return fail(f'Unexpected blueprint: {data}')
     roles = [s.get('role') for s in secs]
     tpls = [s.get('sourceTplId') for s in secs]
-    if roles != ['intro', 'body', 'outro'] or tpls != ['map', 'balance', 'kinetic']:
-        return fail(f'Mismatch in roles/templates: roles={roles}, tpls={tpls}')
-    print(f'  OK /api/ai/compose-sequence -> roles={roles}, templates={tpls}, totalDuration={bp.get("totalDuration")}s')
+    if roles != ['intro', 'body', 'outro'] or tpls != ['map', 'balance', 'kinetic'] or bp.get('model') != 'online-gemini-pro' or bp.get('permission') != 'ask' or len(bp.get('attachments', [])) != 1:
+        return fail(f'Mismatch in roles/templates/meta: roles={roles}, tpls={tpls}, bp={bp}')
+    print(f'  OK /api/ai/compose-sequence -> roles={roles}, templates={tpls}, model={bp.get("model")}, perm={bp.get("permission")}, totalDuration={bp.get("totalDuration")}s')
     return ok
 
 p1 = run_pass_1()

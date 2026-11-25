@@ -3616,7 +3616,24 @@ body.rg-cutout-editor-active #stage-tf-box {
 
 .rg-ai-bp-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 6px;
+}
+
+.rg-ai-apply-bp-btn {
+  background: rgba(56, 189, 248, 0.16);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  color: #bae6fd;
+  border-radius: 7px;
+  padding: 4px 9px;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rg-ai-apply-bp-btn:hover {
+  background: rgba(56, 189, 248, 0.28);
 }
 
 .rg-ai-save-tpl-btn {
@@ -3634,6 +3651,30 @@ body.rg-cutout-editor-active #stage-tf-box {
   background: rgba(139, 92, 246, 0.32);
 }
 
+.rg-ai-msg-atts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.rg-ai-msg-att-thumb {
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.rg-ai-msg-att-pill {
+  font-size: 10px;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 3px 7px;
+}
+
 .rg-ai-director-starters {
   display: flex;
   flex-wrap: wrap;
@@ -3644,13 +3685,14 @@ body.rg-cutout-editor-active #stage-tf-box {
 
 .rg-ai-starter-chip {
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   color: #94a3b8;
   border-radius: 999px;
   padding: 3px 9px;
   font-size: 10px;
   font-weight: 500;
   cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
 }
 
 .rg-ai-starter-chip:hover {
@@ -3658,36 +3700,267 @@ body.rg-cutout-editor-active #stage-tf-box {
   border-color: rgba(168, 85, 247, 0.45);
 }
 
-.rg-ai-director-composer {
+.rg-ai-composer-shell {
+  position: relative;
+  margin: 0 10px 10px;
+  padding: 9px 10px 8px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #141522;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 12px 12px;
-  border-top: 1px solid var(--rg-border-subtle);
-  background: rgba(14, 15, 23, 0.9);
+  flex-direction: column;
+  gap: 7px;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rg-ai-composer-shell:focus-within,
+.rg-ai-composer-shell.is-dragover {
+  border-color: rgba(168, 85, 247, 0.62);
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.18);
+}
+
+.rg-ai-plus-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  min-width: 196px;
+  padding: 5px;
+  border-radius: 11px;
+  background: #181a28;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 30;
+}
+
+.rg-ai-plus-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 7px 9px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.rg-ai-plus-item:hover {
+  background: rgba(168, 85, 247, 0.18);
+  color: #fff;
+}
+
+.rg-ai-attachments-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-bottom: 2px;
+}
+
+.rg-ai-att-item {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-radius: 9px;
+  overflow: visible;
   flex-shrink: 0;
 }
 
-.rg-ai-director-input {
-  flex: 1;
-  min-width: 0;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  padding: 8px 10px;
+.rg-ai-att-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: 9px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  display: block;
+}
+
+.rg-ai-att-file-badge {
+  width: 100%;
+  height: 100%;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-size: 13px;
+}
+
+.rg-ai-att-ext {
+  font-size: 8px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.rg-ai-att-remove {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #0b0c14;
   color: #f8fafc;
-  font-size: 11.5px;
+  font-size: 11px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease;
+}
+
+.rg-ai-att-item:hover .rg-ai-att-remove {
+  opacity: 1;
+}
+
+.rg-ai-att-remove:hover {
+  background: #ef4444;
+  border-color: #f87171;
+}
+
+.rg-ai-director-input {
+  width: 100%;
+  min-height: 24px;
+  max-height: 110px;
+  resize: none;
+  background: transparent;
+  border: none;
+  padding: 2px 2px 4px;
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.45;
   outline: none;
 }
 
-.rg-ai-director-input:focus {
-  border-color: rgba(168, 85, 247, 0.65);
+.rg-ai-director-input::placeholder {
+  color: #64748b;
+}
+
+.rg-ai-composer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.rg-ai-toolbar-left,
+.rg-ai-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.rg-ai-plus-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+  font-size: 15px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.rg-ai-plus-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.rg-ai-model-select {
+  max-width: 128px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  color: #cbd5e1;
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 4px 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.rg-ai-model-select option,
+.rg-ai-model-select optgroup,
+.rg-ai-perm-select option {
+  background: #141522;
+  color: #f8fafc;
+}
+
+.rg-ai-perm-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+.rg-ai-perm-shield {
+  font-size: 10px;
+  line-height: 1;
+}
+
+.rg-ai-perm-select {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 10.5px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+}
+
+.rg-ai-voice-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.rg-ai-voice-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.rg-ai-voice-btn.is-recording {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+  color: #fca5a5;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.45);
 }
 
 .rg-ai-director-send {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   border: 1px solid rgba(168, 85, 247, 0.55);
   background: linear-gradient(180deg, #9353F5 0%, #7C3AED 100%);
   color: #fff;

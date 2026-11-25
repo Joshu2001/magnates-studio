@@ -312,13 +312,24 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
 
   router.post('/compose-sequence', (req, res) => {
     const prompt = String(req.body?.prompt || '').trim();
-    if (!prompt) return res.status(400).json({ ok: false, error: 'prompt is required' });
+    const attachments = Array.isArray(req.body?.attachments) ? req.body.attachments : [];
+    if (!prompt && attachments.length === 0) {
+      return res.status(400).json({ ok: false, error: 'prompt or attachment is required' });
+    }
     const availableTemplates = Array.isArray(req.body?.availableTemplates) ? req.body.availableTemplates : [];
-    const blueprint = composeSequenceFromPrompt(prompt, availableTemplates);
+    const model = String(req.body?.model || 'local-studio-fast');
+    const permission = ['ask', 'balanced', 'turbo'].includes(req.body?.permission) ? req.body.permission : 'turbo';
+    const effectivePrompt = prompt || `Create a 30s visual sequence using attached media (${attachments.map((a) => a.name || 'asset').join(', ')})`;
+    const blueprint = composeSequenceFromPrompt(effectivePrompt, availableTemplates);
+    blueprint.model = model;
+    blueprint.permission = permission;
+    blueprint.attachments = attachments.map((a) => ({ name: String(a.name || 'attachment'), type: String(a.type || 'file') }));
     res.json({
       ok: true,
       blueprint,
-      summary: `Composed ${blueprint.totalDuration}s sequence with Intro (${blueprint.sections[0].sourceTitle}), Body (${blueprint.sections[1].sourceTitle}), and Outro (${blueprint.sections[2].sourceTitle}).`,
+      model,
+      permission,
+      summary: `Composed ${blueprint.totalDuration}s sequence (${model} · ${permission}) with Intro (${blueprint.sections[0].sourceTitle}), Body (${blueprint.sections[1].sourceTitle}), and Outro (${blueprint.sections[2].sourceTitle}).`,
     });
   });
 
