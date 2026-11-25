@@ -9,16 +9,37 @@
    search.placeholder='Search templates, scenes, motion or ideas…';search.setAttribute('aria-label','Search templates');
    search.parentElement?.parentElement?.classList.add('rm-library-search');
  }
- // Relocate original action nodes, preserving all attached click handlers.
- let create=topbar.querySelector('.rm-create-menu');
+ // Relocate original Create menu into the top of the left vertical rail (Canva-style + Create).
+ const rail=document.getElementById('main-nav-rail');
+ let create=document.querySelector('.rm-create-menu');
  if(!create){
-   create=document.createElement('details');create.className='rm-create-menu';create.innerHTML='<summary>Create <span aria-hidden="true">＋</span></summary><div class="rm-create-items"></div>';
+   create=document.createElement('details');create.className='rm-create-menu';create.innerHTML='<summary><span class="rm-create-plus" aria-hidden="true">＋</span><span class="rail-label">Create</span></summary><div class="rm-create-items"></div>';
    const items=create.querySelector('div');
    for(const id of ['btn-templates-open-editor','btn-top-blank-comp','btn-top-story-prompts','btn-top-assets-tools']){const node=document.getElementById(id);if(node)items.appendChild(node);}
-   topbar.appendChild(create);
  }
- document.addEventListener('click',e=>{if(!create.contains(e.target))create.open=false;else if(e.target.closest('button'))create.open=false;});
- document.addEventListener('keydown',e=>{if(e.key==='Escape'){create.open=false;const fm=home.querySelector('.rm-filter-menu');if(fm)fm.open=false;}});
+ if(create){
+   const summary=create.querySelector('summary');
+   if(summary&&!summary.querySelector('.rm-create-plus')){
+     summary.innerHTML='<span class="rm-create-plus" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="rail-label">Create</span>';
+   }
+   if(rail&&create.parentElement!==rail)rail.prepend(create);
+ }
+ // Use fixed-position flyout coordinates so menus escape #main-nav-rail's overflow-y:auto clipping.
+ const positionRailFlyout=(anchor,panel)=>{
+   if(!anchor||!panel)return;
+   const r=anchor.getBoundingClientRect();
+   panel.style.left=(Math.round(r.right)+10)+'px';
+   const maxTop=window.innerHeight-Math.min(panel.offsetHeight||280,window.innerHeight-24)-16;
+   panel.style.top=Math.max(12,Math.min(Math.round(r.top),maxTop))+'px';
+ };
+ if(create){
+   create.addEventListener('toggle',()=>{if(create.open)positionRailFlyout(create.querySelector('summary'),create.querySelector('.rm-create-items'));});
+ }
+ document.addEventListener('click',e=>{
+   if(create&&!create.contains(e.target))create.open=false;
+   else if(create&&e.target.closest('button'))create.open=false;
+ });
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(create)create.open=false;const fm=home.querySelector('.rm-filter-menu');if(fm)fm.open=false;}});
  
  let controls=home.querySelector('.rm-library-controls');
  if(!controls){
@@ -74,15 +95,13 @@
  const stopHover=window.stopTemplateHoverVideo;
  if(stopHover)window.stopTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId||tpl?.id===luckinPart2Id||tpl?.id===barryOpeningId)return;return stopHover.call(this,card,tpl,...args);};
  window.renderHomepageTemplates?.();
- // Match homepage rail icons to the editor's thin outline icon language.
- const rail=document.getElementById('main-nav-rail');
+ // Match homepage rail icons to the editor's thin outline icon language (no circles).
  const syncRail=()=>{if(home.style.display==='none')return;for(const button of rail.querySelectorAll('.rail-btn')){const active=button.dataset.railTab==='templates';if(button.classList.contains('active')!==active)button.classList.toggle('active',active);}};
  if(rail){new MutationObserver(syncRail).observe(rail,{attributes:true,attributeFilter:['class'],subtree:true});new MutationObserver(syncRail).observe(home,{attributes:true,attributeFilter:['style']});syncRail();}
  const icons={templates:'M3 4h18v16H3z M3 9h18',all:'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7',elements:'M5 20V10 M12 20V4 M19 20v-7',animate:'M8 4l12 8-12 8z',transitions:'M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z',text:'M4 5h16 M12 5v15',icons:'M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z',layers:'M12 3L2 8l10 5 10-5z M2 12l10 5 10-5 M2 16l10 5 10-5',projects:'M3 6h7l2 3h9v12H3z'};
  document.querySelectorAll('#main-nav-rail .rail-btn').forEach(button=>{
    const path=icons[button.dataset.railTab];
    const old=button.querySelector('svg');
-   let iconEl=old;
    if(path&&old){
      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
      svg.setAttribute('viewBox','0 0 24 24');
@@ -91,16 +110,53 @@
      p.setAttribute('d',path);
      svg.appendChild(p);
      old.replaceWith(svg);
-     iconEl=svg;
-   }
-   if(iconEl&&!iconEl.parentElement?.classList.contains('rm-rail-circle')){
-     const circle=document.createElement('span');
-     circle.className='rm-rail-circle';
-     circle.setAttribute('aria-hidden','true');
-     iconEl.parentNode.insertBefore(circle,iconEl);
-     circle.appendChild(iconEl);
    }
  });
+
+ // Organize left rail: primary items (Create, Templates, Projects, Uploads) + More (...) + bottom Notifications.
+ if(rail&&!rail.querySelector('.rm-rail-more')){
+   const primaryOrder=['templates','projects','all'];
+   const primarySet=new Set(primaryOrder);
+   const allBtns=[...rail.querySelectorAll(':scope > .rail-btn[data-rail-tab]')];
+   const byTab=Object.fromEntries(allBtns.map(b=>[b.dataset.railTab,b]));
+   for(const tab of primaryOrder){if(byTab[tab])rail.appendChild(byTab[tab]);}
+
+   const secondary=allBtns.filter(b=>!primarySet.has(b.dataset.railTab));
+   if(secondary.length){
+     const moreWrap=document.createElement('details');
+     moreWrap.className='rm-rail-more';
+     moreWrap.innerHTML='<summary class="rail-btn rm-rail-more-btn" title="More tools &amp; layers"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg><span class="rail-label">More</span></summary><div class="rm-rail-more-menu" role="menu"></div>';
+     const menu=moreWrap.querySelector('.rm-rail-more-menu');
+     secondary.forEach(btn=>menu.appendChild(btn));
+     rail.appendChild(moreWrap);
+     moreWrap.addEventListener('toggle',()=>{if(moreWrap.open)positionRailFlyout(moreWrap.querySelector('summary'),menu);});
+     document.addEventListener('click',e=>{
+       if(!moreWrap.contains(e.target))moreWrap.open=false;
+       else if(e.target.closest('.rm-rail-more-menu .rail-btn'))moreWrap.open=false;
+     });
+     document.addEventListener('keydown',e=>{if(e.key==='Escape')moreWrap.open=false;});
+   }
+
+   // Bottom-pinned Notifications bell on the rail
+   const notifWrap=document.createElement('details');
+   notifWrap.className='rm-rail-notif';
+   notifWrap.innerHTML='<summary class="rail-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><strong>Notifications</strong><p>You\'re all caught up. New template drops and render updates will appear here.</p></div>';
+   rail.appendChild(notifWrap);
+   notifWrap.addEventListener('toggle',()=>{if(notifWrap.open)positionRailFlyout(notifWrap.querySelector('summary'),notifWrap.querySelector('.rm-rail-notif-menu'));});
+   document.addEventListener('click',e=>{if(!notifWrap.contains(e.target))notifWrap.open=false;});
+   document.addEventListener('keydown',e=>{if(e.key==='Escape')notifWrap.open=false;});
+ }
+
+ // Floating bottom-right Help (?) button (Canva-style)
+ if(!document.getElementById('rm-floating-help')){
+   const helpWrap=document.createElement('details');
+   helpWrap.id='rm-floating-help';
+   helpWrap.className='rm-floating-help';
+   helpWrap.innerHTML='<summary class="rm-help-fab" title="Help &amp; Shortcuts" aria-label="Help &amp; Shortcuts">?</summary><div class="rm-help-popover"><strong>Regaarder Motion</strong><ul><li><span>+ Create</span><em>New project, Blank Comp, Storyboard</em></li><li><span>More (•••)</span><em>Elements, Animate, Text, Icons, Layers</em></li><li><span>Ctrl+S</span><em>Save current studio project</em></li></ul></div>';
+   document.body.appendChild(helpWrap);
+   document.addEventListener('click',e=>{if(!helpWrap.contains(e.target))helpWrap.open=false;});
+   document.addEventListener('keydown',e=>{if(e.key==='Escape')helpWrap.open=false;});
+ }
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  function refineMeshInspector(section){
   if(section.dataset.rmPrecision||!section.querySelector('[data-n3d-prop="editTool"]'))return;

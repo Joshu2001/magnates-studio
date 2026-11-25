@@ -98,7 +98,7 @@
 .rm-task-heading{font-size:12px;font-weight:650;line-height:1.5;color:#eee9f5}.rm-task-actions .rg-section-title[hidden]{display:none!important}.rm-task-body>.rm-task-actions{padding:0!important;margin:0!important;border:0!important}
 
 /* ============================================================================
-   ELEVATED WORKSPACE SURFACE & CIRCULAR VERTICAL RAIL (Canva-inspired Dark)
+   ELEVATED WORKSPACE SURFACE & CANVA-STYLE VERTICAL RAIL (No nav circles)
    ============================================================================ */
 :root {
   --rm-shell-bg: #07080d;
@@ -107,11 +107,8 @@
   --rm-surface-border: rgba(255, 255, 255, 0.08);
   --rm-surface-highlight: rgba(255, 255, 255, 0.06);
   --rm-surface-radius: 18px;
-  --rm-rail-width: 78px;
-  --rm-rail-circle-size: 38px;
-  --rm-rail-circle-bg: rgba(255, 255, 255, 0.045);
-  --rm-rail-circle-hover: rgba(255, 255, 255, 0.10);
-  --rm-rail-circle-active: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  --rm-rail-width: 82px;
+  --rm-create-circle-bg: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
 }
 
 html,
@@ -131,60 +128,42 @@ body,
   height: calc(100vh - 56px) !important;
 }
 
-/* Recessed Left Vertical Rail with Circular Icon Containers */
+/* Recessed Left Vertical Rail — Clean Bare Icons (Image 2 active treatment) */
 #main-nav-rail {
   width: var(--rm-rail-width) !important;
   min-width: var(--rm-rail-width) !important;
   background: var(--rm-shell-bg) !important;
   border-right: 0 !important;
-  padding: 10px 0 18px !important;
+  padding: 12px 0 14px !important;
   gap: 6px !important;
 }
 
 #main-nav-rail .rail-btn {
   width: 68px !important;
-  min-height: 58px !important;
+  min-height: 56px !important;
   height: auto !important;
   margin: 0 auto !important;
-  padding: 4px 2px !important;
+  padding: 6px 4px !important;
   gap: 5px !important;
-  border-radius: 12px !important;
-  border: 0 !important;
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
   background: transparent !important;
-  color: #8b94ab !important;
+  color: #929bb1 !important;
   box-shadow: none !important;
-  transition: color 0.16s ease, transform 0.14s ease !important;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease !important;
 }
 
 #main-nav-rail .rail-btn:hover {
-  background: transparent !important;
-  color: #e2e8f0 !important;
-}
-
-#main-nav-rail .rail-btn .rm-rail-circle {
-  width: var(--rm-rail-circle-size);
-  height: var(--rm-rail-circle-size);
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--rm-rail-circle-bg);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
-}
-
-#main-nav-rail .rail-btn:hover .rm-rail-circle {
-  background: var(--rm-rail-circle-hover);
-  border-color: rgba(255, 255, 255, 0.12);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #f1f5f9 !important;
 }
 
 #main-nav-rail .rail-btn svg {
-  width: 17px !important;
-  height: 17px !important;
+  width: 20px !important;
+  height: 20px !important;
   fill: none !important;
   stroke: currentColor !important;
-  stroke-width: 1.75 !important;
+  stroke-width: 1.7 !important;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -197,22 +176,235 @@ body,
 }
 
 #main-nav-rail .rail-btn.active {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  color: #f3e8ff !important;
-}
-
-#main-nav-rail .rail-btn.active .rm-rail-circle {
-  background: var(--rm-rail-circle-active);
-  border-color: rgba(196, 181, 253, 0.55);
-  color: #ffffff;
-  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.28) 0%, rgba(91, 33, 182, 0.18) 100%) !important;
+  border: 1px solid rgba(139, 92, 246, 0.55) !important;
+  border-radius: 10px !important;
+  color: #e9d5ff !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.18), inset 0 0 8px rgba(168, 85, 247, 0.1) !important;
 }
 
 #main-nav-rail .rail-btn.active .rail-label {
   color: #e9d5ff !important;
   font-weight: 600 !important;
+}
+
+/* Rail Top: Canva-style + Create Button & Flyout */
+#main-nav-rail .rm-create-menu {
+  margin-left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+#main-nav-rail .rm-create-menu > summary {
+  list-style: none;
+  cursor: pointer;
+  width: 68px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: color 0.16s ease, transform 0.14s ease;
+}
+
+#main-nav-rail .rm-create-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+#main-nav-rail .rm-create-menu > summary:hover {
+  color: #ffffff;
+}
+
+.rm-create-plus {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  background: var(--rm-create-circle-bg);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#main-nav-rail .rm-create-menu > summary:hover .rm-create-plus {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+#main-nav-rail .rm-create-items {
+  position: fixed;
+  right: auto;
+  width: 236px;
+  z-index: 1200;
+}
+
+/* Rail More (...) Flyout & Bottom Notifications */
+.rm-rail-more,
+.rm-rail-notif {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.rm-rail-notif {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.rm-rail-more > summary,
+.rm-rail-notif > summary {
+  list-style: none;
+}
+
+.rm-rail-more > summary::-webkit-details-marker,
+.rm-rail-notif > summary::-webkit-details-marker {
+  display: none;
+}
+
+.rm-rail-more-menu,
+.rm-rail-notif-menu {
+  position: fixed;
+  z-index: 1200;
+  background: #141622;
+  border: 1px solid rgba(139, 92, 246, 0.26);
+  border-radius: 14px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.72);
+}
+
+.rm-rail-more-menu {
+  width: 256px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.rm-rail-more:not([open]) .rm-rail-more-menu,
+.rm-rail-notif:not([open]) .rm-rail-notif-menu {
+  display: none !important;
+}
+
+#main-nav-rail .rm-rail-more-menu .rail-btn {
+  width: 100% !important;
+  min-height: 54px !important;
+  padding: 6px 4px !important;
+  margin: 0 !important;
+}
+
+.rm-rail-notif-menu {
+  width: 260px;
+  padding: 14px 16px;
+  color: #e2e8f0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.rm-rail-notif-menu strong {
+  display: block;
+  font-size: 13px;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.rm-rail-notif-menu p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* Floating Bottom-Right Help (?) Button */
+.rm-floating-help {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 900;
+}
+
+.rm-help-fab {
+  list-style: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: var(--rm-create-circle-bg);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(109, 40, 217, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.rm-help-fab::-webkit-details-marker {
+  display: none;
+}
+
+.rm-help-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(139, 92, 246, 0.6);
+}
+
+.rm-help-popover {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: 264px;
+  padding: 14px 16px;
+  background: #141622;
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: 14px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.72);
+  color: #e2e8f0;
+  font-size: 12px;
+}
+
+.rm-help-popover strong {
+  display: block;
+  font-size: 13px;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.rm-help-popover ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.rm-help-popover li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rm-help-popover li span {
+  font-weight: 600;
+  color: #d8b4fe;
+  font-size: 11.5px;
+}
+
+.rm-help-popover li em {
+  font-style: normal;
+  color: #94a3b8;
+  font-size: 11px;
 }
 
 /* Elevated Main Workspace Sheet */
