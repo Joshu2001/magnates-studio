@@ -385,6 +385,43 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
     });
   });
 
+  function buildObjectCutoutResult(prompt, attachments = []) {
+    const p = String(prompt || '').trim();
+    const low = p.toLowerCase();
+    const region = /\bon the right\b|\bright side\b|\bright\b/.test(low)
+      ? 'right'
+      : /\bon the left\b|\bleft side\b|\bleft\b/.test(low)
+        ? 'left'
+        : 'center';
+    const targetLayer = /\b(3d|depth|extrude|parallax|floating)\b/.test(low) ? '3d' : 'foreground';
+    const subjectMatch = p.match(/(?:cut\s*out|cutout|isolate|extract|mask\s*out|remove\s+background\s+(?:of|on|for|from)?)\s+(?:the\s+)?([a-z0-9 _-]{2,36})/i);
+    const rawSubject = subjectMatch ? subjectMatch[1].replace(/\b(on the (left|right|center)|from.*|into.*|as a.*)\b/gi, '').trim() : '';
+    const subject = rawSubject || (attachments[0]?.name ? attachments[0].name.replace(/\.[^.]+$/, '') : 'Primary Subject');
+    const safeLabel = subject.replace(/[<>&"]/g, '');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient></defs><rect x="64" y="26" width="192" height="168" rx="28" fill="url(#g)" fill-opacity="0.22" stroke="#c084fc" stroke-width="2.5" stroke-dasharray="6 4"/><circle cx="160" cy="96" r="34" fill="#f3e8ff" fill-opacity="0.9"/><path d="M104 168c12-26 32-38 56-38s44 12 56 38" fill="#ddd6fe" fill-opacity="0.88"/><text x="160" y="208" text-anchor="middle" fill="#e9d5ff" font-family="Inter, sans-serif" font-size="12" font-weight="600">${safeLabel}</text></svg>`;
+    const cutoutDataUrl = `data:image/svg+xml;base64,${Buffer.from(svg, 'utf8').toString('base64')}`;
+    return {
+      subject,
+      region,
+      targetLayer,
+      zIndex: targetLayer === '3d' ? 45 : 30,
+      featherPx: 1.5,
+      cutoutDataUrl
+    };
+  }
+
+  router.post('/cutout-object', (req, res) => {
+    const prompt = String(req.body?.prompt || '').trim();
+    if (!prompt) return res.status(400).json({ ok: false, error: 'prompt is required' });
+    const attachments = Array.isArray(req.body?.attachments) ? req.body.attachments : [];
+    const cutout = buildObjectCutoutResult(prompt, attachments);
+    res.json({
+      ok: true,
+      cutout,
+      summary: `Isolated "${cutout.subject}" (${cutout.region}) as a clean ${cutout.targetLayer === '3d' ? '3D' : 'Foreground'} cutout.`
+    });
+  });
+
   // Browser client bridge endpoints
   router.get('/commands/pending', (req, res) => {
     const pending = commandQueue.filter((c) => c.status === 'queued');

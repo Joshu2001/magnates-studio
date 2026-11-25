@@ -461,12 +461,27 @@
         </div>
       ` : '';
 
+      const cutoutHtml = msg.cutout ? `
+        <div class="rg-ai-cutout-card">
+          <div class="rg-ai-cutout-preview"><img src="${msg.cutout.cutoutDataUrl}" alt="${escapeHtml(msg.cutout.subject)}" /></div>
+          <div class="rg-ai-cutout-meta">
+            <strong>${escapeHtml(msg.cutout.subject)}</strong>
+            <span>${escapeHtml(msg.cutout.region)} · ${msg.cutout.appliedMode ? `Applied (${msg.cutout.appliedMode})` : 'Ready'}</span>
+          </div>
+          <div class="rg-ai-cutout-actions">
+            <button type="button" data-cutout-msg="${msgIdx}" data-cutout-mode="foreground">Use as Foreground</button>
+            <button type="button" data-cutout-msg="${msgIdx}" data-cutout-mode="3d">Use as 3D Layer</button>
+          </div>
+        </div>
+      ` : '';
+
       return `
         <div class="rg-ai-msg rg-ai-msg-assistant">
           <div class="rg-ai-avatar" aria-hidden="true">✦</div>
           <div class="rg-ai-bubble-assistant">
             ${msg.text ? `<div class="rg-ai-msg-text">${escapeHtml(msg.text)}</div>` : ''}
             ${pillsHtml}
+            ${cutoutHtml}
           </div>
         </div>
       `;
@@ -501,7 +516,46 @@
       });
     });
 
+    feed.querySelectorAll('[data-cutout-msg]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mIdx = parseInt(btn.getAttribute('data-cutout-msg'), 10);
+        const mode = btn.getAttribute('data-cutout-mode') || 'foreground';
+        const targetMsg = state.messages[mIdx];
+        if (targetMsg && targetMsg.cutout) {
+          applyCutoutToStage(targetMsg.cutout, mode);
+          targetMsg.cutout.appliedMode = mode;
+          renderMessages(panel);
+        }
+      });
+    });
+
     feed.scrollTop = feed.scrollHeight;
+  }
+
+  function isCutoutPrompt(prompt) {
+    return /\b(cut\s*out|cutout|isolate|remove\s+background|extract\s+(?:the\s+)?(?:subject|object)|mask\s*out)\b/i.test(String(prompt || ''));
+  }
+
+  function applyCutoutToStage(cutout, mode) {
+    if (!cutout) return;
+    const sbApi = window.RegaarderStoryboardSketch && typeof window.RegaarderStoryboardSketch.getActiveEditorApi === 'function'
+      ? window.RegaarderStoryboardSketch.getActiveEditorApi() : null;
+    if (sbApi && typeof sbApi.addLayer === 'function') {
+      sbApi.addLayer({
+        name: `${cutout.subject} (${mode === '3d' ? '3D Cutout' : 'Foreground'})`,
+        type: 'image',
+        dataUrl: cutout.cutoutDataUrl
+      });
+      return;
+    }
+    if (window.topCustomizerState) {
+      window.topCustomizerState.primaryUrl = cutout.cutoutDataUrl;
+      window.topCustomizerState.cutoutLayerMode = mode;
+      window.topCustomizerState.cutoutZIndex = mode === '3d' ? 45 : 30;
+      if (typeof window.renderCustomizerFrameAtTime === 'function') {
+        window.renderCustomizerFrameAtTime(0);
+      }
+    }
   }
 
   async function submitPrompt(shell, prompt) {
@@ -520,6 +574,34 @@
     if (sendBtn) sendBtn.disabled = true;
 
     try {
+      if (isCutoutPrompt(prompt)) {
+        const res = await fetch('/api/ai/cutout-object', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt,
+            model: state.model,
+            permission: state.permission,
+            attachments: sentAttachments.map((a) => ({ name: a.name, type: a.type, kind: a.kind }))
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok || !data.cutout) {
+          throw new Error(data.error || 'Failed to isolate object');
+        }
+        const needsApproval = state.permission === 'ask';
+        if (!needsApproval) {
+          applyCutoutToStage(data.cutout, data.cutout.targetLayer || 'foreground');
+          data.cutout.appliedMode = data.cutout.targetLayer || 'foreground';
+        }
+        state.messages.push({
+          role: 'assistant',
+          text: data.summary || `Isolated ${data.cutout.subject}.`,
+          cutout: data.cutout
+        });
+        return;
+      }
+
       const res = await fetch('/api/ai/compose-sequence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

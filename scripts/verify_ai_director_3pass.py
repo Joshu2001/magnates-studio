@@ -153,8 +153,17 @@ const server = app.listen(0, '127.0.0.1', () => {
         let b2 = '';
         res2.on('data', (c) => b2 += c);
         res2.on('end', () => {
-          server.close();
-          console.log(JSON.stringify({ compose: JSON.parse(body), comment: JSON.parse(b2) }));
+          const p3 = JSON.stringify({ prompt: 'Cut out the speaker on the right as a 3D layer' });
+          const req3 = http.request({ hostname: '127.0.0.1', port, path: '/api/ai/cutout-object', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(p3) } }, (res3) => {
+            let b3 = '';
+            res3.on('data', (c) => b3 += c);
+            res3.on('end', () => {
+              server.close();
+              console.log(JSON.stringify({ compose: JSON.parse(body), comment: JSON.parse(b2), cutout: JSON.parse(b3) }));
+            });
+          });
+          req3.write(p3);
+          req3.end();
         });
       });
       req2.write(p2);
@@ -172,6 +181,7 @@ const server = app.listen(0, '127.0.0.1', () => {
         parsed = json.loads(res.stdout.strip())
         data = parsed.get('compose', {})
         cdata = parsed.get('comment', {})
+        cutdata = parsed.get('cutout', {})
     except Exception as e:
         return fail(f'Invalid JSON from /api/ai/*: {e} | {res.stdout}')
 
@@ -185,8 +195,12 @@ const server = app.listen(0, '127.0.0.1', () => {
         return fail(f'Mismatch in roles/templates/meta: roles={roles}, tpls={tpls}, bp={bp}')
     if not cdata.get('ok') or not cdata.get('generatedAsset') or cdata.get('animation', {}).get('type') != 'dolly-zoom':
         return fail(f'Unexpected /api/ai/animate-comment response: {cdata}')
+    cutout = cutdata.get('cutout', {})
+    if not cutdata.get('ok') or cutout.get('region') != 'right' or cutout.get('targetLayer') != '3d' or not str(cutout.get('cutoutDataUrl', '')).startswith('data:image/svg+xml;base64,'):
+        return fail(f'Unexpected /api/ai/cutout-object response: {cutdata}')
     print(f'  OK /api/ai/compose-sequence -> roles={roles}, templates={tpls}, model={bp.get("model")}, perm={bp.get("permission")}, totalDuration={bp.get("totalDuration")}s')
     print(f'  OK /api/ai/animate-comment -> asset={cdata["generatedAsset"]["name"]}, anim={cdata["animation"]["label"]}')
+    print(f'  OK /api/ai/cutout-object -> subject={cutout["subject"]}, region={cutout["region"]}, targetLayer={cutout["targetLayer"]}')
     return ok
 
 p1 = run_pass_1()
