@@ -225,6 +225,49 @@
       }
       .rg-radial-orbit.is-hover-wheel .rg-orbit-hub { cursor: grab; }
       .rg-radial-orbit.is-hover-wheel .rg-orbit-hub.is-dragging { cursor: grabbing; }
+      /* Zoomable All-Scenes Storyboard Overview (#3) */
+      .rg-sb-overview {
+        display: none; width: 100%; height: 100%; overflow: auto; padding: 18px;
+        box-sizing: border-box;
+      }
+      .rg-sb-overview.is-open { display: block; }
+      .rg-sb-overview-track {
+        display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+        transform-origin: top left; transition: transform 0.14s ease;
+      }
+      .rg-ov-card {
+        width: 240px; border-radius: 10px; overflow: hidden; cursor: pointer;
+        background: #14141B; border: 1px solid rgba(255,255,255,0.08);
+        transition: border-color 0.15s ease, transform 0.15s ease;
+        flex-shrink: 0;
+      }
+      .rg-ov-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+      .rg-ov-card.is-current { border-color: rgba(167,139,250,0.65); }
+      .rg-ov-head {
+        display: flex; align-items: center; justify-content: space-between; gap: 6px;
+        padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.06);
+        font-size: 11.5px; font-weight: 600; color: var(--rg-text-primary, #F5F5F7);
+      }
+      .rg-ov-role {
+        font-size: 9.5px; font-weight: 700; letter-spacing: 0.04em; padding: 2px 6px;
+        border-radius: 999px; text-transform: uppercase;
+      }
+      .rg-ov-role.role-intro { background: rgba(56,189,248,0.16); color: #7dd3fc; }
+      .rg-ov-role.role-body { background: rgba(167,139,250,0.18); color: #ddd6fe; }
+      .rg-ov-role.role-outro { background: rgba(52,211,153,0.16); color: #6ee7b7; }
+      .rg-ov-role.role-scene { background: rgba(255,255,255,0.08); color: #a1a1b0; }
+      .rg-ov-thumb {
+        aspect-ratio: 16/9; background: #070709; display: flex; align-items: center;
+        justify-content: center; overflow: hidden; position: relative;
+      }
+      .rg-ov-thumb img { width: 100%; height: 100%; object-fit: contain; }
+      .rg-ov-foot {
+        display: flex; align-items: center; justify-content: space-between; gap: 6px;
+        padding: 7px 10px; font-size: 10.5px; color: var(--rg-text-secondary, #A1A1B0);
+      }
+      .rg-ov-arrow {
+        color: var(--rg-text-muted, #6E6E80); font-size: 14px; user-select: none; flex-shrink: 0;
+      }
       .rg-inspector-shell .rg-sb-inspector-pane {
         display: none; flex-direction: column; gap: 12px; padding: 14px;
         overflow-y: auto; flex: 1; min-height: 0;
@@ -629,6 +672,7 @@
     if (inlineCleanup) { try { inlineCleanup(); } catch (_) {} inlineCleanup = null; }
 
     const commentPinSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+    const overviewSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`;
     const topbarInnerHtml = `
       <div class="rg-sb-brand">
         <span>${escapeHtml(scene.title)}</span>
@@ -638,6 +682,7 @@
       <div class="rg-sb-flat-group">
         <button type="button" class="rg-sb-flat-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">${commentPinSvg} Pin Comment</button>
         <span class="rg-sb-divider"></span>
+        <button type="button" class="rg-sb-flat-btn" id="rg-sb-overview-btn" title="Zoom out to inspect all Intro / Body / Outro scenes">${overviewSvg} All Scenes</button>
         <button type="button" class="rg-sb-flat-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">${ICONS.zoomBox} Area Zoom</button>
         <button type="button" class="rg-sb-flat-btn" id="rg-zoom-out" title="Zoom Out" style="padding:4px 6px;">-</button>
         <span id="rg-zoom-label" style="font-size:11.5px; min-width:36px; text-align:center; color:var(--rg-text-secondary);">100%</span>
@@ -706,6 +751,9 @@
             <canvas id="rg-ed-canvas" width="${ratio.w}" height="${ratio.h}"></canvas>
             <div class="rg-ed-guides" id="rg-ed-guides-el" style="display:${showGuides ? 'block' : 'none'};"></div>
             <div class="rg-zoom-marquee" id="rg-zoom-marquee"></div>
+          </div>
+          <div class="rg-sb-overview" id="rg-sb-overview">
+            <div class="rg-sb-overview-track" id="rg-sb-overview-track"></div>
           </div>
         </div>
         ${sidebarHostEl ? '' : `<div class="rg-ed-sidebar">${sidebarInnerHtml}</div>`}
@@ -813,13 +861,153 @@
     applyZoom();
 
     const zoomAreaBtn = q('#rg-zoom-area-btn');
+    const overviewBtn = q('#rg-sb-overview-btn');
+    const overviewEl = q('#rg-sb-overview');
+    const overviewTrack = q('#rg-sb-overview-track');
+    let overviewMode = false;
+    let overviewZoom = 0.85;
+
+    function getOverviewItems() {
+      const proj = Array.isArray(window.projectScenes) ? window.projectScenes : [];
+      const pinsAll = (window.RegaarderCommentPins && typeof window.RegaarderCommentPins.getAllPins === 'function')
+        ? window.RegaarderCommentPins.getAllPins() : [];
+      if (proj.length > 0) {
+        return proj.map((ps, idx) => {
+          const matched = state.scenes[idx] || state.scenes.find((s) => s.id === ps.storyboardSceneId);
+          const role = (ps.sectionRole || (idx === 0 ? 'intro' : idx === proj.length - 1 ? 'outro' : 'body')).toLowerCase();
+          const pinCount = pinsAll.filter((p) => p.sceneId === (matched && matched.id) || p.sceneId === ps.id).length;
+          return {
+            idx,
+            role,
+            title: ps.name || ps.title || (matched ? matched.title : `Scene ${idx + 1}`),
+            duration: ps.duration ? `${ps.duration}s` : '',
+            thumbUrl: (matched && matched.id === scene.id) ? scene.thumbUrl : (matched && matched.thumbUrl) || ps.thumbUrl || '',
+            frameCount: matched ? matched.frames.length : 1,
+            pinCount,
+            sketchSceneId: matched ? matched.id : null,
+            isCurrent: matched ? matched.id === scene.id : idx === 0
+          };
+        });
+      }
+      return state.scenes.map((sc, idx) => {
+        const pinCount = pinsAll.filter((p) => p.sceneId === sc.id).length;
+        const role = state.scenes.length >= 3 ? (idx === 0 ? 'intro' : idx === state.scenes.length - 1 ? 'outro' : 'body') : 'scene';
+        return {
+          idx,
+          role,
+          title: sc.title || `Scene ${idx + 1}`,
+          duration: '',
+          thumbUrl: sc.thumbUrl || '',
+          frameCount: (sc.frames && sc.frames.length) || 1,
+          pinCount,
+          sketchSceneId: sc.id,
+          isCurrent: sc.id === scene.id
+        };
+      });
+    }
+
+    function applyOverviewZoom() {
+      if (!overviewTrack) return;
+      overviewTrack.style.transform = `scale(${overviewZoom})`;
+      overviewTrack.style.width = `${Math.round(100 / overviewZoom)}%`;
+      q('#rg-zoom-label').textContent = Math.round(overviewZoom * 100) + '%';
+    }
+
+    function renderOverviewBoard() {
+      if (!overviewTrack) return;
+      const items = getOverviewItems();
+      overviewTrack.innerHTML = items.map((it, i) => `
+        <div class="rg-ov-card ${it.isCurrent ? 'is-current' : ''}" data-ov-idx="${it.idx}" data-ov-scid="${it.sketchSceneId || ''}" title="Double-click to edit ${escapeHtml(it.title)}">
+          <div class="rg-ov-head">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(it.title)}</span>
+            <span class="rg-ov-role role-${it.role}">${it.role}</span>
+          </div>
+          <div class="rg-ov-thumb">
+            ${it.thumbUrl ? `<img src="${it.thumbUrl}" alt="${escapeHtml(it.title)}" />` : `<span style="font-size:11px;color:var(--rg-text-muted);">No sketch yet</span>`}
+          </div>
+          <div class="rg-ov-foot">
+            <span>${it.frameCount} frame${it.frameCount > 1 ? 's' : ''}${it.duration ? ' · ' + it.duration : ''}</span>
+            <span>${it.pinCount > 0 ? `${it.pinCount} pin${it.pinCount > 1 ? 's' : ''}` : 'Double-click to edit'}</span>
+          </div>
+        </div>
+        ${i < items.length - 1 ? '<span class="rg-ov-arrow">→</span>' : ''}
+      `).join('');
+
+      overviewTrack.querySelectorAll('.rg-ov-card').forEach((card) => {
+        card.ondblclick = () => {
+          const targetScId = card.getAttribute('data-ov-scid');
+          const targetIdx = parseInt(card.getAttribute('data-ov-idx'), 10);
+          if (targetScId && state.scenes.some((s) => s.id === targetScId)) {
+            openSceneEditor(targetScId, opts);
+          } else {
+            while (state.scenes.length <= targetIdx) {
+              addBlankScene(false);
+            }
+            openSceneEditor(state.scenes[targetIdx].id, opts);
+          }
+        };
+      });
+      applyOverviewZoom();
+    }
+
+    function setOverviewMode(next) {
+      overviewMode = !!next;
+      if (overviewBtn) overviewBtn.classList.toggle('active', overviewMode);
+      const orbitElRef = q('#rg-radial-orbit');
+      if (overviewMode) {
+        commitBufferToActiveLayer();
+        compositeAllLayers(true);
+        scene.thumbUrl = canvas.toDataURL('image/png');
+        saveState();
+        zoomBoxMode = false;
+        zoomAreaBtn.classList.remove('active');
+        canvasWrap.style.display = 'none';
+        if (orbitElRef) orbitElRef.style.display = 'none';
+        overviewEl.classList.add('is-open');
+        renderOverviewBoard();
+      } else {
+        overviewEl.classList.remove('is-open');
+        canvasWrap.style.display = '';
+        if (orbitElRef) orbitElRef.style.display = '';
+        applyZoom();
+      }
+    }
+
+    if (overviewBtn) {
+      overviewBtn.onclick = () => setOverviewMode(!overviewMode);
+    }
+    stage.addEventListener('wheel', (e) => {
+      if (!overviewMode || !(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      const delta = e.deltaY < 0 ? 0.1 : -0.1;
+      overviewZoom = Math.min(1.5, Math.max(0.35, Math.round((overviewZoom + delta) * 100) / 100));
+      applyOverviewZoom();
+    }, { passive: false });
+
     zoomAreaBtn.onclick = () => {
+      if (overviewMode) setOverviewMode(false);
       zoomBoxMode = !zoomBoxMode;
       zoomAreaBtn.classList.toggle('active', zoomBoxMode);
       canvas.style.cursor = zoomBoxMode ? 'zoom-in' : 'crosshair';
     };
-    q('#rg-zoom-in').onclick = () => { zoomLevel = Math.min(3, Math.round((zoomLevel + 0.25) * 100) / 100); applyZoom(); };
-    q('#rg-zoom-out').onclick = () => { zoomLevel = Math.max(0.5, Math.round((zoomLevel - 0.25) * 100) / 100); applyZoom(); };
+    q('#rg-zoom-in').onclick = () => {
+      if (overviewMode) {
+        overviewZoom = Math.min(1.5, Math.round((overviewZoom + 0.15) * 100) / 100);
+        applyOverviewZoom();
+      } else {
+        zoomLevel = Math.min(3, Math.round((zoomLevel + 0.25) * 100) / 100);
+        applyZoom();
+      }
+    };
+    q('#rg-zoom-out').onclick = () => {
+      if (overviewMode) {
+        overviewZoom = Math.max(0.35, Math.round((overviewZoom - 0.15) * 100) / 100);
+        applyOverviewZoom();
+      } else {
+        zoomLevel = Math.max(0.5, Math.round((zoomLevel - 0.25) * 100) / 100);
+        applyZoom();
+      }
+    };
 
     function getActiveFrame() { return scene.frames[scene.activeFrameIdx] || scene.frames[0]; }
     function getActiveLayer() {
