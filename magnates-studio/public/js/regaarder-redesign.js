@@ -6464,6 +6464,12 @@ setInterval(() => {
   function defaultExecute(actionId, ctx) {
     const label = ctx.label || 'selected item';
     const toolbar = window.RegaarderContextualToolbar;
+    if (actionId === 'add-to-ai-chat') {
+      if (window.RegaarderAIDirector && typeof window.RegaarderAIDirector.attachPreviewElement === 'function') {
+        window.RegaarderAIDirector.attachPreviewElement(extractPreviewElementContext(ctx.targetEl, ctx));
+      }
+      return;
+    }
     if (actionId === 'apply-effects') return switchInspectorTab('effects');
     if (actionId === 'edit-content' || actionId === 'change-texture') return switchInspectorTab('content');
     if (actionId === 'style-presets' || actionId === 'toggle-rim-light') return switchInspectorTab('look');
@@ -6506,11 +6512,60 @@ setInterval(() => {
     return fallback || 'media';
   }
 
+  function extractPreviewElementContext(el, opts = {}) {
+    const stage = document.getElementById('tpl-modal-preview-stage-container');
+    const st = window.topCustomizerState || {};
+    const titleEl = document.getElementById('tpl-modal-title');
+    const tplTitle = titleEl?.textContent?.trim() || st.tplTitle || st.tplId || 'Studio Preview';
+    const layerId = el?.getAttribute?.('data-layer-id') || el?.getAttribute?.('data-object-id') || '';
+    const rawType = el?.getAttribute?.('data-object-type') || el?.getAttribute?.('data-rg-type') || detectType(el, 'media');
+    const cls = String(el?.className || '').toLowerCase();
+    const cs = el && el.nodeType === 1 ? window.getComputedStyle(el) : null;
+    const zVal = cs ? parseInt(cs.zIndex, 10) || 0 : 0;
+    let role = 'Stage Element';
+    if (/foreground|cutout/.test(cls) || /foreground|cutout/.test(layerId) || (rawType === 'media' && zVal >= 10)) role = 'Foreground Cutout';
+    else if (/background|backdrop|bg/.test(cls) || /background|bg/.test(layerId)) role = 'Background Layer';
+    else if (/effect|overlay|ray|glow|grain|smoke/.test(cls) || rawType === 'effect') role = 'Effect / Overlay';
+    else if (rawType === 'text') role = 'Text Layer';
+    else if (rawType === 'object3d') role = '3D Object';
+
+    const name = opts.label || el?.getAttribute?.('aria-label') || el?.getAttribute?.('alt') || layerId || (el?.tagName === 'IMG' ? 'Cutout Image' : role);
+    let dataUrl = '';
+    if (el?.tagName === 'IMG' && el.src && el.src.startsWith('data:')) {
+      dataUrl = el.src;
+    } else if (el?.tagName === 'IMG' && (el.currentSrc || el.src)) {
+      dataUrl = el.currentSrc || el.src;
+    } else if (stage) {
+      const cvs = stage.querySelector('canvas');
+      if (cvs) {
+        try { dataUrl = cvs.toDataURL('image/jpeg', 0.65); } catch (_) {}
+      }
+    }
+    return {
+      name: String(name).slice(0, 64),
+      role,
+      layerId,
+      objectType: rawType,
+      templateId: st.tplId || '',
+      templateTitle: tplTitle,
+      timeSec: Number(st.currentTime || 0).toFixed(1),
+      opacity: cs ? cs.opacity : '1',
+      zIndex: zVal,
+      textContent: rawType === 'text' ? String(el?.textContent || '').trim().slice(0, 120) : '',
+      dataUrl
+    };
+  }
+
   function open(opts = {}) {
     closeMenu();
     const type = CLICK_TO_ACT_MENUS[opts.type] ? opts.type : detectType(opts.targetEl, 'media');
     const schema = CLICK_TO_ACT_MENUS[type] || CLICK_TO_ACT_MENUS.media;
     const label = opts.label || (opts.targetEl && (opts.targetEl.getAttribute('aria-label') || opts.targetEl.getAttribute('alt'))) || schema.badge;
+    const menuItems = [
+      { id: 'add-to-ai-chat', label: '✨ Add to AI Chat', ai: true },
+      { sep: true },
+      ...schema.items
+    ];
 
     const menu = document.createElement('div');
     menu.className = 'rg-cta-dropdown';
@@ -6519,7 +6574,7 @@ setInterval(() => {
         <span class="rg-cta-title">${String(label).replace(/[<>&"]/g, '')}</span>
         <span class="rg-cta-badge">${schema.badge}</span>
       </div>
-      ${schema.items.map((it) => it.sep
+      ${menuItems.map((it) => it.sep
         ? '<div class="rg-cta-sep"></div>'
         : `<button type="button" class="rg-cta-item ${it.ai ? 'is-ai' : ''} ${it.danger ? 'is-danger' : ''}" data-cta-id="${it.id}">${it.label}</button>`
       ).join('')}
@@ -6562,6 +6617,28 @@ setInterval(() => {
     const item = e.target.closest('[data-object-type], [data-layer-id], img, video, h1, h2, h3, p, svg, canvas') || stage;
     const type = detectType(item, 'media');
     open({ type, targetEl: item, x: e.clientX, y: e.clientY });
+  });
+
+  // Enable drag-to-chat from cutout/stage elements and Scene Layer cards
+  document.addEventListener('pointerdown', (e) => {
+    const stage = e.target.closest('#tpl-modal-preview-stage-container');
+    if (stage) {
+      const draggableEl = e.target.closest('[data-layer-id], [data-object-type], img');
+      if (draggableEl && !draggableEl.hasAttribute('draggable')) draggableEl.setAttribute('draggable', 'true');
+    }
+    const layerCard = e.target.closest('.rg-layer-card');
+    if (layerCard && !layerCard.hasAttribute('draggable')) layerCard.setAttribute('draggable', 'true');
+  });
+
+  document.addEventListener('dragstart', (e) => {
+    const layerCard = e.target.closest('.rg-layer-card');
+    const stageEl = e.target.closest('#tpl-modal-preview-stage-container [data-layer-id], #tpl-modal-preview-stage-container [data-object-type], #tpl-modal-preview-stage-container img');
+    const target = stageEl || layerCard;
+    if (!target || !e.dataTransfer) return;
+    const label = layerCard?.querySelector('.rg-layer-name, strong, span')?.textContent?.trim();
+    const payload = extractPreviewElementContext(target, { label });
+    e.dataTransfer.setData('application/x-regaarder-element', JSON.stringify(payload));
+    e.dataTransfer.effectAllowed = 'copy';
   });
 
   window.RegaarderClickToAct = {

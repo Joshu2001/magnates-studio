@@ -341,7 +341,7 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
     res.json({ ok: true, available: true, models });
   });
 
-  async function tryComposeWithOllama(prompt, availableTemplates, requestedModel) {
+  async function tryComposeWithOllama(prompt, availableTemplates, requestedModel, previewElements = []) {
     let modelName = '';
     if (requestedModel.startsWith('ollama:')) {
       modelName = requestedModel.slice('ollama:'.length).trim();
@@ -361,11 +361,20 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
       .map((t) => `- ${t.id}: ${t.title} (${t.category || 'Scene'})`)
       .join('\n');
 
+    const contextLines = previewElements.map((el, i) => {
+      const m = el.meta || el;
+      return `${i + 1}. "${m.name}" | Role: ${m.role} | Template: ${m.templateTitle || m.templateId || 'Preview'} | Time: ${m.timeSec || 0}s | LayerID: ${m.layerId || 'none'} | Opacity: ${m.opacity || '1'} | zIndex: ${m.zIndex || 0}${m.textContent ? ` | Text: "${m.textContent}"` : ''}`;
+    }).join('\n');
+
+    const isQuestion = /\?$|^(who|what|why|how|when|where|which|are you|do you|can you|explain|describe|tell me)\b/i.test(prompt.trim());
+
     const systemPrompt = [
-      'You are Regaarder AI Director for a 30-second video sequence.',
-      'Return ONLY valid JSON with keys: "summary" (1 concise sentence) and "sections" (array of 3 objects: intro, body, outro).',
-      'Each section object must have: "role" ("intro"|"body"|"outro"), "label" (e.g. "Intro"), "duration" (number in seconds), "sourceTplId" (from the catalog below).',
-      catalogText ? `Available templates:\n${catalogText}` : ''
+      'You are Regaarder AI Director inside Regaarder Motion Studio.',
+      isQuestion
+        ? 'The user is asking a question or discussing attached preview elements. Return ONLY valid JSON: { "mode": "chat", "reply": "helpful, specific answer referencing the preview context" }.'
+        : 'Return ONLY valid JSON. If the user wants to compose/build a 30s sequence, return { "mode": "blueprint", "summary": "1 concise sentence", "sections": [ { "role": "intro"|"body"|"outro", "label": "Intro", "duration": 8, "sourceTplId": "..." } ] }. If they are chatting or asking about an attached preview element, return { "mode": "chat", "reply": "..." }.',
+      contextLines ? `\n[PREVIEW ELEMENT CONTEXT]\n${contextLines}` : '',
+      catalogText ? `\nAvailable templates:\n${catalogText}` : ''
     ].filter(Boolean).join('\n');
 
     const chatRes = await fetchOllamaJson('/api/chat', {
@@ -389,11 +398,11 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
       return { modelName, parsed };
     } catch (_) {
       const match = String(rawContent).match(/\{[\s\S]*\}/);
-      if (!match) return null;
+      if (!match) return { modelName, parsed: { mode: 'chat', reply: String(rawContent).trim() } };
       try {
         return { modelName, parsed: JSON.parse(match[0]) };
       } catch (__) {
-        return null;
+        return { modelName, parsed: { mode: 'chat', reply: String(rawContent).trim() } };
       }
     }
   }
@@ -405,14 +414,26 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
       return res.status(400).json({ ok: false, error: 'prompt or attachment is required' });
     }
     const availableTemplates = Array.isArray(req.body?.availableTemplates) ? req.body.availableTemplates : [];
+    const previewElements = attachments.filter((a) => a && a.kind === 'preview-element' && a.meta);
     const model = String(req.body?.model || 'local-studio-fast');
     const permission = ['ask', 'balanced', 'turbo'].includes(req.body?.permission) ? req.body.permission : 'turbo';
-    const effectivePrompt = prompt || `Create a 30s visual sequence using attached media (${attachments.map((a) => a.name || 'asset').join(', ')})`;
-    const blueprint = composeSequenceFromPrompt(effectivePrompt, availableTemplates);
+    const effectivePrompt = prompt || `Describe or enhance the attached preview element (${previewElements[0]?.name || attachments[0]?.name || 'asset'})`;
     let usedModel = model;
     let customSummary = '';
 
-    const ollamaOut = await tryComposeWithOllama(effectivePrompt, availableTemplates, model);
+    const ollamaOut = await tryComposeWithOllama(effectivePrompt, availableTemplates, model, previewElements);
+    if (ollamaOut?.parsed?.mode === 'chat' && typeof ollamaOut.parsed.reply === 'string' && ollamaOut.parsed.reply.trim()) {
+      return res.json({
+        ok: true,
+        blueprint: null,
+        reply: ollamaOut.parsed.reply.trim(),
+        model: `ollama:${ollamaOut.modelName}`,
+        permission,
+        engine: 'ollama'
+      });
+    }
+
+    const blueprint = composeSequenceFromPrompt(effectivePrompt, availableTemplates);
     if (ollamaOut?.parsed) {
       usedModel = `ollama:${ollamaOut.modelName}`;
       if (typeof ollamaOut.parsed.summary === 'string' && ollamaOut.parsed.summary.trim()) {

@@ -100,6 +100,22 @@
     }
   }
 
+  function addPreviewElementAttachment(meta) {
+    if (!meta || typeof meta !== 'object') return;
+    const key = meta.layerId || meta.name || 'stage-element';
+    state.attachments = state.attachments.filter((a) => !(a.kind === 'preview-element' && (a.meta?.layerId || a.name) === key));
+    state.attachments.push({
+      id: `el_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: `${meta.name || 'Element'} · ${meta.role || 'Preview'}`,
+      type: meta.role || 'stage-element',
+      kind: 'preview-element',
+      previewUrl: meta.dataUrl || '',
+      meta
+    });
+    const panel = document.querySelector('.rg-ai-director-panel');
+    if (panel) renderAttachments(panel);
+  }
+
   function renderAttachments(panel) {
     const strip = panel.querySelector('[data-role="attachments"]');
     if (!strip) return;
@@ -420,7 +436,24 @@
     composerShell.addEventListener('drop', (e) => {
       e.preventDefault();
       composerShell.classList.remove('is-dragover');
+      const rawEl = e.dataTransfer?.getData('application/x-regaarder-element');
+      if (rawEl) {
+        try { addPreviewElementAttachment(JSON.parse(rawEl)); } catch (_) {}
+      }
       Array.from(e.dataTransfer?.files || []).forEach(addFileAttachment);
+    });
+    panel.addEventListener('dragover', (e) => {
+      if (e.dataTransfer?.types?.includes('application/x-regaarder-element')) {
+        e.preventDefault();
+        composerShell.classList.add('is-dragover');
+      }
+    });
+    panel.addEventListener('drop', (e) => {
+      const rawEl = e.dataTransfer?.getData('application/x-regaarder-element');
+      if (!rawEl) return;
+      e.preventDefault();
+      composerShell.classList.remove('is-dragover');
+      try { addPreviewElementAttachment(JSON.parse(rawEl)); } catch (_) {}
     });
 
     panel.querySelector('[data-role="send"]').addEventListener('click', triggerSend);
@@ -760,12 +793,24 @@
           prompt,
           model: state.model,
           permission: state.permission,
-          attachments: sentAttachments.map((a) => ({ name: a.name, type: a.type, kind: a.kind })),
+          attachments: sentAttachments.map((a) => ({ name: a.name, type: a.type, kind: a.kind, meta: a.meta || null })),
           availableTemplates: getCatalogSummary()
         })
       });
       const data = await parseApiJson(res);
-      if (!res.ok || !data.ok || !data.blueprint) {
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || 'Failed to compose sequence');
+      }
+
+      if (!data.blueprint && data.reply) {
+        state.messages.push({
+          role: 'assistant',
+          text: data.reply,
+          blueprint: null
+        });
+        return;
+      }
+      if (!data.blueprint) {
         throw new Error(data.error || 'Failed to compose sequence');
       }
 
@@ -832,10 +877,19 @@
     setOpen(targetShell, !state.isOpen);
   }
 
+  function attachPreviewElement(meta, shell) {
+    const targetShell = shell || document.querySelector('#modal-top-template-customizer .rg-inspector-shell, .rg-inspector-shell');
+    if (targetShell) setOpen(targetShell, true);
+    addPreviewElementAttachment(meta);
+    const inp = targetShell?.querySelector('.rg-ai-director-input');
+    if (inp) setTimeout(() => inp.focus(), 50);
+  }
+
   window.RegaarderAIDirector = {
     open: (shell) => setOpen(shell, true),
     close: (shell) => setOpen(shell, false),
     toggle,
+    attachPreviewElement,
     isOpen: () => state.isOpen,
     getLastBlueprint: () => state.lastBlueprint
   };
