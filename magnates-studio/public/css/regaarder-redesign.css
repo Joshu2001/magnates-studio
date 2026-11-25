@@ -3430,15 +3430,23 @@ body.rg-cutout-editor-active #stage-tf-box {
 }
 
 .rg-rail-btn-ai {
-  background: linear-gradient(180deg, rgba(124, 58, 237, 0.16) 0%, rgba(56, 189, 248, 0.12) 100%);
-  border: 1px solid rgba(168, 85, 247, 0.34);
-  color: #d8b4fe;
+  background: var(--rg-accent, #823CF0);
+  border: 1px solid transparent;
+  color: #ffffff;
 }
 
 .rg-rail-btn-ai:hover {
-  border-color: rgba(168, 85, 247, 0.65);
-  color: #f3e8ff;
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.32);
+  background: var(--rg-accent-hover, #9353F5);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(130, 60, 240, 0.35);
+}
+
+.rg-rail-btn-ai.is-active {
+  background: var(--rg-accent, #823CF0);
+  border-color: rgba(216, 180, 254, 0.75);
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(130, 60, 240, 0.32), 0 4px 16px rgba(130, 60, 240, 0.4);
 }
 
 .rg-rail-btn-storyboard {

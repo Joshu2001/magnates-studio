@@ -190,12 +190,41 @@
         opacity: 1; transform: scale(1); pointer-events: auto;
       }
       .rg-sb-inline-topbar {
-        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        display: flex; align-items: center; justify-content: space-between; gap: 10px;
         width: 100%; flex-wrap: nowrap; min-width: 0;
       }
-      .rg-sb-inline-topbar .rg-sb-btn {
-        padding: 4px 8px; font-size: 11px; white-space: nowrap;
+      .rg-sb-inline-topbar .rg-sb-pill {
+        background: rgba(255,255,255,0.06); color: var(--rg-text-secondary, #A1A1B0);
+        border: 1px solid rgba(255,255,255,0.08); font-weight: 600;
       }
+      .rg-sb-flat-group {
+        display: inline-flex; align-items: center; gap: 2px; flex-wrap: nowrap;
+      }
+      .rg-sb-divider {
+        width: 1px; height: 14px; background: rgba(255,255,255,0.1); margin: 0 5px; flex-shrink: 0;
+      }
+      .rg-sb-flat-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+        padding: 4px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 500;
+        background: transparent; border: 1px solid transparent;
+        color: var(--rg-text-secondary, #B4B4C2); cursor: pointer; white-space: nowrap;
+        transition: background 0.14s ease, color 0.14s ease;
+      }
+      .rg-sb-flat-btn:hover { background: rgba(255,255,255,0.07); color: #F5F5F7; }
+      .rg-sb-flat-btn.active { background: rgba(130,60,240,0.2); color: #E9D5FF; }
+      .rg-sb-flat-select {
+        background: transparent; border: 1px solid transparent; border-radius: 6px;
+        color: var(--rg-text-secondary, #B4B4C2); font-size: 11.5px; font-weight: 500;
+        padding: 4px 6px; cursor: pointer; outline: none; transition: background 0.14s ease, color 0.14s ease;
+      }
+      .rg-sb-flat-select:hover { background: rgba(255,255,255,0.07); color: #F5F5F7; }
+      .rg-sb-flat-select option { background: #14141B; color: #F5F5F7; }
+      .rg-sb-inline-topbar .rg-sb-btn-accent,
+      .rg-ed-frames .rg-sb-btn-accent {
+        padding: 5px 12px; font-size: 11.5px; border-radius: 7px; white-space: nowrap;
+      }
+      .rg-radial-orbit.is-hover-wheel .rg-orbit-hub { cursor: grab; }
+      .rg-radial-orbit.is-hover-wheel .rg-orbit-hub.is-dragging { cursor: grabbing; }
       .rg-inspector-shell .rg-sb-inspector-pane {
         display: none; flex-direction: column; gap: 12px; padding: 14px;
         overflow-y: auto; flex: 1; min-height: 0;
@@ -328,8 +357,14 @@
       .rg-layer-row .rg-sb-btn[data-ref].active {
         background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.16); color: #F5F5F7;
       }
+      .rg-layer-row .rg-sb-btn[data-rm] {
+        opacity: 0; width: 22px; height: 22px; padding: 0; font-size: 14px; line-height: 1;
+        color: var(--rg-text-muted, #7A7A8C); transition: opacity 0.14s ease, background 0.14s ease, color 0.14s ease;
+      }
+      .rg-layer-row:hover .rg-sb-btn[data-rm],
+      .rg-layer-row .rg-sb-btn[data-rm]:focus-visible { opacity: 1; }
       .rg-layer-row .rg-sb-btn[data-rm]:hover {
-        background: rgba(248,113,113,0.12); color: #fca5a5;
+        background: rgba(248,113,113,0.14); color: #f87171;
       }
       .rg-layer-hover-actions { display: none; align-items: center; gap: 4px; justify-content: flex-end; }
       .rg-layer-row:hover .rg-layer-hover-actions { display: flex; }
@@ -593,19 +628,23 @@
     const sidebarHostEl = (opts && opts.sidebarHostEl) || null;
     if (inlineCleanup) { try { inlineCleanup(); } catch (_) {} inlineCleanup = null; }
 
+    const commentPinSvg = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
     const topbarInnerHtml = `
       <div class="rg-sb-brand">
         <span>${escapeHtml(scene.title)}</span>
         <span class="rg-sb-pill">${scene.aspectRatio || state.aspectRatio}</span>
         <span id="rg-coord-readout" style="font-size:11px; color:var(--rg-text-muted); font-family:monospace;">0, 0</span>
       </div>
-      <div style="display:flex; gap:6px; align-items:center; flex-wrap:nowrap;">
-        <button type="button" class="rg-sb-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">💬 Pin Comment</button>
-        <button type="button" class="rg-sb-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">${ICONS.zoomBox} Area Zoom</button>
-        <button type="button" class="rg-sb-btn" id="rg-zoom-out" title="Zoom Out">-</button>
-        <span id="rg-zoom-label" style="font-size:11.5px; min-width:38px; text-align:center;">100%</span>
-        <button type="button" class="rg-sb-btn" id="rg-zoom-in" title="Zoom In (up to 300%)">+</button>
-        <button type="button" class="rg-sb-btn" id="rg-ed-guides">${showGuides ? 'Guides: On' : 'Guides: Off'}</button>
+      <div class="rg-sb-flat-group">
+        <button type="button" class="rg-sb-flat-btn" id="rg-ed-comment-pin-btn" title="Drop a Comment Pin to AI-Animate &amp; Create Assets">${commentPinSvg} Pin Comment</button>
+        <span class="rg-sb-divider"></span>
+        <button type="button" class="rg-sb-flat-btn" id="rg-zoom-area-btn" title="Drag a box on the canvas to zoom into that exact cell or area">${ICONS.zoomBox} Area Zoom</button>
+        <button type="button" class="rg-sb-flat-btn" id="rg-zoom-out" title="Zoom Out" style="padding:4px 6px;">-</button>
+        <span id="rg-zoom-label" style="font-size:11.5px; min-width:36px; text-align:center; color:var(--rg-text-secondary);">100%</span>
+        <button type="button" class="rg-sb-flat-btn" id="rg-zoom-in" title="Zoom In (up to 300%)" style="padding:4px 6px;">+</button>
+        <span class="rg-sb-divider"></span>
+        <button type="button" class="rg-sb-flat-btn" id="rg-ed-guides">${showGuides ? 'Guides: On' : 'Guides: Off'}</button>
+        <span class="rg-sb-divider"></span>
         <button type="button" class="rg-sb-btn rg-sb-btn-accent" id="rg-ed-save">Save &amp; Back</button>
       </div>
     `;
@@ -673,16 +712,18 @@
       </div>
       <div class="rg-ed-frames">
         <div class="rg-frame-list" id="rg-frame-list"></div>
-        <div style="display:flex; align-items:center; gap:6px;">
-          <button type="button" class="rg-sb-btn" id="rg-fr-add">+ Frame</button>
-          <button type="button" class="rg-sb-btn" id="rg-fr-copy">Copy</button>
-          <button type="button" class="rg-sb-btn" id="rg-fr-paste">Paste</button>
-          <select id="rg-fr-fps" class="rg-sb-btn" title="Frames Per Second">
+        <div class="rg-sb-flat-group">
+          <button type="button" class="rg-sb-flat-btn" id="rg-fr-add">+ Frame</button>
+          <button type="button" class="rg-sb-flat-btn" id="rg-fr-copy">Copy</button>
+          <button type="button" class="rg-sb-flat-btn" id="rg-fr-paste">Paste</button>
+          <span class="rg-sb-divider"></span>
+          <select id="rg-fr-fps" class="rg-sb-flat-select" title="Frames Per Second">
             ${[12, 24, 30, 60].map((f) => `<option value="${f}" ${scene.fps === f ? 'selected' : ''}>${f} FPS</option>`).join('')}
           </select>
-          <select id="rg-fr-speed" class="rg-sb-btn" title="Playback Speed">
+          <select id="rg-fr-speed" class="rg-sb-flat-select" title="Playback Speed">
             ${[0.01, 0.1, 0.25, 0.5, 1].map((sp) => `<option value="${sp}" ${scene.speed === sp ? 'selected' : ''}>${sp}x</option>`).join('')}
           </select>
+          <span class="rg-sb-divider"></span>
           <button type="button" class="rg-sb-btn rg-sb-btn-accent" id="rg-fr-play">Play</button>
         </div>
       </div>
@@ -1011,8 +1052,49 @@
       btn.classList.add('active');
     };
 
-    q('#rg-orbit-hub').onclick = () => {
-      const orbitEl = q('#rg-radial-orbit');
+    const orbitHubEl = q('#rg-orbit-hub');
+    const orbitEl = q('#rg-radial-orbit');
+    let suppressOrbitClick = false;
+    orbitHubEl.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0 || !orbitEl) return;
+      const parentEl = orbitEl.offsetParent || q('.rg-ed-main') || document.body;
+      const parentRect = parentEl.getBoundingClientRect();
+      const orbitRect = orbitEl.getBoundingClientRect();
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const origLeft = orbitRect.left - parentRect.left;
+      const origTop = orbitRect.top - parentRect.top;
+      let moved = false;
+
+      const onMove = (ev) => {
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+        if (!moved && Math.hypot(dx, dy) < 4) return;
+        moved = true;
+        suppressOrbitClick = true;
+        orbitHubEl.classList.add('is-dragging');
+        const maxLeft = Math.max(0, parentRect.width - orbitRect.width);
+        const maxTop = Math.max(0, parentRect.height - orbitRect.height);
+        const nextLeft = Math.max(0, Math.min(maxLeft, origLeft + dx));
+        const nextTop = Math.max(0, Math.min(maxTop, origTop + dy));
+        orbitEl.style.transform = 'none';
+        orbitEl.style.left = `${Math.round(nextLeft)}px`;
+        orbitEl.style.top = `${Math.round(nextTop)}px`;
+      };
+
+      const onUp = () => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        orbitHubEl.classList.remove('is-dragging');
+        if (moved) setTimeout(() => { suppressOrbitClick = false; }, 0);
+      };
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    });
+
+    orbitHubEl.onclick = () => {
+      if (suppressOrbitClick) return;
       if (orbitEl && orbitEl.classList.contains('is-hover-wheel')) {
         orbitEl.classList.toggle('is-pinned');
       } else {
