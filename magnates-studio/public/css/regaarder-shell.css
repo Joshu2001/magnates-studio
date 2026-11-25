@@ -176,12 +176,12 @@ body,
 }
 
 #main-nav-rail .rail-btn.active {
-  background: rgba(139, 92, 246, 0.18) !important;
-  border: 1px solid rgba(167, 139, 250, 0.28) !important;
+  background: linear-gradient(180deg, rgba(124, 58, 237, 0.28) 0%, rgba(91, 33, 182, 0.18) 100%) !important;
+  border: 1px solid rgba(139, 92, 246, 0.55) !important;
   border-radius: 10px !important;
   color: #e9d5ff !important;
   font-weight: 600 !important;
-  box-shadow: none !important;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.18), inset 0 0 8px rgba(168, 85, 247, 0.1) !important;
 }
 
 #main-nav-rail .rail-btn.active .rail-label {
