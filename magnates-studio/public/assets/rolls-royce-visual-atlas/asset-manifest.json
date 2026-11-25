@@ -1,0 +1,733 @@
+{
+  "schemaVersion": 1,
+  "title": "Rolls-Royce — Visual Atlas Reconstruction Template",
+  "referenceFile": "Rolls_Royce_All_Frames_Visual_Atlas (1).pdf",
+  "segment": {
+    "fromSeconds": 0,
+    "toSeconds": 120,
+    "fps": 30,
+    "frameCount": 3600
+  },
+  "policy": "Reuse actual source frames/plates from the original footage. The atlas thumbnails guide extraction but are not clean production assets.",
+  "items": [
+    {
+      "id": "rr-asset-01",
+      "role": "Luxury car plates",
+      "src": null,
+      "sourceAtlasPages": [
+        1,
+        2,
+        3
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-02",
+      "role": "smoke/scanline overlay",
+      "src": null,
+      "sourceAtlasPages": [
+        1,
+        2,
+        3
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-03",
+      "role": "Wheel close-up",
+      "src": null,
+      "sourceAtlasPages": [
+        4,
+        5
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-04",
+      "role": "child/teddy cutout",
+      "src": null,
+      "sourceAtlasPages": [
+        4,
+        5
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-05",
+      "role": "brush mask",
+      "src": null,
+      "sourceAtlasPages": [
+        4
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-06",
+      "role": "Child plates",
+      "src": null,
+      "sourceAtlasPages": [
+        6,
+        7,
+        8
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-07",
+      "role": "hall plate",
+      "src": null,
+      "sourceAtlasPages": [
+        6,
+        7,
+        8
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-08",
+      "role": "title",
+      "src": null,
+      "sourceAtlasPages": [
+        6,
+        7,
+        8,
+        9,
+        48,
+        54
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-09",
+      "role": "Hall plate",
+      "src": null,
+      "sourceAtlasPages": [
+        9
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-10",
+      "role": "Radial tunnel",
+      "src": null,
+      "sourceAtlasPages": [
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-11",
+      "role": "chapter title",
+      "src": null,
+      "sourceAtlasPages": [
+        10
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-12",
+      "role": "yellow/white type",
+      "src": null,
+      "sourceAtlasPages": [
+        11
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-13",
+      "role": "chapter typography",
+      "src": null,
+      "sourceAtlasPages": [
+        12,
+        13,
+        14
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-14",
+      "role": "Spinning marque",
+      "src": null,
+      "sourceAtlasPages": [
+        15
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-15",
+      "role": "portrait",
+      "src": null,
+      "sourceAtlasPages": [
+        15,
+        17
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-16",
+      "role": "1863 typography",
+      "src": null,
+      "sourceAtlasPages": [
+        15,
+        16
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-17",
+      "role": "Portrait",
+      "src": null,
+      "sourceAtlasPages": [
+        16,
+        18,
+        19
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-18",
+      "role": "Logo",
+      "src": null,
+      "sourceAtlasPages": [
+        17
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-19",
+      "role": "date",
+      "src": null,
+      "sourceAtlasPages": [
+        17,
+        18
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-20",
+      "role": "family",
+      "src": null,
+      "sourceAtlasPages": [
+        17,
+        18,
+        19
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-21",
+      "role": "mill exterior",
+      "src": null,
+      "sourceAtlasPages": [
+        17,
+        18,
+        19
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-22",
+      "role": "Mill/family plate",
+      "src": null,
+      "sourceAtlasPages": [
+        20,
+        21
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-23",
+      "role": "smoke",
+      "src": null,
+      "sourceAtlasPages": [
+        20,
+        21
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-24",
+      "role": "BANKRUPT type",
+      "src": null,
+      "sourceAtlasPages": [
+        20,
+        21,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-25",
+      "role": "Mill/family",
+      "src": null,
+      "sourceAtlasPages": [
+        22
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-26",
+      "role": "red type",
+      "src": null,
+      "sourceAtlasPages": [
+        22
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-27",
+      "role": "rural plate",
+      "src": null,
+      "sourceAtlasPages": [
+        22
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-28",
+      "role": "Rural imagery",
+      "src": null,
+      "sourceAtlasPages": [
+        23,
+        25,
+        26,
+        28
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-29",
+      "role": "Rural plate",
+      "src": null,
+      "sourceAtlasPages": [
+        24,
+        27
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-30",
+      "role": "Family/road plate",
+      "src": null,
+      "sourceAtlasPages": [
+        29
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-31",
+      "role": "railway",
+      "src": null,
+      "sourceAtlasPages": [
+        29
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-32",
+      "role": "aperture mask",
+      "src": null,
+      "sourceAtlasPages": [
+        29
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-33",
+      "role": "Railway plate",
+      "src": null,
+      "sourceAtlasPages": [
+        30
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-34",
+      "role": "dark field",
+      "src": null,
+      "sourceAtlasPages": [
+        30
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-35",
+      "role": "aperture",
+      "src": null,
+      "sourceAtlasPages": [
+        30
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-36",
+      "role": "Boy cutout",
+      "src": null,
+      "sourceAtlasPages": [
+        31
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-37",
+      "role": "birds",
+      "src": null,
+      "sourceAtlasPages": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-38",
+      "role": "landscape",
+      "src": null,
+      "sourceAtlasPages": [
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-39",
+      "role": "Boy",
+      "src": null,
+      "sourceAtlasPages": [
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-40",
+      "role": "Field",
+      "src": null,
+      "sourceAtlasPages": [
+        39
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-41",
+      "role": "boy",
+      "src": null,
+      "sourceAtlasPages": [
+        39
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-42",
+      "role": "Boy/field",
+      "src": null,
+      "sourceAtlasPages": [
+        40
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-43",
+      "role": "family detail",
+      "src": null,
+      "sourceAtlasPages": [
+        40
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-44",
+      "role": "Family hand/baby",
+      "src": null,
+      "sourceAtlasPages": [
+        41
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-45",
+      "role": "school/work plates",
+      "src": null,
+      "sourceAtlasPages": [
+        41
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-46",
+      "role": "School/work plates",
+      "src": null,
+      "sourceAtlasPages": [
+        42
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-47",
+      "role": "School/work imagery",
+      "src": null,
+      "sourceAtlasPages": [
+        43
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-48",
+      "role": "Work imagery",
+      "src": null,
+      "sourceAtlasPages": [
+        44,
+        45,
+        46
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-49",
+      "role": "Labor imagery",
+      "src": null,
+      "sourceAtlasPages": [
+        47
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-50",
+      "role": "HARD LABOUR type",
+      "src": null,
+      "sourceAtlasPages": [
+        47
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-51",
+      "role": "Debt/food/work imagery",
+      "src": null,
+      "sourceAtlasPages": [
+        48
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-52",
+      "role": "DEBT type",
+      "src": null,
+      "sourceAtlasPages": [
+        49
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-53",
+      "role": "bread/milk",
+      "src": null,
+      "sourceAtlasPages": [
+        49
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-54",
+      "role": "worker imagery",
+      "src": null,
+      "sourceAtlasPages": [
+        49
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-55",
+      "role": "HARD LABOUR",
+      "src": null,
+      "sourceAtlasPages": [
+        49,
+        51,
+        52,
+        55
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-56",
+      "role": "Food close-ups",
+      "src": null,
+      "sourceAtlasPages": [
+        50
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-57",
+      "role": "worker",
+      "src": null,
+      "sourceAtlasPages": [
+        50,
+        52,
+        53,
+        58,
+        59
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-58",
+      "role": "titles",
+      "src": null,
+      "sourceAtlasPages": [
+        50,
+        53
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-59",
+      "role": "Worker imagery",
+      "src": null,
+      "sourceAtlasPages": [
+        51,
+        55
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-60",
+      "role": "DEBT",
+      "src": null,
+      "sourceAtlasPages": [
+        52
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-61",
+      "role": "food",
+      "src": null,
+      "sourceAtlasPages": [
+        52,
+        54
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-62",
+      "role": "Food",
+      "src": null,
+      "sourceAtlasPages": [
+        53
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-63",
+      "role": "Worker",
+      "src": null,
+      "sourceAtlasPages": [
+        54
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-64",
+      "role": "Railway/work plate",
+      "src": null,
+      "sourceAtlasPages": [
+        56
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-65",
+      "role": "fee close-up",
+      "src": null,
+      "sourceAtlasPages": [
+        56
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-66",
+      "role": "Fee graphic",
+      "src": null,
+      "sourceAtlasPages": [
+        57
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-67",
+      "role": "worker/tools",
+      "src": null,
+      "sourceAtlasPages": [
+        57
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-68",
+      "role": "Fee",
+      "src": null,
+      "sourceAtlasPages": [
+        58,
+        59
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-69",
+      "role": "tools",
+      "src": null,
+      "sourceAtlasPages": [
+        58,
+        59
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-70",
+      "role": "model wheelbarrow",
+      "src": null,
+      "sourceAtlasPages": [
+        58,
+        59
+      ],
+      "status": "needs-original-source-extraction"
+    },
+    {
+      "id": "rr-asset-71",
+      "role": "industrial plate",
+      "src": null,
+      "sourceAtlasPages": [
+        58,
+        59
+      ],
+      "status": "needs-original-source-extraction"
+    }
+  ]
+}

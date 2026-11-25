@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Luckin Coffee — 30s layered template</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080b10;--panel:#111722;--line:#283445;--cyan:#79d7ef;--muted:#98a8b9}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1e2d3d 0,#080b10 55%);color:#eef5f9;font:14px/1.45 Inter,Arial,sans-serif}
+    .shell{max-width:1420px;margin:0 auto;padding:24px 24px 32px}.head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:16px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.head h1{font-size:clamp(22px,3vw,36px);line-height:1.1;margin:7px 0}.head p{color:var(--muted);margin:0}.status{border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:#c7d6e2;font-size:12px;white-space:nowrap}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start}.stage{overflow:hidden;border:1px solid #263444;border-radius:12px;background:#030507;box-shadow:0 24px 80px #0009}.canvas-wrap{position:relative;aspect-ratio:16/9}.canvas-wrap canvas{width:100%;height:100%;display:block}.safe-label{position:absolute;left:12px;bottom:10px;color:#a9bac8;font:10px/1.2 Arial,sans-serif;letter-spacing:.04em;text-shadow:0 1px 4px #000}.side{background:linear-gradient(180deg,#121a25,#0d131b);border:1px solid var(--line);border-radius:12px;padding:16px}.side h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px}.layer-list{display:grid;gap:7px}.layer-list label{display:flex;gap:9px;align-items:center;color:#d1dbe3;font-size:12px;cursor:pointer}.layer-list input{accent-color:#70d1e8}.side .note{font-size:11px;color:var(--muted);margin:16px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+    .controls{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;margin-top:12px;background:#101722;border:1px solid var(--line);border-radius:10px;padding:10px 12px}.controls button,.controls select{background:#1c2937;color:#eff6fa;border:1px solid #34475a;border-radius:6px;padding:8px 11px;font:600 12px Arial,sans-serif;cursor:pointer}.controls button:hover{border-color:var(--cyan)}.scrub{width:100%;accent-color:var(--cyan)}.timecode{font-variant-numeric:tabular-nums;color:#d4e4ec;font:12px ui-monospace,monospace;white-space:nowrap}.frame-list{display:flex;gap:6px;overflow:auto;margin-top:10px;padding:4px 0}.frame-list button{flex:0 0 auto;text-align:left;min-width:108px;max-width:148px;background:#101722;border:1px solid #273648;color:#c6d5df;border-radius:6px;padding:7px 9px;cursor:pointer}.frame-list button.active{border-color:var(--cyan);color:#fff;background:#142633}.frame-list b{display:block;font:700 10px ui-monospace,monospace;color:var(--cyan)}.frame-list span{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.foot{margin-top:14px;color:#9eacb9;font-size:11px}.foot strong{color:#d6e3eb}.foot a{color:var(--cyan)}
+    @media(max-width:900px){.layout{grid-template-columns:1fr}.side{order:2}.head{align-items:start;flex-direction:column}.controls{grid-template-columns:auto auto 1fr}.timecode{grid-column:1/-1}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="head"><div><div class="eyebrow">Luckin Coffee · First 30 seconds</div><h1>The scandal that didn’t end the story</h1><p>Option B · cinematic 2.5D choreography · 28 storyboard states · 24 fps</p></div><div class="status" id="status">Loading source layers…</div></header>
+  <section class="layout">
+    <div><div class="stage"><div class="canvas-wrap"><canvas id="stage" width="1280" height="720" aria-label="Luckin Coffee 30 second animated storyboard preview"></canvas><div class="safe-label">ILLUSTRATIVE ANIMATIC · NOT HISTORICAL FOOTAGE OR SOURCE DOCUMENTS</div></div></div>
+      <div class="controls"><button id="play">▶ Play</button><button id="prev" aria-label="Previous frame">◀ 1 frame</button><input id="scrub" class="scrub" type="range" min="0" max="719" value="0"><span id="time" class="timecode">00:00:00:00</span><button id="next" aria-label="Next frame">1 frame ▶</button></div>
+      <div id="frames" class="frame-list" aria-label="Storyboard keyframes"></div>
+    </div>
+    <aside class="side"><h2>Layer visibility</h2><div class="layer-list" id="layers"></div><p class="note">Scrub uses integer 24 fps frames. During the cup beat, the source clip is trimmed to its first pickup only. Toggle tracks to inspect the composition; the underlying plates, vector layers, text, and effects stay separate.</p></aside>
+  </section>
+  <p class="foot"><strong>Evidence guardrail:</strong> sample map points and charts are illustrative and contain no measured data. The desk papers are marked as reconstructions. Replace app UI, filings, receipts, and metrics with verified sources before publication. <a href="SHOT_REQUESTS.md">Future shot request guide</a> · <a href="timeline.json">Timeline data</a></p>
+</main>
+<video id="pickup" src="media/cup_pickup_source.mp4" preload="auto" muted playsinline style="display:none"></video>
+<script src="renderer.js"></script>
+</body>
+</html>

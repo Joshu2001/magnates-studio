@@ -2536,6 +2536,27 @@
         thumb: '/jani_cinematic_letterbox_ref.png',
         priority: 1
       },
+      'barry-sacramento-searchlight': {
+        shortTitle: 'Barry Sacramento',
+        shortSub: 'Searchlight Reveal',
+        cat: 'Cinematic',
+        thumb: '/assets/barry-sacramento/assets/poster.webp',
+        priority: 0
+      },
+      'barry-sacramento-interior-flythrough': {
+        shortTitle: 'Barry Interior',
+        shortSub: '2.5D Fly-Through',
+        cat: 'Cinematic',
+        thumb: '/assets/barry-minkow-opening/assets/construction-corridor.webp',
+        priority: 1
+      },
+      'barry-minkow-contract-deception': {
+        shortTitle: 'Barry Contract Reveal',
+        shortSub: '$7M · No Work',
+        cat: 'Cinematic',
+        thumb: '/assets/barry-minkow-next/assets/contract-bg.webp',
+        priority: 2
+      },
       'jani-spin-flash-glitch-reveal': {
         shortTitle: 'Circular Spin',
         shortSub: 'Falling Particles',
@@ -2663,6 +2684,30 @@
       const options = opts || {};
 
       if (typeof EFFECT_TEMPLATES_DATA !== 'undefined' && Array.isArray(EFFECT_TEMPLATES_DATA)) {
+        if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'barry-sacramento-interior-flythrough')) {
+          EFFECT_TEMPLATES_DATA.unshift({
+            id: 'barry-sacramento-interior-flythrough',
+            title: 'Barry Sacramento · Interior 2.5D Fly-Through',
+            category: 'Documentary',
+            badge: 'BARRY SACRAMENTO',
+            description: 'Multiplane construction-corridor fly-through with separate walking figures, shadows, foreground occluders and editable two-line title.',
+            defaultImage: '/assets/barry-minkow-opening/assets/construction-corridor.webp',
+            timeToApply: '7s',
+            tags: ['barry', 'sacramento', 'construction', '2.5d', 'parallax', 'fly-through', 'documentary']
+          });
+        }
+        if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'barry-minkow-contract-deception')) {
+          EFFECT_TEMPLATES_DATA.unshift({
+            id: 'barry-minkow-contract-deception',
+            title: 'Barry Minkow · Contract Deception Continuation',
+            category: 'Documentary',
+            badge: 'BARRY MINKOW',
+            description: 'Five-beat cinematic continuation: Barry reveal, $7 million contract duplication, NO WORK WAS DONE evidence wall, violent Wall Street belief zoom, and animated $300M valuation climax.',
+            defaultImage: '/assets/barry-minkow-next/assets/contract-bg.webp',
+            timeToApply: '17s',
+            tags: ['barry minkow','zzzz best','contract','fraud','evidence wall','wall street','valuation','financial graph','documentary','cinematic']
+          });
+        }
         if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'jani-cinematic-letterbox')) {
           EFFECT_TEMPLATES_DATA.unshift({
             id: 'jani-cinematic-letterbox',
@@ -2806,6 +2851,18 @@
         }
         card.addEventListener('click', () => {
           drawerEl.style.display = 'none';
+          if (tplId === 'barry-sacramento-searchlight') {
+            window.location.assign('/assets/barry-sacramento/');
+            return;
+          }
+          if (tplId === 'barry-sacramento-interior-flythrough') {
+            window.location.assign('/assets/barry-sacramento-interior-flythrough/');
+            return;
+          }
+          if (tplId === 'barry-minkow-contract-deception') {
+            window.location.assign('/assets/barry-minkow-next/');
+            return;
+          }
           if (typeof options.onSelectTemplate === 'function') {
             options.onSelectTemplate(tplId, tpl);
             return;
@@ -3283,6 +3340,7 @@
   function cleanInspectorLabelText(raw) {
     if (!raw) return '';
     return String(raw)
+      .replace(/[\uFE0E\uFE0F]/g, '')
       .replace(/\(Z\s*=\s*[^)]+\)/gi, '')
       .replace(/\bZ\s*=\s*\d+(\.\.\d+)?\b/gi, '')
       .replace(/#[a-z0-9_-]+/gi, '')
@@ -3294,6 +3352,7 @@
 
   function classifyControlCategory(label, ctrlType) {
     const t = (label || '').toLowerCase();
+    if (/simulation|motes|smoke|rain|snow|dust|sparks|fog|fireworks/.test(t) && ctrlType !== 'file') return 'effects';
     if (ctrlType === 'file' || ctrlType === 'text') {
       if (t.includes('color') || t.includes('hex') || t.includes('tint')) return 'look';
       return 'content';
@@ -3561,6 +3620,52 @@
           <span>Replace</span>
         </button>
       `;
+      const name = wrap.querySelector('.rg-media-asset-name');
+      const adding = /add\s*(layer|media|image)/i.test(label);
+      if (name && /^(replace|add layer)$/i.test(label.replace(/^\+\s*/, '').trim())) name.textContent = adding ? 'New media layer' : 'Scene media';
+      wrap.querySelector('.rg-asset-replace-btn span').textContent = adding ? 'Add media' : 'Replace';
+      const mediaRoot = el.closest('#tpl-modal-wrap-primary,#tpl-modal-wrap-secondary,[data-layer-id],.layer-row,.media-row');
+      const sourceImage = mediaRoot?.querySelector('img');
+      const semanticName = mediaRoot?.querySelector('[id^="tpl-modal-label-"]')?.textContent;
+      if (semanticName && name) name.textContent = cleanInspectorLabelText(semanticName);
+      const mediaActions = mediaRoot ? [...mediaRoot.querySelectorAll('button')].filter(button => {
+        for (let node = button; node && node !== mediaRoot; node = node.parentElement) {
+          if (node.hidden || node.style.display === 'none' || getComputedStyle(node).display === 'none') return false;
+        }
+        return button.id !== 'tpl-modal-btn-sec-backdrop';
+      }) : [];
+      if (mediaActions.length) {
+        const actions = document.createElement('div'); actions.className = 'rm-media-tools';
+        for (const original of mediaActions) {
+          const action = document.createElement('button'); action.type = 'button'; action.className = 'rg-btn-secondary';
+          action.textContent = original.id === 'btn-tpl-modal-edit-cutout' ? 'Edit cutout' : cleanInspectorLabelText(original.textContent) || original.title || 'Edit media';
+          action.disabled = original.disabled; action.title = original.title; action.addEventListener('click', () => original.click()); actions.appendChild(action);
+        }
+        wrap.appendChild(actions);
+      }
+      const backdrop = mediaRoot?.querySelector('#tpl-modal-sec-backdrop-popover');
+      if (backdrop) {
+        const picker = document.createElement('details'); picker.className = 'rm-background-picker';
+        const summary = document.createElement('summary'); summary.textContent = 'Choose background'; picker.appendChild(summary);
+        const grid = document.createElement('div'); grid.className = 'rm-background-grid';
+        for (const original of backdrop.querySelectorAll('button:not(#tpl-modal-sec-backdrop-close)')) {
+          const action = original.cloneNode(true); action.removeAttribute('id'); action.type = 'button';
+          for (const node of [action,...action.querySelectorAll('*')]) for (const attr of [...node.attributes]) if (attr.name === 'id' || attr.name.startsWith('on')) node.removeAttribute(attr.name);
+          action.addEventListener('click', () => original.click()); grid.appendChild(action);
+        }
+        for (const original of backdrop.querySelectorAll('input')) {
+          const label = document.createElement('label'); label.textContent = original.type === 'color' ? 'Background color' : original.title || 'Background value';
+          const field = original.cloneNode(true); field.removeAttribute('id'); field.setAttribute('aria-label',label.textContent);
+          for (const event of ['input','change']) field.addEventListener(event, () => {original.value = field.value; original.dispatchEvent(new Event(event,{bubbles:true}));});
+          label.appendChild(field); grid.appendChild(label);
+        }
+        picker.appendChild(grid); wrap.appendChild(picker);
+      }
+      if (sourceImage?.getAttribute('src')) {
+        const thumb = document.createElement('img'); thumb.className = 'rg-media-asset-thumb';
+        thumb.src = sourceImage.src; thumb.alt = '';
+        wrap.querySelector('.rg-media-asset-icon').replaceWith(thumb);
+      }
       const btn = wrap.querySelector('.rg-asset-replace-btn');
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -3673,7 +3778,7 @@
     };
 
     const seenElements = new Set();
-    const seenLabels = new Set();
+    // Different objects may have identically named controls. Deduplicate by node only.
 
     candidateRoots.forEach((root) => {
       const controls = root.querySelectorAll('input, select, textarea');
@@ -3686,7 +3791,7 @@
         if (inputType === 'hidden' || inputType === 'submit' || inputType === 'button') return;
 
         // Check if control's immediate wrapper is explicitly hidden (except file inputs which are often display:none with a trigger label/button)
-        if (inputType !== 'file' && !isSectionActive(ctrl)) return;
+        if (!isSectionActive(inputType === 'file' ? ctrl.parentElement : ctrl)) return;
 
         let normType = 'text';
         if (tag === 'select') normType = 'select';
@@ -3697,9 +3802,6 @@
 
         const label = extractControlLabel(ctrl, root);
         if (!label || label.length < 2) return;
-        const dedupeKey = `${normType}:${label.toLowerCase()}`;
-        if (seenLabels.has(dedupeKey)) return;
-        seenLabels.add(dedupeKey);
 
         const category = classifyControlCategory(label, normType);
         const descriptor = { type: normType, label, el: ctrl };
@@ -3724,7 +3826,11 @@
       `;
       list.forEach((desc) => {
         const dom = buildStandardizedControlDom(desc);
-        if (dom) card.appendChild(dom);
+        if (dom) {
+          dom.dataset.inspectorSource = desc.el.id || '';
+          dom.dataset.inspectorKind = desc.type === 'file' ? 'media' : desc.type === 'text' ? 'text' : 'settings';
+          card.appendChild(dom);
+        }
       });
       targetContainer.appendChild(card);
     };
@@ -6625,4 +6731,15 @@ setInterval(() => {
     setState: (patch = {}) => { Object.assign(textState, patch); applyTextStyleToStage(); },
     mount: mountRegaarderTextControls
   };
+})();
+
+/* Shared first-class audio layer timeline + inspector. Loaded here so all universal
+   Studio template builders inherit audio support without modifying the 3.3 MB app.js. */
+(function loadRegaarderAudioLayers(){
+  if (window.RegaarderAudioLayers || document.getElementById('rg-audio-layers-module')) return;
+  const script=document.createElement('script');
+  script.id='rg-audio-layers-module';
+  script.src='/js/regaarder-audio-layers.js?v=20261112-audio-layers-v1';
+  script.defer=true;
+  document.head.appendChild(script);
 })();

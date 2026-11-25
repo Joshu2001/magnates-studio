@@ -1,0 +1,190 @@
+{
+  "id": "barry-sacramento-interior-flythrough",
+  "title": "Barry Sacramento · Interior 2.5D Fly-Through",
+  "version": "1.9.0",
+  "kind": "scene-template",
+  "durationSeconds": 6.5,
+  "frameRate": 24,
+  "resolution": {
+    "width": 1280,
+    "height": 720
+  },
+  "status": "preview-ready",
+  "textLayersEditable": true,
+  "provenance": "Clean Sacramento construction corridor rendered once as the continuous interior plate, plus generated photographic cutouts derived from the user-approved reference composition: two independent businessmen, two synchronized foot-anchored floor shadows, foreground fog and residual haze. Figures enter and exit as separate cutout layers; no duplicated rectangular corridor slices are used.",
+  "motion": {
+    "effect": "photographic 2.5D parallax fly-through / foreground fog occlusion / downward camera glide",
+    "principle": "continuous forward/downward camera travel; one clean corridor plate remains spatially coherent; foreground fog fully occludes the lens before clearing downward; people and shadows remain independent depth planes",
+    "flyThroughSeconds": 2.9,
+    "titleStartSeconds": 3.05,
+    "entryOcclusionSeconds": 1.35,
+    "masterTransitionWindow": "00:06–00:09",
+    "masterTransitionSeconds": 3,
+    "masterTransition": "foreground construction dust/fog rises across the lens, vertical whoosh smear hides the substitution, then the same occluder sweeps downward while the already-moving interior resolves",
+    "figureReveal": {
+      "roomOnlyUntilSeconds": 0.58,
+      "leftEntry": "0.58–1.00",
+      "rightEntry": "1.02–1.44",
+      "rightExit": "5.24–5.62",
+      "leftExit": "5.62–6.00",
+      "behavior": "staggered visible depth-push entrance: person scales from 0.90 toward camera with a subtle overshoot/settle while corridor counter-scales backward; exit remains leftward multi-band dissipation",
+      "exitDirection": "left",
+      "exitEffect": "multi-band photographic dissipation with blurred leftward ghosting",
+      "entranceParallax": "foreground cutout pushes toward camera while corridor scale decreases by up to 2.8% and shifts down subtly",
+      "foregroundFog": "brief 0.42s residual release only; fully clears before first person enters"
+    }
+  },
+  "layers": [
+    {
+      "id": "corridor",
+      "src": "assets/corridor-clean.webp",
+      "role": "clean people-free supplied-image-derived corridor background"
+    },
+    {
+      "id": "shadowLeft",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        96,
+        225,
+        92,
+        65
+      ],
+      "role": "independent left figure floor shadow, tightened to foot contact and synchronized with left figure entry/exit"
+    },
+    {
+      "id": "shadowRight",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        95,
+        306,
+        120,
+        58
+      ],
+      "role": "independent right figure floor shadow, tightened to foot contact and synchronized with right figure entry/exit"
+    },
+    {
+      "id": "manLeft",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        26,
+        5,
+        81,
+        207
+      ],
+      "role": "photographic businessman with briefcase; staggered fade/settle entrance, left-swipe dissipation exit"
+    },
+    {
+      "id": "manRight",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        176,
+        10,
+        87,
+        199
+      ],
+      "role": "photographic businessman with documents; staggered fade/settle entrance, left-swipe dissipation exit"
+    },
+    {
+      "id": "fog",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        288,
+        219,
+        288,
+        159
+      ],
+      "role": "near-lens foreground fog transition"
+    },
+    {
+      "id": "haze",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        318,
+        411,
+        235,
+        127
+      ],
+      "role": "residual interior atmospheric haze"
+    },
+    {
+      "id": "title",
+      "src": "editable canvas typography",
+      "role": "two-line fact title after camera settle"
+    }
+  ],
+  "audio": [
+    {
+      "id": "construction-bed",
+      "name": "Distant Construction Ambience",
+      "src": "audio/distant-construction.wav",
+      "startSeconds": 0,
+      "durationSeconds": 6.5,
+      "volume": 0.48,
+      "fadeInSeconds": 0.35,
+      "fadeOutSeconds": 0.45,
+      "kind": "ambience"
+    },
+    {
+      "id": "corridor-footsteps",
+      "name": "Echoing Footsteps",
+      "src": "audio/echoing-footsteps.wav",
+      "startSeconds": 0.55,
+      "durationSeconds": 3.65,
+      "volume": 0.72,
+      "fadeInSeconds": 0.08,
+      "fadeOutSeconds": 0.28,
+      "kind": "foley"
+    }
+  ],
+  "audioEditing": {
+    "ui": "shared Regaarder audio lane + Effects inspector",
+    "selectable": true,
+    "editable": [
+      "start",
+      "duration",
+      "volume",
+      "fadeIn",
+      "fadeOut",
+      "mute",
+      "loop"
+    ]
+  },
+  "masterSequenceAudio": [
+    {
+      "id": "downward-whoosh",
+      "name": "Heavy Downward Whoosh",
+      "src": "audio/downward-whoosh.wav",
+      "globalStartSeconds": 6.1,
+      "durationSeconds": 2.8,
+      "volume": 0.9,
+      "fadeInSeconds": 0.06,
+      "fadeOutSeconds": 0.24,
+      "kind": "transition"
+    },
+    {
+      "id": "construction-bed",
+      "name": "Distant Construction Ambience",
+      "src": "audio/distant-construction.wav",
+      "globalStartSeconds": 9,
+      "durationSeconds": 6.5,
+      "volume": 0.48,
+      "kind": "ambience"
+    },
+    {
+      "id": "corridor-footsteps",
+      "name": "Echoing Footsteps",
+      "src": "audio/echoing-footsteps.wav",
+      "globalStartSeconds": 9.55,
+      "durationSeconds": 3.65,
+      "volume": 0.72,
+      "kind": "foley"
+    }
+  ],
+  "audioSystem": {
+    "sharedModule": "/js/regaarder-audio-layers.js",
+    "timelineLane": true,
+    "effectsInspector": true,
+    "persistentEdits": true,
+    "browserGestureUnlock": true
+  }
+}
