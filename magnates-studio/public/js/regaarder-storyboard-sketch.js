@@ -1132,6 +1132,26 @@
               }
               return true;
             }
+            if (actionId === 'ai-render-sketch' && window.Regaarder3DMeshStudio) {
+              fetch('/api/ai/sketch-to-3d', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: ly.name || 'Storyboard Sketch 3D Mesh', vectorHistory: ly.vectors || [] })
+              })
+                .then((r) => r.json())
+                .then((d) => {
+                  if (d && d.ok && d.meshBlueprint) {
+                    const host = document.getElementById('tpl-modal-preview-stage-container') || editorEl;
+                    window.Regaarder3DMeshStudio.open(host, d.meshBlueprint, {
+                      onApply: (dataUrl) => {
+                        if (activeEditorApi) activeEditorApi.addLayer({ name: `${d.meshBlueprint.title} (3D)`, type: 'image', dataUrl });
+                      }
+                    });
+                  }
+                })
+                .catch(() => {});
+              return true;
+            }
             return false;
           }
         });

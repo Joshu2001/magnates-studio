@@ -475,6 +475,12 @@
         </div>
       ` : '';
 
+      const meshHtml = msg.meshBlueprint ? `
+        <div class="rg-ai-bp-actions">
+          <button type="button" class="rg-ai-apply-bp-btn" data-open-3d-msg="${msgIdx}">🧊 Open 3D Mesh Studio (${escapeHtml(msg.meshBlueprint.texture)})</button>
+        </div>
+      ` : '';
+
       return `
         <div class="rg-ai-msg rg-ai-msg-assistant">
           <div class="rg-ai-avatar" aria-hidden="true">✦</div>
@@ -482,6 +488,7 @@
             ${msg.text ? `<div class="rg-ai-msg-text">${escapeHtml(msg.text)}</div>` : ''}
             ${pillsHtml}
             ${cutoutHtml}
+            ${meshHtml}
           </div>
         </div>
       `;
@@ -529,7 +536,22 @@
       });
     });
 
+    feed.querySelectorAll('[data-open-3d-msg]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mIdx = parseInt(btn.getAttribute('data-open-3d-msg'), 10);
+        const targetMsg = state.messages[mIdx];
+        if (targetMsg && targetMsg.meshBlueprint && window.Regaarder3DMeshStudio) {
+          const stage = document.getElementById('tpl-modal-preview-stage-container');
+          window.Regaarder3DMeshStudio.open(stage, targetMsg.meshBlueprint);
+        }
+      });
+    });
+
     feed.scrollTop = feed.scrollHeight;
+  }
+
+  function is3DSketchPrompt(prompt) {
+    return /\b(3d\s*mesh|sketch\s*(?:to|into)\s*3d|sculpt|carve\s*hole|3d\s*render|extrude)\b/i.test(String(prompt || ''));
   }
 
   function isCutoutPrompt(prompt) {
@@ -574,6 +596,31 @@
     if (sendBtn) sendBtn.disabled = true;
 
     try {
+      if (is3DSketchPrompt(prompt)) {
+        const sbApi = window.RegaarderStoryboardSketch && typeof window.RegaarderStoryboardSketch.getActiveEditorApi === 'function'
+          ? window.RegaarderStoryboardSketch.getActiveEditorApi() : null;
+        const vectorHistory = sbApi && typeof sbApi.getVectorHistory === 'function' ? sbApi.getVectorHistory() : [];
+        const res = await fetch('/api/ai/sketch-to-3d', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, vectorHistory })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok || !data.meshBlueprint) {
+          throw new Error(data.error || 'Failed to build 3D mesh');
+        }
+        if (state.permission !== 'ask' && window.Regaarder3DMeshStudio) {
+          const stage = document.getElementById('tpl-modal-preview-stage-container');
+          window.Regaarder3DMeshStudio.open(stage, data.meshBlueprint);
+        }
+        state.messages.push({
+          role: 'assistant',
+          text: data.summary || `Rendered ${data.meshBlueprint.title} as 3D mesh.`,
+          meshBlueprint: data.meshBlueprint
+        });
+        return;
+      }
+
       if (isCutoutPrompt(prompt)) {
         const res = await fetch('/api/ai/cutout-object', {
           method: 'POST',

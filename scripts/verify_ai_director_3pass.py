@@ -18,6 +18,7 @@ def run_pass_1():
         os.path.join(STUDIO, 'ai-harness.js'),
         os.path.join(PUBLIC, 'js', 'regaarder-comment-pins.js'),
         os.path.join(PUBLIC, 'js', 'regaarder-storyboard-sketch.js'),
+        os.path.join(PUBLIC, 'js', 'regaarder-3d-mesh-studio.js'),
         os.path.join(PUBLIC, 'js', 'regaarder-ai-director.js'),
         os.path.join(PUBLIC, 'js', 'regaarder-redesign.js'),
         os.path.join(PUBLIC, 'js', 'app.js'),
@@ -81,6 +82,12 @@ def run_pass_2():
         ok = fail('Granular Text Animation & Style Controls (#6) missing')
     else:
         print('  OK Granular Text Animation & Style Controls (Motion + Look tabs)')
+
+    mesh_js = open(os.path.join(PUBLIC, 'js', 'regaarder-3d-mesh-studio.js'), encoding='utf-8').read()
+    if 'Regaarder3DMeshStudio' not in mesh_js or 'ExtrudeGeometry' not in mesh_js:
+        ok = fail('Regaarder3DMeshStudio (#7) missing')
+    else:
+        print('  OK AI Sketch -> 3D Mesh Studio (Texturing, Holes & Sculpting)')
 
     required_css = [
         '.rg-rail-btn-ai', '.rg-ai-director-panel', '.rg-inspector-shell.is-ai-director-open',
@@ -163,8 +170,17 @@ const server = app.listen(0, '127.0.0.1', () => {
             let b3 = '';
             res3.on('data', (c) => b3 += c);
             res3.on('end', () => {
-              server.close();
-              console.log(JSON.stringify({ compose: JSON.parse(body), comment: JSON.parse(b2), cutout: JSON.parse(b3) }));
+              const p4 = JSON.stringify({ prompt: 'Turn my metal camera sketch into a 3D mesh with a lens hole' });
+              const req4 = http.request({ hostname: '127.0.0.1', port, path: '/api/ai/sketch-to-3d', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(p4) } }, (res4) => {
+                let b4 = '';
+                res4.on('data', (c) => b4 += c);
+                res4.on('end', () => {
+                  server.close();
+                  console.log(JSON.stringify({ compose: JSON.parse(body), comment: JSON.parse(b2), cutout: JSON.parse(b3), mesh3d: JSON.parse(b4) }));
+                });
+              });
+              req4.write(p4);
+              req4.end();
             });
           });
           req3.write(p3);
@@ -187,6 +203,7 @@ const server = app.listen(0, '127.0.0.1', () => {
         data = parsed.get('compose', {})
         cdata = parsed.get('comment', {})
         cutdata = parsed.get('cutout', {})
+        m3data = parsed.get('mesh3d', {})
     except Exception as e:
         return fail(f'Invalid JSON from /api/ai/*: {e} | {res.stdout}')
 
@@ -203,9 +220,13 @@ const server = app.listen(0, '127.0.0.1', () => {
     cutout = cutdata.get('cutout', {})
     if not cutdata.get('ok') or cutout.get('region') != 'right' or cutout.get('targetLayer') != '3d' or not str(cutout.get('cutoutDataUrl', '')).startswith('data:image/svg+xml;base64,'):
         return fail(f'Unexpected /api/ai/cutout-object response: {cutdata}')
+    mbp = m3data.get('meshBlueprint', {})
+    if not m3data.get('ok') or mbp.get('texture') != 'metal' or len(mbp.get('holes', [])) < 1:
+        return fail(f'Unexpected /api/ai/sketch-to-3d response: {m3data}')
     print(f'  OK /api/ai/compose-sequence -> roles={roles}, templates={tpls}, model={bp.get("model")}, perm={bp.get("permission")}, totalDuration={bp.get("totalDuration")}s')
     print(f'  OK /api/ai/animate-comment -> asset={cdata["generatedAsset"]["name"]}, anim={cdata["animation"]["label"]}')
     print(f'  OK /api/ai/cutout-object -> subject={cutout["subject"]}, region={cutout["region"]}, targetLayer={cutout["targetLayer"]}')
+    print(f'  OK /api/ai/sketch-to-3d -> title={mbp["title"]}, texture={mbp["texture"]}, holes={len(mbp["holes"])}')
     return ok
 
 p1 = run_pass_1()

@@ -422,6 +422,65 @@ function createAIHarnessRouter({ templatesFile, projectFile, uploadsDir, userDow
     });
   });
 
+  function buildSketchTo3DBlueprint(prompt, vectorHistory = []) {
+    const p = String(prompt || '').trim();
+    const low = p.toLowerCase();
+    const texture = /\b(metal|steel|chrome|aluminum|brushed)\b/.test(low)
+      ? 'metal'
+      : /\b(glass|neon|crystal|translucent)\b/.test(low)
+        ? 'glass'
+        : /\b(carbon|grid|tech|cyber)\b/.test(low)
+          ? 'carbon'
+          : 'clay';
+    const baseShape = /\b(circle|coin|wheel|ring|disc|orb|sphere)\b/.test(low)
+      ? 'circle'
+      : /\b(shield|hex|badge|emblem)\b/.test(low)
+        ? 'hex'
+        : 'rounded-rect';
+    const holes = [];
+    if (/\b(hole|vent|lens|ring|cutout|donut|carve)\b/.test(low)) {
+      holes.push({ x: 0, y: 0, radius: 0.42 });
+    }
+    const contourPoints = [];
+    if (Array.isArray(vectorHistory) && vectorHistory.length > 0) {
+      const stroke = vectorHistory.find((v) => v && v.kind === 'stroke' && Array.isArray(v.points) && v.points.length >= 3);
+      if (stroke) {
+        stroke.points.slice(0, 48).forEach(([px, py]) => {
+          contourPoints.push([
+            Math.max(-1.6, Math.min(1.6, Number(((px - 400) / 220).toFixed(3)))),
+            Math.max(-1.2, Math.min(1.2, Number((-(py - 225) / 220).toFixed(3))))
+          ]);
+        });
+      }
+    }
+    const labelMatch = p.match(/(?:sketch|render|turn|convert|make|create|3d)\s+(?:a|an|the)?\s*([a-z0-9 _-]{2,32})/i);
+    const title = (labelMatch ? labelMatch[1].replace(/\b(into 3d|3d mesh|with.*|and.*)\b/gi, '').trim() : '') || '3D Concept Mesh';
+    return {
+      title,
+      baseShape,
+      contourPoints,
+      depth: /\b(thick|deep|block|cube)\b/.test(low) ? 0.9 : 0.55,
+      bevelSize: 0.08,
+      texture,
+      color: texture === 'glass' ? '#8b5cf6' : texture === 'metal' ? '#cbd5e1' : texture === 'carbon' ? '#334155' : '#a78bfa',
+      holes
+    };
+  }
+
+  router.post('/sketch-to-3d', (req, res) => {
+    const prompt = String(req.body?.prompt || '').trim();
+    const vectorHistory = Array.isArray(req.body?.vectorHistory) ? req.body.vectorHistory : [];
+    if (!prompt && vectorHistory.length === 0) {
+      return res.status(400).json({ ok: false, error: 'prompt or vectorHistory is required' });
+    }
+    const meshBlueprint = buildSketchTo3DBlueprint(prompt || 'Storyboard Sketch 3D Mesh', vectorHistory);
+    res.json({
+      ok: true,
+      meshBlueprint,
+      summary: `Rendered "${meshBlueprint.title}" as an interactive 3D mesh (${meshBlueprint.texture} material${meshBlueprint.holes.length ? ', with carved hole' : ''}).`
+    });
+  });
+
   // Browser client bridge endpoints
   router.get('/commands/pending', (req, res) => {
     const pending = commandQueue.filter((c) => c.status === 'queued');
