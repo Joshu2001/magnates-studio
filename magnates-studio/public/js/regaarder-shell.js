@@ -429,6 +429,126 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
+     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
+     const headerLeft=exportModal.querySelector('.export-modal-header-left');
+     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
+       const backBtn=document.createElement('button');
+       backBtn.type='button';
+       backBtn.className='rm-export-back-btn';
+       backBtn.title='Back to Share';
+       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
+       backBtn.addEventListener('click',()=>{
+         exportModal.style.display='none';
+         window.openGlobalShareModal?.();
+       });
+       headerLeft.prepend(backBtn);
+     }
+   }
+
+   // Unified Canva-style flat Share Popover (#modal-global-share-project)
+   const shareModal=document.getElementById('modal-global-share-project');
+   const shareBox=shareModal?.querySelector('.vector-modal-box');
+   if(shareModal&&shareBox&&!shareModal.dataset.rmCanvaShare){
+     shareModal.dataset.rmCanvaShare='true';
+     const hiddenLink=document.getElementById('input-global-share-link');
+     if(hiddenLink)hiddenLink.style.display='none';
+     let accessPublic=false;
+     shareBox.innerHTML=`
+       <div class="rm-share-header">
+         <h4>People with access</h4>
+         <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
+       </div>
+       <div class="rm-share-search">
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+         <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
+       </div>
+       <div class="rm-share-avatars">
+         <div class="rm-share-avatar" title="You (Owner)">R</div>
+         <button type="button" class="rm-share-avatar-add" title="Invite collaborator">+</button>
+       </div>
+       <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:2px;">Access level</div>
+       <button type="button" class="rm-share-access-row" id="rm-share-access-toggle">
+         <span class="rm-share-access-left">
+           <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1.5 1.5 0 0 0-1.5 1.5v5A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 12 6h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z"/></svg>
+           <span id="rm-share-access-label">Only you can access</span>
+         </span>
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z"/></svg>
+       </button>
+       <button type="button" class="rm-share-copy-btn" id="btn-copy-share-link">
+         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1Z"/><path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9Z"/></svg>
+         <span>Copy link</span>
+       </button>
+       <div class="rm-share-divider"></div>
+       <div class="rm-share-actions-grid">
+         <button type="button" class="rm-share-circle-action" data-share-act="download">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M5 20h14v-2H5v2zm7-16v8.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V4h1z"/></svg></div>
+           <span>Download</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="public">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+           <span>Public link</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="youtube">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#f87171"><path d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.94C17.93 4.8 12 4.8 12 4.8s-5.93 0-7.64.45a2.75 2.75 0 0 0-1.94 1.94C2 8.9 2 12 2 12s0 3.1.42 4.81a2.75 2.75 0 0 0 1.94 1.94c1.71.45 7.64.45 7.64.45s5.93 0 7.64-.45a2.75 2.75 0 0 0 1.94-1.94C22 15.1 22 12 22 12s0-3.1-.42-4.81ZM10 15V9l5.2 3L10 15Z"/></svg></div>
+           <span>YouTube</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="tiktok">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#f472b6"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.29 1.76-.23.77-.14 1.62.24 2.33.43.77 1.22 1.34 2.08 1.51.81.18 1.68.07 2.41-.33.72-.37 1.25-1.05 1.41-1.84.11-.64.1-1.3.1-1.95V.02z"/></svg></div>
+           <span>TikTok</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="twitter">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="#e2e8f0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+           <span>X / Twitter</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="whatsapp">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#4ade80"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div>
+           <span>WhatsApp</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="embed">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c4b5fd" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+           <span>Embed</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="template">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+           <span>Template</span>
+         </button>
+       </div>`;
+     if(hiddenLink)shareBox.appendChild(hiddenLink);
+     shareBox.querySelector('.rm-share-close')?.addEventListener('click',()=>window.closeGlobalShareModal?.());
+     shareBox.querySelector('#rm-share-access-toggle')?.addEventListener('click',()=>{
+       accessPublic=!accessPublic;
+       const lbl=shareBox.querySelector('#rm-share-access-label');
+       if(lbl)lbl.textContent=accessPublic?'Anyone with the link':'Only you can access';
+     });
+     shareBox.querySelector('#btn-copy-share-link')?.addEventListener('click',()=>{
+       window.copyShareLinkToClipboard?.();
+       const span=shareBox.querySelector('#btn-copy-share-link span');
+       if(span){const prev=span.textContent;span.textContent='Copied!';setTimeout(()=>{span.textContent=prev;},1400);}
+     });
+     shareBox.querySelectorAll('[data-share-act]').forEach(btn=>{
+       btn.addEventListener('click',()=>{
+         const act=btn.dataset.shareAct;
+         if(act==='download'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else if(act==='public'){
+           shareBox.querySelector('#btn-copy-share-link')?.click();
+         }else if(act==='embed'){
+           window.quickShareOption?.('copy_embed');
+         }else if(act==='template'){
+           window.closeGlobalShareModal?.();
+           document.getElementById('btn-top-turn-template')?.click();
+         }else if(act==='youtube'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else{
+           window.shareToSocialPlatform?.(act);
+         }
+       });
+     });
+     shareModal.addEventListener('click',e=>{
+       if(e.target===shareModal)window.closeGlobalShareModal?.();
+     });
    }
  })();
 
@@ -552,6 +672,126 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
+     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
+     const headerLeft=exportModal.querySelector('.export-modal-header-left');
+     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
+       const backBtn=document.createElement('button');
+       backBtn.type='button';
+       backBtn.className='rm-export-back-btn';
+       backBtn.title='Back to Share';
+       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
+       backBtn.addEventListener('click',()=>{
+         exportModal.style.display='none';
+         window.openGlobalShareModal?.();
+       });
+       headerLeft.prepend(backBtn);
+     }
+   }
+
+   // Unified Canva-style flat Share Popover (#modal-global-share-project)
+   const shareModal=document.getElementById('modal-global-share-project');
+   const shareBox=shareModal?.querySelector('.vector-modal-box');
+   if(shareModal&&shareBox&&!shareModal.dataset.rmCanvaShare){
+     shareModal.dataset.rmCanvaShare='true';
+     const hiddenLink=document.getElementById('input-global-share-link');
+     if(hiddenLink)hiddenLink.style.display='none';
+     let accessPublic=false;
+     shareBox.innerHTML=`
+       <div class="rm-share-header">
+         <h4>People with access</h4>
+         <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
+       </div>
+       <div class="rm-share-search">
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+         <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
+       </div>
+       <div class="rm-share-avatars">
+         <div class="rm-share-avatar" title="You (Owner)">R</div>
+         <button type="button" class="rm-share-avatar-add" title="Invite collaborator">+</button>
+       </div>
+       <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:2px;">Access level</div>
+       <button type="button" class="rm-share-access-row" id="rm-share-access-toggle">
+         <span class="rm-share-access-left">
+           <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1.5 1.5 0 0 0-1.5 1.5v5A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 12 6h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z"/></svg>
+           <span id="rm-share-access-label">Only you can access</span>
+         </span>
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z"/></svg>
+       </button>
+       <button type="button" class="rm-share-copy-btn" id="btn-copy-share-link">
+         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1Z"/><path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9Z"/></svg>
+         <span>Copy link</span>
+       </button>
+       <div class="rm-share-divider"></div>
+       <div class="rm-share-actions-grid">
+         <button type="button" class="rm-share-circle-action" data-share-act="download">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M5 20h14v-2H5v2zm7-16v8.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V4h1z"/></svg></div>
+           <span>Download</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="public">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+           <span>Public link</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="youtube">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#f87171"><path d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.94C17.93 4.8 12 4.8 12 4.8s-5.93 0-7.64.45a2.75 2.75 0 0 0-1.94 1.94C2 8.9 2 12 2 12s0 3.1.42 4.81a2.75 2.75 0 0 0 1.94 1.94c1.71.45 7.64.45 7.64.45s5.93 0 7.64-.45a2.75 2.75 0 0 0 1.94-1.94C22 15.1 22 12 22 12s0-3.1-.42-4.81ZM10 15V9l5.2 3L10 15Z"/></svg></div>
+           <span>YouTube</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="tiktok">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#f472b6"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.29 1.76-.23.77-.14 1.62.24 2.33.43.77 1.22 1.34 2.08 1.51.81.18 1.68.07 2.41-.33.72-.37 1.25-1.05 1.41-1.84.11-.64.1-1.3.1-1.95V.02z"/></svg></div>
+           <span>TikTok</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="twitter">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="#e2e8f0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+           <span>X / Twitter</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="whatsapp">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#4ade80"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div>
+           <span>WhatsApp</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="embed">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c4b5fd" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+           <span>Embed</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="template">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+           <span>Template</span>
+         </button>
+       </div>`;
+     if(hiddenLink)shareBox.appendChild(hiddenLink);
+     shareBox.querySelector('.rm-share-close')?.addEventListener('click',()=>window.closeGlobalShareModal?.());
+     shareBox.querySelector('#rm-share-access-toggle')?.addEventListener('click',()=>{
+       accessPublic=!accessPublic;
+       const lbl=shareBox.querySelector('#rm-share-access-label');
+       if(lbl)lbl.textContent=accessPublic?'Anyone with the link':'Only you can access';
+     });
+     shareBox.querySelector('#btn-copy-share-link')?.addEventListener('click',()=>{
+       window.copyShareLinkToClipboard?.();
+       const span=shareBox.querySelector('#btn-copy-share-link span');
+       if(span){const prev=span.textContent;span.textContent='Copied!';setTimeout(()=>{span.textContent=prev;},1400);}
+     });
+     shareBox.querySelectorAll('[data-share-act]').forEach(btn=>{
+       btn.addEventListener('click',()=>{
+         const act=btn.dataset.shareAct;
+         if(act==='download'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else if(act==='public'){
+           shareBox.querySelector('#btn-copy-share-link')?.click();
+         }else if(act==='embed'){
+           window.quickShareOption?.('copy_embed');
+         }else if(act==='template'){
+           window.closeGlobalShareModal?.();
+           document.getElementById('btn-top-turn-template')?.click();
+         }else if(act==='youtube'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else{
+           window.shareToSocialPlatform?.(act);
+         }
+       });
+     });
+     shareModal.addEventListener('click',e=>{
+       if(e.target===shareModal)window.closeGlobalShareModal?.();
+     });
    }
  })();
 
@@ -659,6 +899,126 @@
        if(!e.target.closest?.('.rm-custom-select')){
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
+     });
+     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
+     const headerLeft=exportModal.querySelector('.export-modal-header-left');
+     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
+       const backBtn=document.createElement('button');
+       backBtn.type='button';
+       backBtn.className='rm-export-back-btn';
+       backBtn.title='Back to Share';
+       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
+       backBtn.addEventListener('click',()=>{
+         exportModal.style.display='none';
+         window.openGlobalShareModal?.();
+       });
+       headerLeft.prepend(backBtn);
+     }
+   }
+
+   // Unified Canva-style flat Share Popover (#modal-global-share-project)
+   const shareModal=document.getElementById('modal-global-share-project');
+   const shareBox=shareModal?.querySelector('.vector-modal-box');
+   if(shareModal&&shareBox&&!shareModal.dataset.rmCanvaShare){
+     shareModal.dataset.rmCanvaShare='true';
+     const hiddenLink=document.getElementById('input-global-share-link');
+     if(hiddenLink)hiddenLink.style.display='none';
+     let accessPublic=false;
+     shareBox.innerHTML=`
+       <div class="rm-share-header">
+         <h4>People with access</h4>
+         <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
+       </div>
+       <div class="rm-share-search">
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+         <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
+       </div>
+       <div class="rm-share-avatars">
+         <div class="rm-share-avatar" title="You (Owner)">R</div>
+         <button type="button" class="rm-share-avatar-add" title="Invite collaborator">+</button>
+       </div>
+       <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:2px;">Access level</div>
+       <button type="button" class="rm-share-access-row" id="rm-share-access-toggle">
+         <span class="rm-share-access-left">
+           <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1.5 1.5 0 0 0-1.5 1.5v5A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 12 6h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z"/></svg>
+           <span id="rm-share-access-label">Only you can access</span>
+         </span>
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z"/></svg>
+       </button>
+       <button type="button" class="rm-share-copy-btn" id="btn-copy-share-link">
+         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1Z"/><path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9Z"/></svg>
+         <span>Copy link</span>
+       </button>
+       <div class="rm-share-divider"></div>
+       <div class="rm-share-actions-grid">
+         <button type="button" class="rm-share-circle-action" data-share-act="download">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M5 20h14v-2H5v2zm7-16v8.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V4h1z"/></svg></div>
+           <span>Download</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="public">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+           <span>Public link</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="youtube">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#f87171"><path d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.94C17.93 4.8 12 4.8 12 4.8s-5.93 0-7.64.45a2.75 2.75 0 0 0-1.94 1.94C2 8.9 2 12 2 12s0 3.1.42 4.81a2.75 2.75 0 0 0 1.94 1.94c1.71.45 7.64.45 7.64.45s5.93 0 7.64-.45a2.75 2.75 0 0 0 1.94-1.94C22 15.1 22 12 22 12s0-3.1-.42-4.81ZM10 15V9l5.2 3L10 15Z"/></svg></div>
+           <span>YouTube</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="tiktok">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#f472b6"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.29 1.76-.23.77-.14 1.62.24 2.33.43.77 1.22 1.34 2.08 1.51.81.18 1.68.07 2.41-.33.72-.37 1.25-1.05 1.41-1.84.11-.64.1-1.3.1-1.95V.02z"/></svg></div>
+           <span>TikTok</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="twitter">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="#e2e8f0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+           <span>X / Twitter</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="whatsapp">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#4ade80"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div>
+           <span>WhatsApp</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="embed">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c4b5fd" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+           <span>Embed</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="template">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+           <span>Template</span>
+         </button>
+       </div>`;
+     if(hiddenLink)shareBox.appendChild(hiddenLink);
+     shareBox.querySelector('.rm-share-close')?.addEventListener('click',()=>window.closeGlobalShareModal?.());
+     shareBox.querySelector('#rm-share-access-toggle')?.addEventListener('click',()=>{
+       accessPublic=!accessPublic;
+       const lbl=shareBox.querySelector('#rm-share-access-label');
+       if(lbl)lbl.textContent=accessPublic?'Anyone with the link':'Only you can access';
+     });
+     shareBox.querySelector('#btn-copy-share-link')?.addEventListener('click',()=>{
+       window.copyShareLinkToClipboard?.();
+       const span=shareBox.querySelector('#btn-copy-share-link span');
+       if(span){const prev=span.textContent;span.textContent='Copied!';setTimeout(()=>{span.textContent=prev;},1400);}
+     });
+     shareBox.querySelectorAll('[data-share-act]').forEach(btn=>{
+       btn.addEventListener('click',()=>{
+         const act=btn.dataset.shareAct;
+         if(act==='download'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else if(act==='public'){
+           shareBox.querySelector('#btn-copy-share-link')?.click();
+         }else if(act==='embed'){
+           window.quickShareOption?.('copy_embed');
+         }else if(act==='template'){
+           window.closeGlobalShareModal?.();
+           document.getElementById('btn-top-turn-template')?.click();
+         }else if(act==='youtube'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else{
+           window.shareToSocialPlatform?.(act);
+         }
+       });
+     });
+     shareModal.addEventListener('click',e=>{
+       if(e.target===shareModal)window.closeGlobalShareModal?.();
      });
    }
  })();
@@ -799,6 +1159,126 @@
        if(!e.target.closest?.('.rm-custom-select')){
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
+     });
+     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
+     const headerLeft=exportModal.querySelector('.export-modal-header-left');
+     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
+       const backBtn=document.createElement('button');
+       backBtn.type='button';
+       backBtn.className='rm-export-back-btn';
+       backBtn.title='Back to Share';
+       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
+       backBtn.addEventListener('click',()=>{
+         exportModal.style.display='none';
+         window.openGlobalShareModal?.();
+       });
+       headerLeft.prepend(backBtn);
+     }
+   }
+
+   // Unified Canva-style flat Share Popover (#modal-global-share-project)
+   const shareModal=document.getElementById('modal-global-share-project');
+   const shareBox=shareModal?.querySelector('.vector-modal-box');
+   if(shareModal&&shareBox&&!shareModal.dataset.rmCanvaShare){
+     shareModal.dataset.rmCanvaShare='true';
+     const hiddenLink=document.getElementById('input-global-share-link');
+     if(hiddenLink)hiddenLink.style.display='none';
+     let accessPublic=false;
+     shareBox.innerHTML=`
+       <div class="rm-share-header">
+         <h4>People with access</h4>
+         <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
+       </div>
+       <div class="rm-share-search">
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+         <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
+       </div>
+       <div class="rm-share-avatars">
+         <div class="rm-share-avatar" title="You (Owner)">R</div>
+         <button type="button" class="rm-share-avatar-add" title="Invite collaborator">+</button>
+       </div>
+       <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:2px;">Access level</div>
+       <button type="button" class="rm-share-access-row" id="rm-share-access-toggle">
+         <span class="rm-share-access-left">
+           <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1.5 1.5 0 0 0-1.5 1.5v5A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 12 6h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z"/></svg>
+           <span id="rm-share-access-label">Only you can access</span>
+         </span>
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z"/></svg>
+       </button>
+       <button type="button" class="rm-share-copy-btn" id="btn-copy-share-link">
+         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1Z"/><path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9Z"/></svg>
+         <span>Copy link</span>
+       </button>
+       <div class="rm-share-divider"></div>
+       <div class="rm-share-actions-grid">
+         <button type="button" class="rm-share-circle-action" data-share-act="download">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M5 20h14v-2H5v2zm7-16v8.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V4h1z"/></svg></div>
+           <span>Download</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="public">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+           <span>Public link</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="youtube">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#f87171"><path d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.94C17.93 4.8 12 4.8 12 4.8s-5.93 0-7.64.45a2.75 2.75 0 0 0-1.94 1.94C2 8.9 2 12 2 12s0 3.1.42 4.81a2.75 2.75 0 0 0 1.94 1.94c1.71.45 7.64.45 7.64.45s5.93 0 7.64-.45a2.75 2.75 0 0 0 1.94-1.94C22 15.1 22 12 22 12s0-3.1-.42-4.81ZM10 15V9l5.2 3L10 15Z"/></svg></div>
+           <span>YouTube</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="tiktok">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#f472b6"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.29 1.76-.23.77-.14 1.62.24 2.33.43.77 1.22 1.34 2.08 1.51.81.18 1.68.07 2.41-.33.72-.37 1.25-1.05 1.41-1.84.11-.64.1-1.3.1-1.95V.02z"/></svg></div>
+           <span>TikTok</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="twitter">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="#e2e8f0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+           <span>X / Twitter</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="whatsapp">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#4ade80"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div>
+           <span>WhatsApp</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="embed">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c4b5fd" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+           <span>Embed</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="template">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+           <span>Template</span>
+         </button>
+       </div>`;
+     if(hiddenLink)shareBox.appendChild(hiddenLink);
+     shareBox.querySelector('.rm-share-close')?.addEventListener('click',()=>window.closeGlobalShareModal?.());
+     shareBox.querySelector('#rm-share-access-toggle')?.addEventListener('click',()=>{
+       accessPublic=!accessPublic;
+       const lbl=shareBox.querySelector('#rm-share-access-label');
+       if(lbl)lbl.textContent=accessPublic?'Anyone with the link':'Only you can access';
+     });
+     shareBox.querySelector('#btn-copy-share-link')?.addEventListener('click',()=>{
+       window.copyShareLinkToClipboard?.();
+       const span=shareBox.querySelector('#btn-copy-share-link span');
+       if(span){const prev=span.textContent;span.textContent='Copied!';setTimeout(()=>{span.textContent=prev;},1400);}
+     });
+     shareBox.querySelectorAll('[data-share-act]').forEach(btn=>{
+       btn.addEventListener('click',()=>{
+         const act=btn.dataset.shareAct;
+         if(act==='download'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else if(act==='public'){
+           shareBox.querySelector('#btn-copy-share-link')?.click();
+         }else if(act==='embed'){
+           window.quickShareOption?.('copy_embed');
+         }else if(act==='template'){
+           window.closeGlobalShareModal?.();
+           document.getElementById('btn-top-turn-template')?.click();
+         }else if(act==='youtube'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else{
+           window.shareToSocialPlatform?.(act);
+         }
+       });
+     });
+     shareModal.addEventListener('click',e=>{
+       if(e.target===shareModal)window.closeGlobalShareModal?.();
      });
    }
  })();
@@ -945,6 +1425,126 @@
        if(!e.target.closest?.('.rm-custom-select')){
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
+     });
+     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
+     const headerLeft=exportModal.querySelector('.export-modal-header-left');
+     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
+       const backBtn=document.createElement('button');
+       backBtn.type='button';
+       backBtn.className='rm-export-back-btn';
+       backBtn.title='Back to Share';
+       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
+       backBtn.addEventListener('click',()=>{
+         exportModal.style.display='none';
+         window.openGlobalShareModal?.();
+       });
+       headerLeft.prepend(backBtn);
+     }
+   }
+
+   // Unified Canva-style flat Share Popover (#modal-global-share-project)
+   const shareModal=document.getElementById('modal-global-share-project');
+   const shareBox=shareModal?.querySelector('.vector-modal-box');
+   if(shareModal&&shareBox&&!shareModal.dataset.rmCanvaShare){
+     shareModal.dataset.rmCanvaShare='true';
+     const hiddenLink=document.getElementById('input-global-share-link');
+     if(hiddenLink)hiddenLink.style.display='none';
+     let accessPublic=false;
+     shareBox.innerHTML=`
+       <div class="rm-share-header">
+         <h4>People with access</h4>
+         <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
+       </div>
+       <div class="rm-share-search">
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+         <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
+       </div>
+       <div class="rm-share-avatars">
+         <div class="rm-share-avatar" title="You (Owner)">R</div>
+         <button type="button" class="rm-share-avatar-add" title="Invite collaborator">+</button>
+       </div>
+       <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:2px;">Access level</div>
+       <button type="button" class="rm-share-access-row" id="rm-share-access-toggle">
+         <span class="rm-share-access-left">
+           <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1.5 1.5 0 0 0-1.5 1.5v5A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 12 6h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z"/></svg>
+           <span id="rm-share-access-label">Only you can access</span>
+         </span>
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z"/></svg>
+       </button>
+       <button type="button" class="rm-share-copy-btn" id="btn-copy-share-link">
+         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1Z"/><path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9Z"/></svg>
+         <span>Copy link</span>
+       </button>
+       <div class="rm-share-divider"></div>
+       <div class="rm-share-actions-grid">
+         <button type="button" class="rm-share-circle-action" data-share-act="download">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M5 20h14v-2H5v2zm7-16v8.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V4h1z"/></svg></div>
+           <span>Download</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="public">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+           <span>Public link</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="youtube">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#f87171"><path d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.94C17.93 4.8 12 4.8 12 4.8s-5.93 0-7.64.45a2.75 2.75 0 0 0-1.94 1.94C2 8.9 2 12 2 12s0 3.1.42 4.81a2.75 2.75 0 0 0 1.94 1.94c1.71.45 7.64.45 7.64.45s5.93 0 7.64-.45a2.75 2.75 0 0 0 1.94-1.94C22 15.1 22 12 22 12s0-3.1-.42-4.81ZM10 15V9l5.2 3L10 15Z"/></svg></div>
+           <span>YouTube</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="tiktok">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#f472b6"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.29 1.76-.23.77-.14 1.62.24 2.33.43.77 1.22 1.34 2.08 1.51.81.18 1.68.07 2.41-.33.72-.37 1.25-1.05 1.41-1.84.11-.64.1-1.3.1-1.95V.02z"/></svg></div>
+           <span>TikTok</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="twitter">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="#e2e8f0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+           <span>X / Twitter</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="whatsapp">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#4ade80"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div>
+           <span>WhatsApp</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="embed">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c4b5fd" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+           <span>Embed</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="template">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+           <span>Template</span>
+         </button>
+       </div>`;
+     if(hiddenLink)shareBox.appendChild(hiddenLink);
+     shareBox.querySelector('.rm-share-close')?.addEventListener('click',()=>window.closeGlobalShareModal?.());
+     shareBox.querySelector('#rm-share-access-toggle')?.addEventListener('click',()=>{
+       accessPublic=!accessPublic;
+       const lbl=shareBox.querySelector('#rm-share-access-label');
+       if(lbl)lbl.textContent=accessPublic?'Anyone with the link':'Only you can access';
+     });
+     shareBox.querySelector('#btn-copy-share-link')?.addEventListener('click',()=>{
+       window.copyShareLinkToClipboard?.();
+       const span=shareBox.querySelector('#btn-copy-share-link span');
+       if(span){const prev=span.textContent;span.textContent='Copied!';setTimeout(()=>{span.textContent=prev;},1400);}
+     });
+     shareBox.querySelectorAll('[data-share-act]').forEach(btn=>{
+       btn.addEventListener('click',()=>{
+         const act=btn.dataset.shareAct;
+         if(act==='download'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else if(act==='public'){
+           shareBox.querySelector('#btn-copy-share-link')?.click();
+         }else if(act==='embed'){
+           window.quickShareOption?.('copy_embed');
+         }else if(act==='template'){
+           window.closeGlobalShareModal?.();
+           document.getElementById('btn-top-turn-template')?.click();
+         }else if(act==='youtube'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else{
+           window.shareToSocialPlatform?.(act);
+         }
+       });
+     });
+     shareModal.addEventListener('click',e=>{
+       if(e.target===shareModal)window.closeGlobalShareModal?.();
      });
    }
  })();
@@ -1103,6 +1703,126 @@
        if(!e.target.closest?.('.rm-custom-select')){
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
+     });
+     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
+     const headerLeft=exportModal.querySelector('.export-modal-header-left');
+     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
+       const backBtn=document.createElement('button');
+       backBtn.type='button';
+       backBtn.className='rm-export-back-btn';
+       backBtn.title='Back to Share';
+       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
+       backBtn.addEventListener('click',()=>{
+         exportModal.style.display='none';
+         window.openGlobalShareModal?.();
+       });
+       headerLeft.prepend(backBtn);
+     }
+   }
+
+   // Unified Canva-style flat Share Popover (#modal-global-share-project)
+   const shareModal=document.getElementById('modal-global-share-project');
+   const shareBox=shareModal?.querySelector('.vector-modal-box');
+   if(shareModal&&shareBox&&!shareModal.dataset.rmCanvaShare){
+     shareModal.dataset.rmCanvaShare='true';
+     const hiddenLink=document.getElementById('input-global-share-link');
+     if(hiddenLink)hiddenLink.style.display='none';
+     let accessPublic=false;
+     shareBox.innerHTML=`
+       <div class="rm-share-header">
+         <h4>People with access</h4>
+         <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
+       </div>
+       <div class="rm-share-search">
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
+         <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
+       </div>
+       <div class="rm-share-avatars">
+         <div class="rm-share-avatar" title="You (Owner)">R</div>
+         <button type="button" class="rm-share-avatar-add" title="Invite collaborator">+</button>
+       </div>
+       <div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:2px;">Access level</div>
+       <button type="button" class="rm-share-access-row" id="rm-share-access-toggle">
+         <span class="rm-share-access-left">
+           <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M8 1a3.5 3.5 0 0 0-3.5 3.5V6H4a1.5 1.5 0 0 0-1.5 1.5v5A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5v-5A1.5 1.5 0 0 0 12 6h-.5V4.5A3.5 3.5 0 0 0 8 1Zm2 5V4.5a2 2 0 1 0-4 0V6h4Z"/></svg>
+           <span id="rm-share-access-label">Only you can access</span>
+         </span>
+         <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor"><path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z"/></svg>
+       </button>
+       <button type="button" class="rm-share-copy-btn" id="btn-copy-share-link">
+         <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9c-.086 0-.17.01-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1Z"/><path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4.02 4.02 0 0 1-.82 1H12a3 3 0 1 0 0-6H9Z"/></svg>
+         <span>Copy link</span>
+       </button>
+       <div class="rm-share-divider"></div>
+       <div class="rm-share-actions-grid">
+         <button type="button" class="rm-share-circle-action" data-share-act="download">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M5 20h14v-2H5v2zm7-16v8.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V4h1z"/></svg></div>
+           <span>Download</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="public">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+           <span>Public link</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="youtube">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="#f87171"><path d="M21.58 7.19a2.75 2.75 0 0 0-1.94-1.94C17.93 4.8 12 4.8 12 4.8s-5.93 0-7.64.45a2.75 2.75 0 0 0-1.94 1.94C2 8.9 2 12 2 12s0 3.1.42 4.81a2.75 2.75 0 0 0 1.94 1.94c1.71.45 7.64.45 7.64.45s5.93 0 7.64-.45a2.75 2.75 0 0 0 1.94-1.94C22 15.1 22 12 22 12s0-3.1-.42-4.81ZM10 15V9l5.2 3L10 15Z"/></svg></div>
+           <span>YouTube</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="tiktok">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#f472b6"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.29 1.76-.23.77-.14 1.62.24 2.33.43.77 1.22 1.34 2.08 1.51.81.18 1.68.07 2.41-.33.72-.37 1.25-1.05 1.41-1.84.11-.64.1-1.3.1-1.95V.02z"/></svg></div>
+           <span>TikTok</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="twitter">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="15" height="15" fill="#e2e8f0"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+           <span>X / Twitter</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="whatsapp">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="#4ade80"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2Z"/></svg></div>
+           <span>WhatsApp</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="embed">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#c4b5fd" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div>
+           <span>Embed</span>
+         </button>
+         <button type="button" class="rm-share-circle-action" data-share-act="template">
+           <div class="rm-share-circle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+           <span>Template</span>
+         </button>
+       </div>`;
+     if(hiddenLink)shareBox.appendChild(hiddenLink);
+     shareBox.querySelector('.rm-share-close')?.addEventListener('click',()=>window.closeGlobalShareModal?.());
+     shareBox.querySelector('#rm-share-access-toggle')?.addEventListener('click',()=>{
+       accessPublic=!accessPublic;
+       const lbl=shareBox.querySelector('#rm-share-access-label');
+       if(lbl)lbl.textContent=accessPublic?'Anyone with the link':'Only you can access';
+     });
+     shareBox.querySelector('#btn-copy-share-link')?.addEventListener('click',()=>{
+       window.copyShareLinkToClipboard?.();
+       const span=shareBox.querySelector('#btn-copy-share-link span');
+       if(span){const prev=span.textContent;span.textContent='Copied!';setTimeout(()=>{span.textContent=prev;},1400);}
+     });
+     shareBox.querySelectorAll('[data-share-act]').forEach(btn=>{
+       btn.addEventListener('click',()=>{
+         const act=btn.dataset.shareAct;
+         if(act==='download'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else if(act==='public'){
+           shareBox.querySelector('#btn-copy-share-link')?.click();
+         }else if(act==='embed'){
+           window.quickShareOption?.('copy_embed');
+         }else if(act==='template'){
+           window.closeGlobalShareModal?.();
+           document.getElementById('btn-top-turn-template')?.click();
+         }else if(act==='youtube'){
+           window.closeGlobalShareModal?.();
+           window.openExportStudioModal?.();
+         }else{
+           window.shareToSocialPlatform?.(act);
+         }
+       });
+     });
+     shareModal.addEventListener('click',e=>{
+       if(e.target===shareModal)window.closeGlobalShareModal?.();
      });
    }
  })();

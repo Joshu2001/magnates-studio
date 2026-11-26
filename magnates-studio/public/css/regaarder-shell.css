@@ -1261,15 +1261,15 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 #export-studio-modal .export-modal-header {
-  padding: 14px 18px 12px !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 14px 18px 10px !important;
+  border-bottom: 0 !important;
 }
 
 #export-studio-modal .export-modal-body {
-  padding: 16px 18px !important;
+  padding: 8px 18px 14px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 16px !important;
+  gap: 14px !important;
 }
 
 #export-studio-modal .export-modal-footer {
@@ -1480,22 +1480,22 @@ body.rm-in-editor #rm-auth-actions,
   gap: 6px;
   padding: 8px 10px;
   border-radius: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 0 !important;
+  background: rgba(255, 255, 255, 0.045);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   color: #f1f5f9;
   font-family: inherit;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: box-shadow 0.15s ease, background 0.15s ease;
   text-align: left;
 }
 
 .rm-custom-select-trigger:hover,
 .rm-custom-select.is-open .rm-custom-select-trigger {
-  border-color: rgba(139, 92, 246, 0.6);
-  background: rgba(139, 92, 246, 0.1);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.55);
+  background: rgba(139, 92, 246, 0.12);
 }
 
 .rm-custom-select-label {
@@ -1574,18 +1574,279 @@ body.rm-in-editor #rm-auth-actions,
 
 #export-studio-modal #btn-export-modal-cancel,
 #export-studio-modal #btn-export-modal-share {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: #cbd5e1 !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #94a3b8 !important;
   border-radius: 8px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 5px !important;
   white-space: nowrap !important;
-  padding: 8px 11px !important;
+  padding: 8px 10px !important;
   font-size: 11.5px !important;
   flex-shrink: 0 !important;
+}
+
+#export-studio-modal #btn-export-modal-cancel:hover,
+#export-studio-modal #btn-export-modal-share:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f1f5f9 !important;
+}
+
+.rm-export-back-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+.rm-export-back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Top-Bar Quiet Restraint + Unified Canva-style Share Popover */
+#btn-save-project,
+#btn-top-turn-template,
+#btn-export {
+  background: transparent !important;
+  border: 0 !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+#btn-save-project:hover,
+#btn-top-turn-template:hover,
+#btn-export:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+}
+
+#btn-top-share-project {
+  background: #f8fafc !important;
+  border: 0 !important;
+  color: #0f172a !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25) !important;
+}
+
+#btn-top-share-project:hover {
+  background: #ffffff !important;
+}
+
+#modal-global-share-project {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  justify-content: flex-end !important;
+  align-items: flex-start !important;
+  padding: 0 !important;
+}
+
+#modal-global-share-project .vector-modal-box {
+  position: fixed !important;
+  top: 60px !important;
+  right: 20px !important;
+  width: min(350px, 92vw) !important;
+  max-width: 350px !important;
+  background: #141622 !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.78) !important;
+  padding: 16px 18px 18px !important;
+  gap: 12px !important;
+}
+
+.rm-share-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rm-share-header h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.rm-share-close {
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.rm-share-close:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rm-share-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  border-radius: 9px;
+  padding: 8px 10px;
+}
+
+.rm-share-search input {
+  border: 0;
+  background: transparent;
+  color: #f1f5f9;
+  font-size: 12px;
+  width: 100%;
+  outline: none;
+}
+
+.rm-share-avatars {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rm-share-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rm-share-avatar-add {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rm-share-avatar-add:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.rm-share-access-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 6px 4px;
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.rm-share-access-row:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.rm-share-access-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rm-share-copy-btn {
+  width: 100%;
+  border: 0;
+  border-radius: 9px;
+  padding: 9px 14px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.35);
+}
+
+.rm-share-copy-btn:hover {
+  filter: brightness(1.08);
+}
+
+.rm-share-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 2px 0;
+}
+
+.rm-share-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px 6px;
+}
+
+.rm-share-circle-action {
+  border: 0;
+  background: transparent;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+
+.rm-share-circle-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.055);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e2e8f0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.rm-share-circle-action:hover .rm-share-circle-icon {
+  background: rgba(139, 92, 246, 0.22);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.rm-share-circle-action span {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #94a3b8;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.rm-share-circle-action:hover span {
+  color: #e2e8f0;
 }
 
 #export-studio-modal #btn-export-start {
