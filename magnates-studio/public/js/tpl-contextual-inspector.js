@@ -111,6 +111,7 @@
 
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
+    'ponzi-minute7-documentary': { type: 'ponzi-minute7-documentary', ponziOpeningV2: null },
     // Photorealistic 3D Investigative Evidence Envelope Engine
     'conspiracy-board': Object.assign({}, (typeof window !== 'undefined' && window.RED_STRING_3D_CONFIG) || {
       type: 'conspiracy-board',
@@ -4141,6 +4142,11 @@
 
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
+    if (tplId === 'ponzi-minute7-documentary') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage && typeof window.tplRefreshPonziMinute7Stage === 'function') window.tplRefreshPonziMinute7Stage(stage, data);
+      return;
+    }
     if (tplId === 'conspiracy-board') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -5923,6 +5929,16 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'ponzi-minute7-documentary') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      if (!container) return;
+      container.style.display = 'flex';
+      for (const id of ['tpl-modal-standard-layers-section','tpl-modal-wrap-primary','tpl-modal-wrap-secondary','tpl-modal-wrap-text']) {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+      }
+      if (typeof window.tplBuildPonziMinute7Inspector === 'function') window.tplBuildPonziMinute7Inspector(container, window.tplGetContextualData(tplId), tplId);
+      return;
+    }
     if (tplId === 'hypnotic-vertigo-roll') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
