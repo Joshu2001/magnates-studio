@@ -28206,6 +28206,12 @@ window.RegaarderDimensionTransform = (function () {
     state = {
       ...DEFAULTS,
       mode: nextMode,
+      depth: nextMode === '2.5d' ? 18 : 28,
+      roundness: 0,
+      centerline: 0,
+      vTaper: 0,
+      detailRelief: 0,
+      shapePreset: 'flat',
       mirrorMode: nextMode === '2.5d' ? 'off' : 'symmetric',
       src: prevSrc,
     };
@@ -28256,7 +28262,7 @@ window.RegaarderDimensionTransform = (function () {
 
     const wrap = document.createElement('div');
     wrap.id = 'rg-dim-transform-stage';
-    wrap.style.cssText = 'position:absolute;inset:0;z-index:85;background:#07080f;display:flex;flex-direction:column;overflow:hidden;';
+    wrap.style.cssText = 'position:absolute;inset:0;z-index:85;background:rgba(7,8,15,0.12);display:flex;flex-direction:column;overflow:hidden;';
     wrap.innerHTML = `
       <div data-rg-dim-view style="position:relative;flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center;perspective:1100px;cursor:${state.mode === '3d' ? 'grab' : 'default'};"></div>
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 12px;background:rgba(15,17,28,0.92);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,0.1);font-size:11px;color:#cbd5e1;">

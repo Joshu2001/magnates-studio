@@ -5471,13 +5471,19 @@
                 <span class="rg-ctx-menu-kbd">⌥⌘V</span>
               </button>
               <div class="rg-ctx-menu-sep"></div>
-              <div class="rg-ctx-menu-sep"></div>
+              <button type="button" class="rg-ctx-menu-item" data-ctx-fx-trigger="true">
+                <span class="rg-ctx-menu-item-left">
+                  ${LUCIDE_ICONS.sparkles || LUCIDE_ICONS.sliders || ''}
+                  <span>Effects &amp; Animations</span>
+                </span>
+                <span class="rg-ctx-menu-kbd">&#x25B8;</span>
+              </button>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 10px;">
                 <span style="font-size:11px;color:#94a3b8;font-weight:600;">Transform</span>
-                <div style="display:flex;gap:4px;">
-                  <button type="button" data-ctx-dim="2d" style="padding:2px 7px;border-radius:5px;border:1px solid rgba(255,255,255,0.16);background:rgba(255,255,255,0.06);color:#e2e8f0;font-size:10.5px;font-weight:700;cursor:pointer;">2D</button>
-                  <button type="button" data-ctx-dim="2.5d" style="padding:2px 7px;border-radius:5px;border:1px solid rgba(168,85,247,0.5);background:rgba(139,92,246,0.22);color:#e9d5ff;font-size:10.5px;font-weight:700;cursor:pointer;">2.5D</button>
-                  <button type="button" data-ctx-dim="3d" style="padding:2px 7px;border-radius:5px;border:1px solid rgba(56,189,248,0.5);background:rgba(14,165,233,0.2);color:#bae6fd;font-size:10.5px;font-weight:700;cursor:pointer;">3D</button>
+                <div class="rm-ctx-dim-pill">
+                  <button type="button" class="rm-ctx-dim-btn is-active" data-ctx-dim="2d">2D</button>
+                  <button type="button" class="rm-ctx-dim-btn" data-ctx-dim="2.5d">2.5D</button>
+                  <button type="button" class="rm-ctx-dim-btn" data-ctx-dim="3d">3D</button>
                 </div>
               </div>
               <button type="button" class="rg-ctx-menu-item is-destructive" data-ctx-cmd="delete">
@@ -6233,9 +6239,68 @@
 })();
 
 document.addEventListener('click', (e) => {
+  const fxBtn = e.target.closest('[data-ctx-fx-trigger]');
+  if (fxBtn) {
+    e.stopPropagation();
+    let pop = document.getElementById('rm-cutout-fx-popover');
+    if (pop) { pop.remove(); return; }
+    pop = document.createElement('div');
+    pop.id = 'rm-cutout-fx-popover';
+    const fxList = [
+      { id: 'float', label: 'Float Drift', kind: 'Motion', apply: (l) => { l.animStyle = 'float'; l.parallax = 1.2; } },
+      { id: 'pulse', label: 'Pulse Scale', kind: 'Motion', apply: (l) => { l.animStyle = 'pulse'; l.scale = 1.06; } },
+      { id: 'pop', label: 'Pop Entrance', kind: 'Motion', apply: (l) => { l.animStyle = 'pop'; l.scale = 1.04; } },
+      { id: 'tilt', label: 'Subtle Tilt', kind: 'Motion', apply: (l) => { l.rotation = 3; } },
+      { id: 'glow', label: 'Soft Glow', kind: 'Effect', apply: (l) => { l.opacity = 1; l.blur = 0; l.glow = 1.4; } },
+      { id: 'softblur', label: 'Soft Depth Blur', kind: 'Effect', apply: (l) => { l.blur = 2.5; } },
+      { id: 'dim', label: 'Muted Dim (70%)', kind: 'Look', apply: (l) => { l.opacity = 0.7; } },
+      { id: 'reset', label: 'Reset Effects', kind: 'Reset', apply: (l) => { l.blur = 0; l.opacity = 1; l.rotation = 0; l.scale = 1; delete l.animStyle; } }
+    ];
+    pop.innerHTML = `
+      <div class="rm-fx-pop-head"><span>Cutout Effects &amp; Animations</span><button type="button" class="rm-fx-pop-close">&#x2715;</button></div>
+      <input type="text" class="rm-fx-pop-search" placeholder="Search effects or animations...">
+      <div class="rm-fx-pop-list"></div>
+    `;
+    document.body.appendChild(pop);
+    const r = fxBtn.getBoundingClientRect();
+    pop.style.left = Math.max(12, Math.min(window.innerWidth - 252, r.left - 250)) + 'px';
+    pop.style.top = Math.max(12, Math.min(window.innerHeight - 320, r.top - 40)) + 'px';
+
+    const listEl = pop.querySelector('.rm-fx-pop-list');
+    const renderItems = (q = '') => {
+      const needle = q.trim().toLowerCase();
+      listEl.innerHTML = '';
+      fxList.filter(it => !needle || it.label.toLowerCase().includes(needle) || it.kind.toLowerCase().includes(needle)).forEach(it => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'rm-fx-pop-item';
+        b.innerHTML = `<span>${it.label}</span><small>${it.kind}</small>`;
+        b.addEventListener('click', () => {
+          const tplId = window.topCustomizerState?.currentTpl?.id || '';
+          const rt = window.REGAARDER_CHAPTER_RUNTIME?.[tplId];
+          const lid = rt?.selectedLayer;
+          if (rt && lid && rt.config?.layers?.[lid]) {
+            it.apply(rt.config.layers[lid]);
+            window.renderCustomizerFrame?.();
+          }
+          pop.remove();
+        });
+        listEl.appendChild(b);
+      });
+    };
+    renderItems();
+    pop.querySelector('.rm-fx-pop-search')?.addEventListener('input', (ev) => renderItems(ev.target.value));
+    pop.querySelector('.rm-fx-pop-close')?.addEventListener('click', () => pop.remove());
+    return;
+  }
+  if (!e.target.closest('#rm-cutout-fx-popover')) {
+    document.getElementById('rm-cutout-fx-popover')?.remove();
+  }
   const db = e.target.closest('[data-ctx-dim]');
   if (!db) return;
   e.stopPropagation();
+  const group = db.closest('.rm-ctx-dim-pill');
+  if (group) group.querySelectorAll('.rm-ctx-dim-btn').forEach(b => b.classList.toggle('is-active', b === db));
   window.RegaarderDimensionTransform?.open(db.getAttribute('data-ctx-dim'));
 });
 
