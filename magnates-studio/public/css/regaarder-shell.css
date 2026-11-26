@@ -735,20 +735,9 @@ body.rm-in-editor #rm-auth-actions,
   display: none !important;
 }
 
-/* Docked Left Drawer (Resizes stage smoothly like Canva instead of floating over video) */
-#editor-workspace .sidebar#left-sidebar {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  height: 100% !important;
-  flex-shrink: 0 !important;
-  z-index: 20 !important;
-  box-shadow: none !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
 /* Decluttered Right Inspector & Visual Backdrop Cards */
-#right-sidebar .hint-text {
+#right-sidebar .hint-text,
+.sidebar-right .hint-text {
   display: none !important;
 }
 
