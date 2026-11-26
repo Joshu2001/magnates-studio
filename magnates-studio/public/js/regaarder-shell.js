@@ -342,6 +342,27 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   const exportModal=document.getElementById('export-studio-modal');
+   if(exportModal&&!exportModal.dataset.rmDropdowns){
+     exportModal.dataset.rmDropdowns='true';
+     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+       const btns=[...grid.querySelectorAll('button')];
+       if(!btns.length)return;
+       grid.classList.add('rm-visual-select-hidden');
+       const sel=document.createElement('select');
+       sel.className='rm-export-select';
+       btns.forEach((b,i)=>{
+         const opt=document.createElement('option');
+         opt.value=String(i);
+         opt.textContent=b.textContent.trim();
+         if(b.classList.contains('active'))opt.selected=true;
+         sel.appendChild(opt);
+       });
+       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
+       grid.after(sel);
+     });
+   }
  })();
 
  // Circular Color Swatch Popovers for #text-color and #text-highlight-color
@@ -377,6 +398,27 @@
      inp.addEventListener('change',sync);
      document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
    });
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   const exportModal=document.getElementById('export-studio-modal');
+   if(exportModal&&!exportModal.dataset.rmDropdowns){
+     exportModal.dataset.rmDropdowns='true';
+     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+       const btns=[...grid.querySelectorAll('button')];
+       if(!btns.length)return;
+       grid.classList.add('rm-visual-select-hidden');
+       const sel=document.createElement('select');
+       sel.className='rm-export-select';
+       btns.forEach((b,i)=>{
+         const opt=document.createElement('option');
+         opt.value=String(i);
+         opt.textContent=b.textContent.trim();
+         if(b.classList.contains('active'))opt.selected=true;
+         sel.appendChild(opt);
+       });
+       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
+       grid.after(sel);
+     });
+   }
  })();
 
  // Visual Mini-Diagrams for Layer Arrangement & Clean Position Alignment
@@ -396,6 +438,27 @@
    if(presetLabel&&/Color Presets/i.test(presetLabel.textContent)){
      presetLabel.textContent='Color Presets';
      presetLabel.style.whiteSpace='nowrap';
+   }
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   const exportModal=document.getElementById('export-studio-modal');
+   if(exportModal&&!exportModal.dataset.rmDropdowns){
+     exportModal.dataset.rmDropdowns='true';
+     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+       const btns=[...grid.querySelectorAll('button')];
+       if(!btns.length)return;
+       grid.classList.add('rm-visual-select-hidden');
+       const sel=document.createElement('select');
+       sel.className='rm-export-select';
+       btns.forEach((b,i)=>{
+         const opt=document.createElement('option');
+         opt.value=String(i);
+         opt.textContent=b.textContent.trim();
+         if(b.classList.contains('active'))opt.selected=true;
+         sel.appendChild(opt);
+       });
+       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
+       grid.after(sel);
+     });
    }
  })();
 
@@ -449,6 +512,27 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   const exportModal=document.getElementById('export-studio-modal');
+   if(exportModal&&!exportModal.dataset.rmDropdowns){
+     exportModal.dataset.rmDropdowns='true';
+     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+       const btns=[...grid.querySelectorAll('button')];
+       if(!btns.length)return;
+       grid.classList.add('rm-visual-select-hidden');
+       const sel=document.createElement('select');
+       sel.className='rm-export-select';
+       btns.forEach((b,i)=>{
+         const opt=document.createElement('option');
+         opt.value=String(i);
+         opt.textContent=b.textContent.trim();
+         if(b.classList.contains('active'))opt.selected=true;
+         sel.appendChild(opt);
+       });
+       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
+       grid.after(sel);
+     });
+   }
  })();
 
  // Side-Opening Visual SFX Picker for #text-sfx
@@ -507,6 +591,27 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   const exportModal=document.getElementById('export-studio-modal');
+   if(exportModal&&!exportModal.dataset.rmDropdowns){
+     exportModal.dataset.rmDropdowns='true';
+     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+       const btns=[...grid.querySelectorAll('button')];
+       if(!btns.length)return;
+       grid.classList.add('rm-visual-select-hidden');
+       const sel=document.createElement('select');
+       sel.className='rm-export-select';
+       btns.forEach((b,i)=>{
+         const opt=document.createElement('option');
+         opt.value=String(i);
+         opt.textContent=b.textContent.trim();
+         if(b.classList.contains('active'))opt.selected=true;
+         sel.appendChild(opt);
+       });
+       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
+       grid.after(sel);
+     });
+   }
  })();
 
  // Global #right-inspector Polish: concise labels, strip inline emojis, collapse dense drawers
@@ -575,6 +680,27 @@
          clip.chartData.transparentBg=!toggle.checked;
          window.renderStudioFrame?.();
        }
+     });
+   }
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   const exportModal=document.getElementById('export-studio-modal');
+   if(exportModal&&!exportModal.dataset.rmDropdowns){
+     exportModal.dataset.rmDropdowns='true';
+     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+       const btns=[...grid.querySelectorAll('button')];
+       if(!btns.length)return;
+       grid.classList.add('rm-visual-select-hidden');
+       const sel=document.createElement('select');
+       sel.className='rm-export-select';
+       btns.forEach((b,i)=>{
+         const opt=document.createElement('option');
+         opt.value=String(i);
+         opt.textContent=b.textContent.trim();
+         if(b.classList.contains('active'))opt.selected=true;
+         sel.appendChild(opt);
+       });
+       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
+       grid.after(sel);
      });
    }
  })();
