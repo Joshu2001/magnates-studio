@@ -320,6 +320,14 @@
      <div class="rm-font-menu">${options.map(o=>`<button type="button" class="rm-font-opt ${o.value===sel.value?'is-active':''}" data-val="${o.value.replace(/"/g,'&quot;')}" style="font-family:${o.value}"><span>Aa</span><em>${o.label}</em></button>`).join('')}</div>`;
    sel.after(wrap);
    const triggerSpan=wrap.querySelector('.rm-font-preview');
+   const menuEl=wrap.querySelector('.rm-font-menu');
+   wrap.addEventListener('toggle',()=>{
+     if(wrap.open&&menuEl){
+       const r=wrap.getBoundingClientRect();
+       menuEl.style.left=Math.max(12,Math.round(r.left-246))+'px';
+       menuEl.style.top=Math.max(12,Math.min(Math.round(r.top),window.innerHeight-260))+'px';
+     }
+   });
    const sync=()=>{
      if(triggerSpan){triggerSpan.textContent=getLabel(sel.value);triggerSpan.style.fontFamily=sel.value;}
      wrap.querySelectorAll('.rm-font-opt').forEach(b=>b.classList.toggle('is-active',b.dataset.val===sel.value));
@@ -370,61 +378,70 @@
    });
  })();
 
- // Visual Mini-Diagrams for Layer Arrangement & Position Alignment
+ // Visual Mini-Diagrams for Layer Arrangement & Clean Position Alignment
  (function initVisualInspectorCards(){
    const backBtn=document.getElementById('btn-text-layer-back');
    const frontBtn=document.getElementById('btn-text-layer-front');
    if(backBtn&&!backBtn.dataset.rmVisual){
      backBtn.dataset.rmVisual='true';
-     backBtn.innerHTML='<svg viewBox="0 0 36 22" width="32" height="20" aria-hidden="true"><text x="6" y="13" fill="currentColor" opacity="0.45" font-size="10" font-weight="700">T</text><rect x="13" y="4" width="18" height="14" rx="3" fill="#1e2235" stroke="currentColor" stroke-width="1.4"/></svg><span>Behind Media</span>';
+     backBtn.innerHTML='<svg viewBox="0 0 36 24" width="32" height="22" aria-hidden="true"><text x="6" y="16" fill="currentColor" opacity="0.5" font-size="13" font-weight="800">T</text><rect x="11" y="4" width="18" height="15" rx="3" fill="#181b28" stroke="currentColor" stroke-width="1.5"/></svg><span>Behind Media</span>';
    }
    if(frontBtn&&!frontBtn.dataset.rmVisual){
      frontBtn.dataset.rmVisual='true';
-     frontBtn.innerHTML='<svg viewBox="0 0 36 22" width="32" height="20" aria-hidden="true"><rect x="5" y="4" width="18" height="14" rx="3" fill="#1e2235" stroke="currentColor" stroke-opacity="0.55" stroke-width="1.2"/><text x="15" y="15" fill="currentColor" font-size="11" font-weight="800">T</text></svg><span>In Front</span>';
+     frontBtn.innerHTML='<svg viewBox="0 0 36 24" width="32" height="22" aria-hidden="true"><rect x="7" y="4" width="18" height="15" rx="3" fill="#181b28" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.3"/><text x="15" y="17" fill="currentColor" font-size="13" font-weight="900">T</text></svg><span>In Front</span>';
    }
-   const posSpecs=[
-     {id:'btn-text-pos-center',label:'Center',y:9},
-     {id:'btn-text-pos-bottom',label:'Bottom 1/3',y:14},
-     {id:'btn-text-pos-top',label:'Top',y:4}
-   ];
-   posSpecs.forEach(p=>{
-     const btn=document.getElementById(p.id);
-     if(btn&&!btn.dataset.rmVisual){
-       btn.dataset.rmVisual='true';
-       btn.innerHTML=`<svg viewBox="0 0 32 20" width="28" height="18" aria-hidden="true"><rect x="1" y="1" width="30" height="18" rx="3" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.2"/><rect x="7" y="${p.y}" width="18" height="3" rx="1.5" fill="currentColor"/></svg><span>${p.label}</span>`;
-     }
-   });
  })();
 
- // Visual Animation Style Grid for #text-anim
+ // Clean Animation Trigger + Side-Opening Live Animated Preview Popover
  (function initAnimationVisualGrid(){
    const sel=document.getElementById('text-anim');
    if(!sel||sel.dataset.rmVisualAnim)return;
    sel.dataset.rmVisualAnim='true';
    sel.classList.add('rm-visual-select-hidden');
    const presets=[
-     {value:'pop',label:'Word Pop',icon:'✦'},
-     {value:'materialize',label:'Materialize',icon:'◌'},
-     {value:'slide_up',label:'Slide Up',icon:'↑'},
-     {value:'zoom_in',label:'Zoom In',icon:'⊕'},
-     {value:'typewriter',label:'Typewriter',icon:'|'},
-     {value:'stamp',label:'Impact',icon:'◆'},
-     {value:'fade',label:'Fade In',icon:'◐'},
-     {value:'none',label:'Static',icon:'—'}
+     {value:'pop',label:'Word Pop',cls:'rm-anim-demo-pop'},
+     {value:'materialize',label:'Materialize',cls:'rm-anim-demo-fade'},
+     {value:'slide_up',label:'Slide Up',cls:'rm-anim-demo-slide'},
+     {value:'zoom_in',label:'Zoom In',cls:'rm-anim-demo-zoom'},
+     {value:'typewriter',label:'Typewriter',cls:'rm-anim-demo-type'},
+     {value:'stamp',label:'Impact',cls:'rm-anim-demo-stamp'},
+     {value:'fade',label:'Fade In',cls:'rm-anim-demo-fade'},
+     {value:'none',label:'Static',cls:''}
    ];
-   const grid=document.createElement('div');
-   grid.className='rm-anim-card-grid';
-   grid.innerHTML=presets.map(p=>`<button type="button" class="rm-anim-card ${sel.value===p.value?'is-active':''}" data-val="${p.value}"><em>${p.icon}</em><span>${p.label}</span></button>`).join('');
-   sel.after(grid);
-   const sync=()=>{for(const b of grid.children)b.classList.toggle('is-active',b.dataset.val===sel.value);};
-   grid.addEventListener('click',e=>{
-     const btn=e.target.closest('.rm-anim-card');
-     if(!btn)return;
-     sel.value=btn.dataset.val;
-     sel.dispatchEvent(new Event('change',{bubbles:true}));
-     sync();
+   const getLabel=(v)=>presets.find(p=>p.value===v)?.label||sel.selectedOptions[0]?.textContent||'Animation';
+   const wrap=document.createElement('details');
+   wrap.className='rm-anim-picker';
+   wrap.innerHTML=`
+     <summary class="rm-anim-trigger"><span class="rm-anim-current">${getLabel(sel.value)}</span><em>Preview ▾</em></summary>
+     <div class="rm-anim-popover">
+       <div class="rm-anim-popover-head"><strong>Animation Style</strong><span>Live motion preview</span></div>
+       <div class="rm-anim-card-grid">
+         ${presets.map(p=>`<button type="button" class="rm-anim-card ${sel.value===p.value?'is-active':''}" data-val="${p.value}"><div class="rm-anim-stage"><span class="rm-anim-sample ${p.cls}">Aa</span></div><span>${p.label}</span></button>`).join('')}
+       </div>
+     </div>`;
+   sel.after(wrap);
+   const pop=wrap.querySelector('.rm-anim-popover');
+   const cur=wrap.querySelector('.rm-anim-current');
+   wrap.addEventListener('toggle',()=>{
+     if(wrap.open&&pop){
+       const r=wrap.getBoundingClientRect();
+       pop.style.left=Math.max(12,Math.round(r.left-290))+'px';
+       pop.style.top=Math.max(12,Math.min(Math.round(r.top-40),window.innerHeight-280))+'px';
+     }
+   });
+   const sync=()=>{
+     if(cur)cur.textContent=getLabel(sel.value);
+     wrap.querySelectorAll('.rm-anim-card').forEach(b=>b.classList.toggle('is-active',b.dataset.val===sel.value));
+   };
+   wrap.querySelectorAll('.rm-anim-card').forEach(btn=>{
+     btn.addEventListener('click',()=>{
+       sel.value=btn.dataset.val;
+       sel.dispatchEvent(new Event('change',{bubbles:true}));
+       wrap.open=false;sync();
+     });
    });
    sel.addEventListener('change',sync);
+   document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
  })();
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  function refineMeshInspector(section){
