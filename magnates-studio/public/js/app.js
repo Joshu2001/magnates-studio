@@ -39048,6 +39048,13 @@ function updateTopCustomizerFrame(seqTime, now) {
       window.stepJaniForbesAnimation(stage, 'jani-forbes-fraud-reveal', localSceneT, jData);
     }
   }
+  if (tplId === 'ponzi-minute7-documentary') {
+    if (typeof window.stepPonziMinute7Animation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('ponzi-minute7-documentary') : {};
+      window.stepPonziMinute7Animation(stage, 'ponzi-minute7-documentary', localSceneT, pData);
+    }
+  }
   if (tplId === 'wire-transfer') {
     if (typeof window.stepWireTransferAnimation === 'function') {
       const stage = document.getElementById('tpl-modal-preview-stage');

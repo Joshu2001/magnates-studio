@@ -24,7 +24,7 @@
       const slideX = t > 2.4 ? ((t - 2.4) / 0.6) * 100 : 0;
       return `
         <div style="position:absolute;inset:0;transform:translateX(${slideX}%);">
-          <img src="${ASSET_BASE}/${showBalcony ? 'bg_city_balcony.svg' : 'bg_office_handshake.svg'}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+          <img src="${ASSET_BASE}/${showBalcony ? 'bg_city_balcony.jpg' : 'bg_office_handshake.svg'}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
           ${!showBalcony ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:64px;font-weight:700;color:#f5c518;text-shadow:0 4px 16px rgba(0,0,0,0.8);">Six Months</div>` : ''}
           ${showBalcony ? `<img src="${ASSET_BASE}/fg_man_back_suit.svg" style="position:absolute;left:50%;bottom:8%;transform:translateX(-50%);height:58%;"/>` : ''}
           <img src="${ASSET_BASE}/fg_handshake.svg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:${showBalcony ? 0.35 : 1};filter:${showBalcony ? 'blur(4px)' : 'none'};"/>
@@ -38,7 +38,7 @@
       const showArrows = t >= 6;
       return `
         <div style="position:absolute;inset:0;">
-          <img src="${ASSET_BASE}/bg_watermelon_table.svg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
+          <img src="${ASSET_BASE}/bg_watermelon_table.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
           <img src="${ASSET_BASE}/fg_father_in_law.svg" style="position:absolute;left:2%;bottom:0;height:78%;"/>
           <div style="position:absolute;right:8%;top:22%;font-family:'Brush Script MT',cursive;font-size:40px;text-shadow:0 3px 10px #000;">${writeOnText('Fruit selling business', writeP, '#f5c518')}</div>
           ${showArrows ? `<div style="position:absolute;right:12%;top:32%;font-size:72px;color:#fff;letter-spacing:16px;opacity:0.9;">⬇ ⬇ ⬇</div>` : ''}
@@ -53,7 +53,7 @@
       return `
         <div style="position:absolute;inset:0;">
           <img src="${ASSET_BASE}/bg_dollar_bills.svg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"/>
-          ${showCloseup ? `<img src="${ASSET_BASE}/fg_ponzi_closeup.svg" style="position:absolute;left:50%;top:0;transform:translateX(-50%);height:100%;opacity:0.85;"/>` : `<img src="${ASSET_BASE}/fg_ponzi_cash_fan.svg" style="position:absolute;left:4%;bottom:0;height:88%;"/>`}
+          ${showCloseup ? `<img src="${ASSET_BASE}/fg_ponzi_closeup.jpg" style="position:absolute;left:50%;top:0;transform:translateX(-50%);height:100%;opacity:0.85;"/>` : `<img src="${ASSET_BASE}/fg_ponzi_cash_fan.svg" style="position:absolute;left:4%;bottom:0;height:88%;"/>`}
           ${!showCloseup ? `<div style="position:absolute;left:22%;top:48%;font-family:'Brush Script MT',cursive;font-size:38px;text-shadow:0 3px 10px #000;">${writeOnText('Financial Genius', writeP, '#f5c518')}</div>` : ''}
           ${showCloseup ? `
             <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Arial,sans-serif;font-weight:900;font-size:30px;text-align:center;text-shadow:0 4px 14px #000;line-height:1.25;">
@@ -219,5 +219,26 @@
     }
 
     stageEl._ponziMin7Raf = requestAnimationFrame(tick);
+  };
+
+  window.stepPonziMinute7Animation = function (stageEl, tplId, localSceneT, data) {
+    if (!stageEl) return;
+    if (stageEl._ponziMin7Raf) {
+      cancelAnimationFrame(stageEl._ponziMin7Raf);
+      stageEl._ponziMin7Raf = null;
+    }
+    let canvas = stageEl.querySelector('.ponzi-min7-canvas');
+    if (!canvas) {
+      stageEl.innerHTML = '';
+      stageEl.style.position = 'relative';
+      stageEl.style.overflow = 'hidden';
+      stageEl.style.background = '#000';
+      canvas = document.createElement('div');
+      canvas.className = 'ponzi-min7-canvas';
+      canvas.style.cssText = 'position:absolute;inset:0;overflow:hidden;';
+      stageEl.appendChild(canvas);
+    }
+    const t = Math.max(0, Number(localSceneT) || 0) % 60;
+    canvas.innerHTML = renderBeat(t);
   };
 })();
