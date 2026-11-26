@@ -6272,40 +6272,58 @@ document.addEventListener('click', (e) => {
       window.renderCustomizerFrame?.();
     };
     const fxList = [
-      { id: 'push', label: 'Push In', kind: 'Motion', apply: (l) => { l.animStyle = 'push'; l.scale = 1.12; } },
-      { id: 'pull', label: 'Pull Out', kind: 'Motion', apply: (l) => { l.animStyle = 'pull'; l.scale = 0.92; } },
-      { id: 'float', label: 'Float Drift', kind: 'Motion', apply: (l) => { l.animStyle = 'float'; l.parallax = 1.25; } },
-      { id: 'parallax', label: 'Parallax Drift', kind: 'Motion', apply: (l) => { l.animStyle = 'parallax'; l.parallax = 1.5; l.depth = 1.2; } },
-      { id: 'pop', label: 'Pop Entrance', kind: 'Motion', apply: (l) => { l.animStyle = 'pop'; l.scale = 1.05; } },
-      { id: 'pulse', label: 'Pulse Scale', kind: 'Motion', apply: (l) => { l.animStyle = 'pulse'; l.scale = 1.06; } },
-      { id: 'slideup', label: 'Slide Up', kind: 'Motion', apply: (l) => { l.animStyle = 'slideup'; l.y = (l.y || 0) - 8; } },
-      { id: 'slideleft', label: 'Slide Left', kind: 'Motion', apply: (l) => { l.animStyle = 'slideleft'; l.x = (l.x || 0) - 8; } },
-      { id: 'tilt', label: 'Subtle Tilt', kind: 'Motion', apply: (l) => { l.rotation = 3.5; } },
-      { id: 'glow', label: 'Soft Glow', kind: 'Effect', apply: (l) => { l.opacity = 1; l.blur = 0; l.glow = 1.5; } },
-      { id: 'bloom', label: 'Cinema Bloom', kind: 'Effect', apply: (l) => { l.opacity = 1; l.glow = 2.2; } },
-      { id: 'softblur', label: 'Depth Blur', kind: 'Effect', apply: (l) => { l.blur = 2.5; } },
-      { id: 'silhouette', label: 'Dark Silhouette', kind: 'Look', apply: (l) => { l.opacity = 0.85; l.blackSilhouette = true; } },
-      { id: 'dim', label: 'Dim 70%', kind: 'Look', apply: (l) => { l.opacity = 0.7; } },
-      { id: 'reset', label: 'Reset All', kind: 'Reset', apply: (l) => { l.blur = 0; l.opacity = 1; l.rotation = 0; l.scale = 1; l.x = 0; l.y = 0; delete l.animStyle; delete l.blackSilhouette; } }
+      { id: 'push', label: 'Push In', kind: 'Motion', ctrls: ['scale'], apply: (l) => { l.animStyle = 'push'; l.scale = 1.12; } },
+      { id: 'pull', label: 'Pull Out', kind: 'Motion', ctrls: ['scale'], apply: (l) => { l.animStyle = 'pull'; l.scale = 0.92; } },
+      { id: 'float', label: 'Float Drift', kind: 'Motion', ctrls: ['parallax', 'scale'], apply: (l) => { l.animStyle = 'float'; l.parallax = 1.25; } },
+      { id: 'parallax', label: 'Parallax Drift', kind: 'Motion', ctrls: ['parallax', 'scale'], apply: (l) => { l.animStyle = 'parallax'; l.parallax = 1.5; l.depth = 1.2; } },
+      { id: 'pop', label: 'Pop Entrance', kind: 'Motion', ctrls: ['scale'], apply: (l) => { l.animStyle = 'pop'; l.scale = 1.05; } },
+      { id: 'pulse', label: 'Pulse Scale', kind: 'Motion', ctrls: ['scale'], apply: (l) => { l.animStyle = 'pulse'; l.scale = 1.06; } },
+      { id: 'slideup', label: 'Slide Up', kind: 'Motion', ctrls: ['offset'], apply: (l) => { l.animStyle = 'slideup'; l.y = (l.y || 0) - 8; } },
+      { id: 'slideleft', label: 'Slide Left', kind: 'Motion', ctrls: ['offset'], apply: (l) => { l.animStyle = 'slideleft'; l.x = (l.x || 0) - 8; } },
+      { id: 'tilt', label: 'Subtle Tilt', kind: 'Motion', ctrls: ['rot'], apply: (l) => { l.rotation = 3.5; } },
+      { id: 'glow', label: 'Soft Glow', kind: 'Effect', ctrls: ['glow'], apply: (l) => { l.opacity = 1; l.blur = 0; l.glow = 1.5; } },
+      { id: 'bloom', label: 'Cinema Bloom', kind: 'Effect', ctrls: ['glow'], apply: (l) => { l.opacity = 1; l.glow = 2.2; } },
+      { id: 'softblur', label: 'Depth Blur', kind: 'Effect', ctrls: ['blur', 'ramp'], apply: (l) => { l.blur = 2.5; } },
+      { id: 'silhouette', label: 'Dark Silhouette', kind: 'Look', ctrls: ['opacity'], apply: (l) => { l.opacity = 0.85; l.blackSilhouette = true; } },
+      { id: 'dim', label: 'Dim 70%', kind: 'Look', ctrls: ['opacity'], apply: (l) => { l.opacity = 0.7; } },
+      { id: 'reset', label: 'Reset All', kind: 'Reset', ctrls: [], apply: (l) => { l.blur = 0; l.opacity = 1; l.rotation = 0; l.scale = 1; l.x = 0; l.y = 0; delete l.animStyle; delete l.blackSilhouette; } }
     ];
+    document.body.classList.add('rm-fx-popover-open');
+    const closePop = () => { document.body.classList.remove('rm-fx-popover-open'); pop.remove(); };
     pop.innerHTML = `
       <div class="rm-fx-pop-head"><span>Cutout Effects &amp; Animations</span><button type="button" class="rm-fx-pop-close">&#x2715;</button></div>
       <input type="text" class="rm-fx-pop-search" placeholder="Search effects or animations...">
       <div class="rm-fx-pop-grid"></div>
-      <div class="rm-fx-custom-panel">
-        <div class="rm-fx-custom-row">
+      <div class="rm-fx-custom-panel" style="display:none;">
+        <div class="rm-fx-custom-row" data-fx-row="rot">
           <label>Tilt <span data-fx-val="rot">0°</span></label>
           <input type="range" data-fx-ctrl="rot" min="-25" max="25" step="0.5" value="0">
         </div>
-        <div class="rm-fx-custom-row">
+        <div class="rm-fx-custom-row" data-fx-row="scale">
           <label>Zoom <span data-fx-val="scale">1.00×</span></label>
           <input type="range" data-fx-ctrl="scale" min="0.6" max="1.8" step="0.02" value="1">
         </div>
-        <div class="rm-fx-custom-row">
+        <div class="rm-fx-custom-row" data-fx-row="parallax">
+          <label>Parallax <span data-fx-val="parallax">1.25×</span></label>
+          <input type="range" data-fx-ctrl="parallax" min="0.5" max="2.5" step="0.05" value="1.25">
+        </div>
+        <div class="rm-fx-custom-row" data-fx-row="offset">
+          <label>Offset <span data-fx-val="offset">0px</span></label>
+          <input type="range" data-fx-ctrl="offset" min="-40" max="40" step="1" value="0">
+        </div>
+        <div class="rm-fx-custom-row" data-fx-row="glow">
+          <label>Glow <span data-fx-val="glow">1.5</span></label>
+          <input type="range" data-fx-ctrl="glow" min="0.2" max="3" step="0.1" value="1.5">
+        </div>
+        <div class="rm-fx-custom-row" data-fx-row="opacity">
+          <label>Opacity <span data-fx-val="opacity">100%</span></label>
+          <input type="range" data-fx-ctrl="opacity" min="0.1" max="1" step="0.05" value="1">
+        </div>
+        <div class="rm-fx-custom-row" data-fx-row="blur">
           <label>Blur <span data-fx-val="blur">0px</span></label>
           <input type="range" data-fx-ctrl="blur" min="0" max="12" step="0.5" value="0">
         </div>
-        <div class="rm-fx-custom-row">
+        <div class="rm-fx-custom-row" data-fx-row="ramp">
           <label>Blur Ramp</label>
           <div class="rm-fx-ramp-pills">
             <button type="button" class="rm-fx-ramp-btn is-active" data-fx-ramp="constant">Constant</button>
@@ -6325,40 +6343,76 @@ document.addEventListener('click', (e) => {
     pop.style.top = Math.max(12, Math.min(window.innerHeight - 520, r.top - 100)) + 'px';
 
     let selectedItem = null;
+    const customPanel = pop.querySelector('.rm-fx-custom-panel');
     const ctrlRot = pop.querySelector('[data-fx-ctrl="rot"]');
     const ctrlScale = pop.querySelector('[data-fx-ctrl="scale"]');
+    const ctrlParallax = pop.querySelector('[data-fx-ctrl="parallax"]');
+    const ctrlOffset = pop.querySelector('[data-fx-ctrl="offset"]');
+    const ctrlGlow = pop.querySelector('[data-fx-ctrl="glow"]');
+    const ctrlOpacity = pop.querySelector('[data-fx-ctrl="opacity"]');
     const ctrlBlur = pop.querySelector('[data-fx-ctrl="blur"]');
     const valRot = pop.querySelector('[data-fx-val="rot"]');
     const valScale = pop.querySelector('[data-fx-val="scale"]');
+    const valParallax = pop.querySelector('[data-fx-val="parallax"]');
+    const valOffset = pop.querySelector('[data-fx-val="offset"]');
+    const valGlow = pop.querySelector('[data-fx-val="glow"]');
+    const valOpacity = pop.querySelector('[data-fx-val="opacity"]');
     const valBlur = pop.querySelector('[data-fx-val="blur"]');
     let blurRamp = layerObj?.blurRamp || 'constant';
 
+    const showRelevantControls = (item) => {
+      if (!customPanel) return;
+      if (!item || !item.ctrls?.length) { customPanel.style.display = 'none'; return; }
+      customPanel.style.display = 'flex';
+      const allowed = new Set(item.ctrls);
+      customPanel.querySelectorAll('[data-fx-row]').forEach(row => {
+        row.style.display = allowed.has(row.dataset.fxRow) ? 'flex' : 'none';
+      });
+    };
     const syncControlsFromLayer = () => {
       if (!layerObj) return;
       const rot = Number(layerObj.rotation || 0);
       const sc = Number(layerObj.scale ?? 1);
+      const px = Number(layerObj.parallax ?? 1);
+      const off = Number(selectedItem?.id === 'slideleft' ? (layerObj.x || 0) : (layerObj.y || 0));
+      const gl = Number(layerObj.glow ?? 1);
+      const op = Number(layerObj.opacity ?? 1);
       const bl = Number(layerObj.blur || 0);
       if (ctrlRot) ctrlRot.value = String(rot);
       if (ctrlScale) ctrlScale.value = String(sc);
+      if (ctrlParallax) ctrlParallax.value = String(px);
+      if (ctrlOffset) ctrlOffset.value = String(off);
+      if (ctrlGlow) ctrlGlow.value = String(gl);
+      if (ctrlOpacity) ctrlOpacity.value = String(op);
       if (ctrlBlur) ctrlBlur.value = String(bl);
       if (valRot) valRot.textContent = rot + '°';
       if (valScale) valScale.textContent = sc.toFixed(2) + '×';
+      if (valParallax) valParallax.textContent = px.toFixed(2) + '×';
+      if (valOffset) valOffset.textContent = off + 'px';
+      if (valGlow) valGlow.textContent = gl.toFixed(1);
+      if (valOpacity) valOpacity.textContent = Math.round(op * 100) + '%';
       if (valBlur) valBlur.textContent = bl + 'px';
       pop.querySelectorAll('.rm-fx-ramp-btn').forEach(btn => btn.classList.toggle('is-active', btn.dataset.fxRamp === blurRamp));
     };
     const applyCustomSliders = () => {
       if (!layerObj) return;
-      layerObj.rotation = Number(ctrlRot?.value || 0);
-      layerObj.scale = Number(ctrlScale?.value || 1);
-      layerObj.blur = Number(ctrlBlur?.value || 0);
-      layerObj.blurRamp = blurRamp;
-      if (valRot) valRot.textContent = layerObj.rotation + '°';
-      if (valScale) valScale.textContent = layerObj.scale.toFixed(2) + '×';
-      if (valBlur) valBlur.textContent = layerObj.blur + 'px';
+      const allowed = new Set(selectedItem?.ctrls || []);
+      if (allowed.has('rot')) layerObj.rotation = Number(ctrlRot?.value || 0);
+      if (allowed.has('scale')) layerObj.scale = Number(ctrlScale?.value || 1);
+      if (allowed.has('parallax')) layerObj.parallax = Number(ctrlParallax?.value || 1);
+      if (allowed.has('offset')) {
+        if (selectedItem?.id === 'slideleft') layerObj.x = Number(ctrlOffset?.value || 0);
+        else layerObj.y = Number(ctrlOffset?.value || 0);
+      }
+      if (allowed.has('glow')) layerObj.glow = Number(ctrlGlow?.value || 1);
+      if (allowed.has('opacity')) layerObj.opacity = Number(ctrlOpacity?.value ?? 1);
+      if (allowed.has('blur')) layerObj.blur = Number(ctrlBlur?.value || 0);
+      if (allowed.has('ramp')) layerObj.blurRamp = blurRamp;
+      syncControlsFromLayer();
       window.renderCustomizerFrame?.();
     };
     syncControlsFromLayer();
-    [ctrlRot, ctrlScale, ctrlBlur].forEach(inp => inp?.addEventListener('input', applyCustomSliders));
+    [ctrlRot, ctrlScale, ctrlParallax, ctrlOffset, ctrlGlow, ctrlOpacity, ctrlBlur].forEach(inp => inp?.addEventListener('input', applyCustomSliders));
     pop.querySelectorAll('.rm-fx-ramp-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         blurRamp = btn.dataset.fxRamp;
@@ -6397,6 +6451,7 @@ document.addEventListener('click', (e) => {
         b.addEventListener('click', () => {
           selectedItem = it;
           gridEl.querySelectorAll('.rm-fx-card').forEach(c => c.classList.toggle('is-selected', c === b));
+          showRelevantControls(it);
           if (layerObj && snapshot) {
             Object.keys(layerObj).forEach(k => { if (!(k in snapshot)) delete layerObj[k]; });
             Object.assign(layerObj, snapshot);
@@ -6404,6 +6459,7 @@ document.addEventListener('click', (e) => {
             syncControlsFromLayer();
             window.renderCustomizerFrame?.();
           }
+          if (!it.ctrls?.length) { committed = true; closePop(); }
         });
         gridEl.appendChild(b);
       });
@@ -6413,6 +6469,7 @@ document.addEventListener('click', (e) => {
     pop.querySelector('.rm-fx-btn-reset')?.addEventListener('click', () => {
       selectedItem = null;
       blurRamp = 'constant';
+      showRelevantControls(null);
       if (layerObj) {
         layerObj.blur = 0; layerObj.opacity = 1; layerObj.rotation = 0; layerObj.scale = 1;
         layerObj.x = 0; layerObj.y = 0; delete layerObj.animStyle; delete layerObj.blackSilhouette; delete layerObj.blurRamp;
@@ -6424,12 +6481,13 @@ document.addEventListener('click', (e) => {
     pop.querySelector('.rm-fx-btn-apply')?.addEventListener('click', () => {
       committed = true;
       applyCustomSliders();
-      pop.remove();
+      closePop();
     });
-    pop.querySelector('.rm-fx-pop-close')?.addEventListener('click', () => { restoreSnapshot(); pop.remove(); });
+    pop.querySelector('.rm-fx-pop-close')?.addEventListener('click', () => { restoreSnapshot(); closePop(); });
     return;
   }
   if (!e.target.closest('#rm-cutout-fx-popover')) {
+    document.body.classList.remove('rm-fx-popover-open');
     document.getElementById('rm-cutout-fx-popover')?.remove();
   }
   const db = e.target.closest('[data-ctx-dim]');
