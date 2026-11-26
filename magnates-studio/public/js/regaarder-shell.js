@@ -2213,11 +2213,42 @@
         if (!pop.contains(e.target) && e.target !== addBtn) pop.classList.remove('is-open');
       });
 
-      if (addAudioStrip) {
-        const imgContent = document.getElementById('content-image');
-        if (imgContent) imgContent.appendChild(addWrap);
-        else addAudioStrip.before(addWrap);
-      } else tlScroll.appendChild(addWrap);
+      const imgContent = document.getElementById('content-image');
+      const syncAddButton = () => {
+        if (!imgContent) return;
+        if (addWrap.parentElement !== imgContent) imgContent.appendChild(addWrap);
+        const clips = [...imgContent.querySelectorAll('.clip-block')];
+        const maxRight = clips.reduce((m, c) => Math.max(m, (parseFloat(c.style.left) || c.offsetLeft || 0) + (parseFloat(c.style.width) || c.offsetWidth || 0)), 0);
+        addWrap.style.left = (maxRight > 0 ? maxRight + 8 : 8) + 'px';
+      };
+      if (imgContent) {
+        syncAddButton();
+        new MutationObserver(syncAddButton).observe(imgContent, { childList: true });
+      } else if (addAudioStrip) {
+        addAudioStrip.before(addWrap);
+      } else {
+        tlScroll.appendChild(addWrap);
+      }
+      const txtContent = document.getElementById('content-text');
+      const syncTextWidths = () => {
+        if (!txtContent) return;
+        const blocks = [...txtContent.querySelectorAll('.clip-block')].sort((a, b) => (parseFloat(a.style.left) || 0) - (parseFloat(b.style.left) || 0));
+        blocks.forEach((b, i) => {
+          const next = blocks[i + 1];
+          if (next) {
+            const avail = Math.max(40, (parseFloat(next.style.left) || 0) - (parseFloat(b.style.left) || 0) - 6);
+            b.style.setProperty('min-width', '0', 'important');
+            b.style.setProperty('max-width', avail + 'px', 'important');
+          } else {
+            b.style.removeProperty('min-width');
+            b.style.removeProperty('max-width');
+          }
+        });
+      };
+      if (txtContent) {
+        syncTextWidths();
+        new MutationObserver(syncTextWidths).observe(txtContent, { childList: true });
+      }
     }
 
     // 4b. Stage Preview Selection Border & Drag-Resize Handles on #previewCanvas

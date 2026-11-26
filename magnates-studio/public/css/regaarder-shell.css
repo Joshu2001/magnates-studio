@@ -2529,11 +2529,13 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 .rm-tl-add-wrap {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
-  margin: 0 0 0 8px;
-  flex-shrink: 0;
+  margin: 0;
+  z-index: 6;
 }
 
 /* Stage Preview Selection Border & Drag-Resize Handles */
@@ -2590,26 +2592,35 @@ body.rm-in-editor #rm-auth-actions,
   display: none !important;
 }
 
-#timeline-body:not(.consolidated-storyline-mode) #track-text .clip,
-#timeline-body:not(.consolidated-storyline-mode) #track-chart .clip {
+#timeline-tracks #track-text .clip-block,
+#timeline-tracks #track-text .clip-block.selected,
+#timeline-tracks #track-chart .clip-block {
   background: rgba(139, 92, 246, 0.28) !important;
   border: 0 !important;
+  outline: none !important;
   box-shadow: none !important;
   border-radius: 7px !important;
   color: #f3e8ff !important;
-  padding: 0 8px !important;
+  padding: 0 10px !important;
+  min-width: max-content !important;
 }
 
-#timeline-tracks .clip .clip-handle {
+#timeline-tracks #track-text .clip-block .clip-block-content {
+  max-width: 260px;
+  overflow: hidden;
+}
+
+#timeline-tracks .clip-block .clip-handle {
   opacity: 0 !important;
   transition: opacity 0.14s ease;
 }
 
-#timeline-tracks .clip:hover .clip-handle {
+#timeline-tracks .clip-block:hover .clip-handle {
   opacity: 1 !important;
 }
 
-#timeline-tracks #track-text .clip .clip-block-content svg {
+#timeline-tracks #track-text .clip-block .clip-icon,
+#timeline-tracks #track-text .clip-block .clip-block-content svg {
   display: none !important;
 }
 
@@ -2617,14 +2628,14 @@ body.rm-in-editor #rm-auth-actions,
   display: none !important;
 }
 
-#timeline-body:not(.consolidated-storyline-mode) #track-image .clip,
-#timeline-body:not(.consolidated-storyline-mode) #track-video .clip {
+#timeline-tracks #track-image .clip-block,
+#timeline-tracks #track-video .clip-block {
   border-radius: 7px !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
 }
 
-#timeline-body:not(.consolidated-storyline-mode) #track-audio .clip,
-#timeline-body:not(.consolidated-storyline-mode) #track-music .clip {
+#timeline-tracks #track-audio .clip-block,
+#timeline-tracks #track-music .clip-block {
   background: rgba(109, 40, 217, 0.28) !important;
   border: 1px solid rgba(139, 92, 246, 0.42) !important;
   border-radius: 7px !important;
