@@ -304,6 +304,128 @@
    {value:'particles',label:'Embers',bg:'background:radial-gradient(circle at 30% 60%,#f97316 0%,transparent 35%),radial-gradient(circle at 70% 35%,#fb923c 0%,transparent 30%),#120c0a;'},
    {value:'silhouette',label:'Silhouette',bg:'background:radial-gradient(circle at 50% 45%,#334155 0%,#05060a 70%);'}
  ]);
+
+ // Custom Live-Font Picker for #text-font
+ (function initLiveFontPicker(){
+   const sel=document.getElementById('text-font');
+   if(!sel||sel.dataset.rmFontPicker)return;
+   sel.dataset.rmFontPicker='true';
+   sel.classList.add('rm-visual-select-hidden');
+   const wrap=document.createElement('details');
+   wrap.className='rm-font-picker';
+   const options=[...sel.options].map(o=>({value:o.value,label:o.textContent}));
+   const getLabel=(val)=>options.find(o=>o.value===val)?.label||options[0]?.label||'Inter';
+   wrap.innerHTML=`
+     <summary class="rm-font-trigger"><span class="rm-font-preview" style="font-family:${sel.value}">${getLabel(sel.value)}</span><span aria-hidden="true">⌄</span></summary>
+     <div class="rm-font-menu">${options.map(o=>`<button type="button" class="rm-font-opt ${o.value===sel.value?'is-active':''}" data-val="${o.value.replace(/"/g,'&quot;')}" style="font-family:${o.value}"><span>Aa</span><em>${o.label}</em></button>`).join('')}</div>`;
+   sel.after(wrap);
+   const triggerSpan=wrap.querySelector('.rm-font-preview');
+   const sync=()=>{
+     if(triggerSpan){triggerSpan.textContent=getLabel(sel.value);triggerSpan.style.fontFamily=sel.value;}
+     wrap.querySelectorAll('.rm-font-opt').forEach(b=>b.classList.toggle('is-active',b.dataset.val===sel.value));
+   };
+   wrap.querySelectorAll('.rm-font-opt').forEach(btn=>{
+     btn.addEventListener('click',()=>{
+       sel.value=btn.dataset.val;
+       sel.dispatchEvent(new Event('change',{bubbles:true}));
+       wrap.open=false;sync();
+     });
+   });
+   sel.addEventListener('change',sync);
+   document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
+ })();
+
+ // Circular Color Swatch Popovers for #text-color and #text-highlight-color
+ (function initCircularColorPickers(){
+   const SWATCHES=['#ffffff','#f8fafc','#cbd5e1','#000000','#ff334b','#f43f5e','#ffd000','#f59e0b','#00e676','#10b981','#00f0ff','#38bdf8','#8b5cf6','#c084fc'];
+   ['text-color','text-highlight-color'].forEach(id=>{
+     const inp=document.getElementById(id);
+     if(!inp||inp.dataset.rmColorSwatch)return;
+     inp.dataset.rmColorSwatch='true';
+     inp.classList.add('rm-visual-select-hidden');
+     const wrap=document.createElement('details');
+     wrap.className='rm-color-picker-wrap';
+     wrap.innerHTML=`
+       <summary class="rm-color-swatch-trigger" title="Choose color"><span class="rm-color-circle" style="background:${inp.value}"></span><code class="rm-color-hex">${inp.value}</code></summary>
+       <div class="rm-color-popover">
+         <div class="rm-color-grid">${SWATCHES.map(c=>`<button type="button" class="rm-color-dot-btn" data-hex="${c}" style="background:${c}" title="${c}"></button>`).join('')}</div>
+         <button type="button" class="rm-color-custom-btn">Custom picker…</button>
+       </div>`;
+     inp.after(wrap);
+     const circle=wrap.querySelector('.rm-color-circle');
+     const hexEl=wrap.querySelector('.rm-color-hex');
+     const sync=()=>{if(circle)circle.style.background=inp.value;if(hexEl)hexEl.textContent=inp.value;};
+     wrap.querySelectorAll('.rm-color-dot-btn').forEach(b=>{
+       b.addEventListener('click',()=>{
+         inp.value=b.dataset.hex;
+         inp.dispatchEvent(new Event('input',{bubbles:true}));
+         inp.dispatchEvent(new Event('change',{bubbles:true}));
+         wrap.open=false;sync();
+       });
+     });
+     wrap.querySelector('.rm-color-custom-btn')?.addEventListener('click',()=>{wrap.open=false;inp.click();});
+     inp.addEventListener('input',sync);
+     inp.addEventListener('change',sync);
+     document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
+   });
+ })();
+
+ // Visual Mini-Diagrams for Layer Arrangement & Position Alignment
+ (function initVisualInspectorCards(){
+   const backBtn=document.getElementById('btn-text-layer-back');
+   const frontBtn=document.getElementById('btn-text-layer-front');
+   if(backBtn&&!backBtn.dataset.rmVisual){
+     backBtn.dataset.rmVisual='true';
+     backBtn.innerHTML='<svg viewBox="0 0 36 22" width="32" height="20" aria-hidden="true"><text x="6" y="13" fill="currentColor" opacity="0.45" font-size="10" font-weight="700">T</text><rect x="13" y="4" width="18" height="14" rx="3" fill="#1e2235" stroke="currentColor" stroke-width="1.4"/></svg><span>Behind Media</span>';
+   }
+   if(frontBtn&&!frontBtn.dataset.rmVisual){
+     frontBtn.dataset.rmVisual='true';
+     frontBtn.innerHTML='<svg viewBox="0 0 36 22" width="32" height="20" aria-hidden="true"><rect x="5" y="4" width="18" height="14" rx="3" fill="#1e2235" stroke="currentColor" stroke-opacity="0.55" stroke-width="1.2"/><text x="15" y="15" fill="currentColor" font-size="11" font-weight="800">T</text></svg><span>In Front</span>';
+   }
+   const posSpecs=[
+     {id:'btn-text-pos-center',label:'Center',y:9},
+     {id:'btn-text-pos-bottom',label:'Bottom 1/3',y:14},
+     {id:'btn-text-pos-top',label:'Top',y:4}
+   ];
+   posSpecs.forEach(p=>{
+     const btn=document.getElementById(p.id);
+     if(btn&&!btn.dataset.rmVisual){
+       btn.dataset.rmVisual='true';
+       btn.innerHTML=`<svg viewBox="0 0 32 20" width="28" height="18" aria-hidden="true"><rect x="1" y="1" width="30" height="18" rx="3" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="1.2"/><rect x="7" y="${p.y}" width="18" height="3" rx="1.5" fill="currentColor"/></svg><span>${p.label}</span>`;
+     }
+   });
+ })();
+
+ // Visual Animation Style Grid for #text-anim
+ (function initAnimationVisualGrid(){
+   const sel=document.getElementById('text-anim');
+   if(!sel||sel.dataset.rmVisualAnim)return;
+   sel.dataset.rmVisualAnim='true';
+   sel.classList.add('rm-visual-select-hidden');
+   const presets=[
+     {value:'pop',label:'Word Pop',icon:'✦'},
+     {value:'materialize',label:'Materialize',icon:'◌'},
+     {value:'slide_up',label:'Slide Up',icon:'↑'},
+     {value:'zoom_in',label:'Zoom In',icon:'⊕'},
+     {value:'typewriter',label:'Typewriter',icon:'|'},
+     {value:'stamp',label:'Impact',icon:'◆'},
+     {value:'fade',label:'Fade In',icon:'◐'},
+     {value:'none',label:'Static',icon:'—'}
+   ];
+   const grid=document.createElement('div');
+   grid.className='rm-anim-card-grid';
+   grid.innerHTML=presets.map(p=>`<button type="button" class="rm-anim-card ${sel.value===p.value?'is-active':''}" data-val="${p.value}"><em>${p.icon}</em><span>${p.label}</span></button>`).join('');
+   sel.after(grid);
+   const sync=()=>{for(const b of grid.children)b.classList.toggle('is-active',b.dataset.val===sel.value);};
+   grid.addEventListener('click',e=>{
+     const btn=e.target.closest('.rm-anim-card');
+     if(!btn)return;
+     sel.value=btn.dataset.val;
+     sel.dispatchEvent(new Event('change',{bubbles:true}));
+     sync();
+   });
+   sel.addEventListener('change',sync);
+ })();
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  function refineMeshInspector(section){
   if(section.dataset.rmPrecision||!section.querySelector('[data-n3d-prop="editTool"]'))return;

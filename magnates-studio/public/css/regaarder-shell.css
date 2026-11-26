@@ -715,15 +715,24 @@ body.rm-in-editor #rm-auth-actions,
   color: #ffffff !important;
 }
 
-/* Collapse redundant transport pill under video down to just the (...) ellipses button */
+/* Collapse redundant transport pill under video & tuck (...) into bottom-right of canvas */
+.canvas-wrapper {
+  position: relative;
+}
+
 #canvas-controls-bar {
+  position: absolute !important;
+  right: 12px !important;
+  bottom: 12px !important;
+  left: auto !important;
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
   padding: 0 !important;
+  margin: 0 !important;
   min-height: 0 !important;
   height: auto !important;
-  margin-top: 4px !important;
+  z-index: 35 !important;
 }
 
 #canvas-controls-bar #btn-rewind,
@@ -736,9 +745,246 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 /* Decluttered Right Inspector & Visual Backdrop Cards */
+#right-sidebar,
+.sidebar-right {
+  padding-bottom: 76px !important;
+}
+
 #right-sidebar .hint-text,
 .sidebar-right .hint-text {
   display: none !important;
+}
+
+#right-sidebar #btn-save-color-template,
+#right-sidebar #btn-preview-text-sfx,
+#right-sidebar #btn-text-pos-center,
+#right-sidebar #btn-text-pos-bottom,
+#right-sidebar #btn-text-pos-top,
+#right-sidebar #btn-text-layer-back,
+#right-sidebar #btn-text-layer-front,
+#right-sidebar .palette-chip {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+}
+
+#right-sidebar #btn-text-pos-center.active,
+#right-sidebar #btn-text-pos-bottom.active,
+#right-sidebar #btn-text-pos-top.active,
+#right-sidebar #btn-text-layer-back.active,
+#right-sidebar #btn-text-layer-front.active,
+#right-sidebar .palette-chip.active {
+  background: rgba(139, 92, 246, 0.2) !important;
+  border-color: rgba(167, 139, 250, 0.5) !important;
+  color: #f3e8ff !important;
+}
+
+#right-sidebar #btn-text-layer-back,
+#right-sidebar #btn-text-layer-front,
+#right-sidebar #btn-text-pos-center,
+#right-sidebar #btn-text-pos-bottom,
+#right-sidebar #btn-text-pos-top {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  padding: 7px 6px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+/* Custom Live-Font Picker */
+.rm-font-picker {
+  position: relative;
+  width: 100%;
+}
+
+.rm-font-trigger {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #10111a;
+  color: #f8fafc;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.rm-font-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.rm-font-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 200;
+  background: #141622;
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: 10px;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.72);
+}
+
+.rm-font-opt {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #e2e8f0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rm-font-opt:hover,
+.rm-font-opt.is-active {
+  background: rgba(139, 92, 246, 0.2);
+  color: #ffffff;
+}
+
+.rm-font-opt span {
+  font-size: 15px;
+  font-weight: 700;
+  color: #c4b5fd;
+  width: 24px;
+  text-align: center;
+}
+
+.rm-font-opt em {
+  font-style: normal;
+  font-size: 12px;
+}
+
+/* Circular Color Swatch Picker */
+.rm-color-picker-wrap {
+  position: relative;
+}
+
+.rm-color-swatch-trigger {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.035);
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.rm-color-swatch-trigger::-webkit-details-marker {
+  display: none;
+}
+
+.rm-color-circle {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.rm-color-hex {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.rm-color-popover {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 220;
+  width: 196px;
+  padding: 10px;
+  background: #141622;
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: 11px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.72);
+}
+
+.rm-color-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.rm-color-dot-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  padding: 0;
+}
+
+.rm-color-custom-btn {
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Visual Animation Style Cards */
+.rm-anim-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.rm-anim-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 7px 3px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: #cbd5e1;
+  cursor: pointer;
+}
+
+.rm-anim-card.is-active {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.2);
+  color: #ffffff;
+}
+
+.rm-anim-card em {
+  font-style: normal;
+  font-size: 13px;
+  color: #c4b5fd;
+}
+
+.rm-anim-card span {
+  font-size: 9.5px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 #right-sidebar .fx-header .badge {
