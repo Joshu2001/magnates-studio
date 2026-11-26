@@ -2498,12 +2498,89 @@ body.rm-in-editor #rm-auth-actions,
 #timeline-scroll-col {
   flex: 1 !important;
   min-width: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+}
+
+#timeline-tracks {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.timeline-scene-sequence-bar {
+  min-height: 26px !important;
+  padding: 2px 10px !important;
+}
+
+#timeline-ruler-container {
+  height: 24px !important;
 }
 
 #timeline-body:not(.consolidated-storyline-mode) .track {
-  min-height: 28px !important;
+  min-height: 26px !important;
   padding: 2px 0 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+#content-image {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.rm-tl-add-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 0 8px;
+  flex-shrink: 0;
+}
+
+/* Stage Preview Selection Border & Drag-Resize Handles */
+.rm-preview-sel-box {
+  position: absolute;
+  pointer-events: none;
+  border: 2px solid #8b5cf6;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.28);
+  z-index: 25;
+  display: none;
+}
+
+.rm-preview-sel-box.is-visible {
+  display: block;
+}
+
+.rm-preview-handle {
+  position: absolute;
+  pointer-events: auto;
+  background: #ffffff;
+  border: 1.5px solid #8b5cf6;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.rm-preview-handle.corner {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+}
+
+.rm-preview-handle.nw { top: -5px; left: -5px; cursor: nwse-resize; }
+.rm-preview-handle.ne { top: -5px; right: -5px; cursor: nesw-resize; }
+.rm-preview-handle.sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+.rm-preview-handle.se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+.rm-preview-handle.e  { width: 5px; height: 22px; border-radius: 9999px; right: -3px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.rm-preview-handle.w  { width: 5px; height: 22px; border-radius: 9999px; left: -3px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+.rm-preview-handle.s  { height: 5px; width: 22px; border-radius: 9999px; bottom: -3px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+
+/* Force Templates Side Drawer Visible */
+#left-sidebar.rm-templates-mode {
+  display: flex !important;
+  width: 280px !important;
+  min-width: 280px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
 }
 
 #timeline-body:not(.consolidated-storyline-mode) #track-chart:not(:has(.clip)),
@@ -2613,6 +2690,16 @@ body.rm-in-editor #rm-auth-actions,
   padding: 14px;
   height: 100%;
   overflow-y: auto;
+}
+
+/* Compact Right Inspector Spacing to Minimize Vertical Scroll */
+#right-inspector .rg-inspector-shell,
+#right-inspector .rm-task-body {
+  gap: 8px !important;
+}
+
+#right-inspector .rm-visual-thumb {
+  height: 24px !important;
 }
 
 #left-sidebar.rm-templates-mode #rm-editor-templates-drawer {

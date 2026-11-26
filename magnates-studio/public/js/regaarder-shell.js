@@ -2212,8 +2212,76 @@
         if (!pop.contains(e.target) && e.target !== addBtn) pop.classList.remove('is-open');
       });
 
-      if (addAudioStrip) addAudioStrip.before(addWrap);
-      else tlScroll.appendChild(addWrap);
+      if (addAudioStrip) {
+        const imgContent = document.getElementById('content-image');
+        if (imgContent) imgContent.appendChild(addWrap);
+        else addAudioStrip.before(addWrap);
+      } else tlScroll.appendChild(addWrap);
+    }
+
+    // 4b. Stage Preview Selection Border & Drag-Resize Handles on #previewCanvas
+    const previewCanvas = document.getElementById('previewCanvas');
+    const canvasWrap = previewCanvas?.closest('.canvas-wrapper');
+    if (previewCanvas && canvasWrap && !document.getElementById('rm-preview-sel-box')) {
+      const selBox = document.createElement('div');
+      selBox.id = 'rm-preview-sel-box';
+      selBox.className = 'rm-preview-sel-box';
+      ['nw','ne','sw','se','e','w','s'].forEach((dir) => {
+        const h = document.createElement('div');
+        h.className = 'rm-preview-handle ' + (dir.length === 2 ? 'corner ' : '') + dir;
+        h.dataset.dir = dir;
+        selBox.appendChild(h);
+      });
+      canvasWrap.appendChild(selBox);
+
+      const syncSelBox = () => {
+        const wRect = canvasWrap.getBoundingClientRect();
+        const cRect = previewCanvas.getBoundingClientRect();
+        if (!cRect.width || !cRect.height) return;
+        selBox.style.left = Math.round(cRect.left - wRect.left) + 'px';
+        selBox.style.top = Math.round(cRect.top - wRect.top) + 'px';
+        selBox.style.width = Math.round(cRect.width) + 'px';
+        selBox.style.height = Math.round(cRect.height) + 'px';
+      };
+
+      previewCanvas.addEventListener('click', (e) => {
+        e.stopPropagation();
+        syncSelBox();
+        selBox.classList.add('is-visible');
+      });
+      document.addEventListener('click', (e) => {
+        if (!canvasWrap.contains(e.target)) selBox.classList.remove('is-visible');
+      });
+      window.addEventListener('resize', () => {
+        if (selBox.classList.contains('is-visible')) syncSelBox();
+      });
+
+      let dragDir = null, sx = 0, sy = 0, sw = 0, sh = 0;
+      selBox.querySelectorAll('.rm-preview-handle').forEach((h) => {
+        h.addEventListener('pointerdown', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          dragDir = h.dataset.dir;
+          sx = e.clientX; sy = e.clientY;
+          const r = previewCanvas.getBoundingClientRect();
+          sw = r.width; sh = r.height;
+          h.setPointerCapture?.(e.pointerId);
+        });
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (!dragDir) return;
+        const dx = e.clientX - sx;
+        const dy = e.clientY - sy;
+        let nextW = sw + (dragDir.includes('w') ? -dx : dx);
+        if (dragDir === 's') nextW = sw * ((sh + dy) / Math.max(1, sh));
+        nextW = Math.max(240, Math.min(canvasWrap.clientWidth - 24, Math.round(nextW)));
+        previewCanvas.style.width = nextW + 'px';
+        previewCanvas.style.height = 'auto';
+        previewCanvas.style.maxWidth = 'none';
+        previewCanvas.style.maxHeight = 'none';
+        syncSelBox();
+      });
+      window.addEventListener('pointerup', () => { dragDir = null; });
     }
 
     // 5. In-Editor Templates Side Drawer (#left-sidebar.rm-templates-mode)
@@ -2233,28 +2301,36 @@
 
       const populateTemplates = (q = '') => {
         const grid = drawer.querySelector('#rm-tpl-drawer-grid');
-        const sourceCards = [...document.querySelectorAll('#home-templates-grid .home-tpl-card')];
         if (!grid) return;
         const needle = q.trim().toLowerCase();
         grid.innerHTML = '';
-        sourceCards.forEach((src) => {
-          const title = src.querySelector('.home-tpl-title, h4, h3')?.textContent?.trim() || 'Template';
-          if (needle && !title.toLowerCase().includes(needle)) return;
-          const img = src.querySelector('img')?.getAttribute('src') || '';
+        const dataList = Array.isArray(window.EFFECT_TEMPLATES_DATA) && window.EFFECT_TEMPLATES_DATA.length
+          ? window.EFFECT_TEMPLATES_DATA.map((t) => ({ id: t.id, title: t.title || t.name || 'Template', img: t.defaultImage || t.thumbnail || '' }))
+          : [...document.querySelectorAll('#home-templates-grid .home-tpl-card')].map((src) => ({
+              el: src,
+              title: src.querySelector('.home-tpl-title, h4, h3')?.textContent?.trim() || 'Template',
+              img: src.querySelector('img')?.getAttribute('src') || ''
+            }));
+        dataList.forEach((tpl) => {
+          if (needle && !tpl.title.toLowerCase().includes(needle)) return;
           const card = document.createElement('button');
           card.type = 'button';
           card.className = 'rm-tpl-mini-card';
           card.innerHTML = `
             <div class="rm-tpl-mini-thumb">
-              ${img ? `<img src="${img}" alt="">` : ''}
+              ${tpl.img ? `<img src="${tpl.img}" alt="">` : ''}
               <span class="rm-tpl-mini-play">&#9654;</span>
             </div>
-            <div class="rm-tpl-mini-title">${title}</div>
+            <div class="rm-tpl-mini-title">${tpl.title}</div>
           `;
           card.addEventListener('click', () => {
-            const useBtn = src.querySelector('button, .btn-use-template');
-            if (useBtn) useBtn.click();
-            else src.click();
+            if (tpl.id && typeof window.loadTemplateIntoStudio === 'function') {
+              window.loadTemplateIntoStudio(tpl.id);
+            } else if (tpl.el) {
+              const useBtn = tpl.el.querySelector('button, .btn-use-template');
+              if (useBtn) useBtn.click();
+              else tpl.el.click();
+            }
           });
           grid.appendChild(card);
         });

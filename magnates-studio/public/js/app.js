@@ -6589,9 +6589,9 @@ function drawTimeRuler() {
     mediumIntervalSec = 1;     // 1 second ticks
     minorIntervalSec = 0.5;    // half second micro ticks
   } else if (pps >= 12) {
-    majorIntervalSec = 5;      // 00:00, 00:05, 00:10...
-    mediumIntervalSec = 1;     // every 1 second
-    minorIntervalSec = 0.5;    // every 0.5 second
+    majorIntervalSec = 10;     // 0s, 10s, 20s...
+    mediumIntervalSec = 5;     // every 5 seconds
+    minorIntervalSec = 1;      // every 1 second
   } else {
     majorIntervalSec = 10;
     mediumIntervalSec = 2;
@@ -6614,10 +6614,10 @@ function drawTimeRuler() {
       ctxR.lineTo(x + 0.5, height - 1);
       ctxR.stroke();
 
-      // Bold, bigger, crisp timecode label
-      ctxR.font = '600 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, monospace';
-      ctxR.fillStyle = '#f1f5f9';
-      ctxR.fillText(formatTime(s), x + 4, 13);
+      // Bold, bigger, crisp timecode label (Canva-style 0s, 10s, 20s)
+      ctxR.font = '600 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif';
+      ctxR.fillStyle = '#cbd5e1';
+      ctxR.fillText(`${Math.round(s)}s`, x + 4, 13);
     } else if (isMedium) {
       // Medium tick
       ctxR.strokeStyle = '#475569';
