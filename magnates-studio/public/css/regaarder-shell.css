@@ -2954,3 +2954,31 @@ body.rm-in-editor #rm-auth-actions,
 .project-menu-dropdown .project-menu-item.highlight {
   color: #c4b5fd !important;
 }
+
+/* Enable Editing Toggle Pulsing Status Dot */
+#btn-toggle-3d-interactive-mode {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+#btn-toggle-3d-interactive-mode::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(148, 163, 184, 0.5);
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+#btn-toggle-3d-interactive-mode[aria-pressed="true"] {
+  color: #f3e8ff !important;
+  background: rgba(139, 92, 246, 0.18) !important;
+  border-radius: 7px !important;
+}
+
+#btn-toggle-3d-interactive-mode[aria-pressed="true"]::before {
+  background: #a855f7;
+  animation: rmProjPulse 1.8s infinite;
+}
