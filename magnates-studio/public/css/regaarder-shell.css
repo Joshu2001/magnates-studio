@@ -3015,7 +3015,7 @@ body.rm-in-editor #rm-auth-actions,
 
 #rm-cutout-fx-popover {
   position: fixed;
-  z-index: 100040;
+  z-index: 2147483000;
   width: 460px;
   max-width: 92vw;
   background: #141622;
@@ -3242,7 +3242,8 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 body.rm-fx-popover-open .rg-ctx-toolbar,
-body.rm-fx-popover-open #rg-contextual-toolbar {
+body.rm-fx-popover-open #rg-contextual-toolbar,
+body.rm-fx-popover-open .rg-chapter-hit-box {
   opacity: 0 !important;
   pointer-events: none !important;
   transform: scale(0.95) !important;

@@ -6343,6 +6343,7 @@ document.addEventListener('click', (e) => {
     pop.style.top = Math.max(12, Math.min(window.innerHeight - 520, r.top - 100)) + 'px';
 
     let selectedItem = null;
+    let draft = snapshot ? { ...snapshot } : { rotation: 0, scale: 1, parallax: 1, x: 0, y: 0, glow: 1, opacity: 1, blur: 0 };
     const customPanel = pop.querySelector('.rm-fx-custom-panel');
     const ctrlRot = pop.querySelector('[data-fx-ctrl="rot"]');
     const ctrlScale = pop.querySelector('[data-fx-ctrl="scale"]');
@@ -6358,7 +6359,7 @@ document.addEventListener('click', (e) => {
     const valGlow = pop.querySelector('[data-fx-val="glow"]');
     const valOpacity = pop.querySelector('[data-fx-val="opacity"]');
     const valBlur = pop.querySelector('[data-fx-val="blur"]');
-    let blurRamp = layerObj?.blurRamp || 'constant';
+    let blurRamp = draft.blurRamp || 'constant';
 
     const showRelevantControls = (item) => {
       if (!customPanel) return;
@@ -6369,15 +6370,33 @@ document.addEventListener('click', (e) => {
         row.style.display = allowed.has(row.dataset.fxRow) ? 'flex' : 'none';
       });
     };
-    const syncControlsFromLayer = () => {
-      if (!layerObj) return;
-      const rot = Number(layerObj.rotation || 0);
-      const sc = Number(layerObj.scale ?? 1);
-      const px = Number(layerObj.parallax ?? 1);
-      const off = Number(selectedItem?.id === 'slideleft' ? (layerObj.x || 0) : (layerObj.y || 0));
-      const gl = Number(layerObj.glow ?? 1);
-      const op = Number(layerObj.opacity ?? 1);
-      const bl = Number(layerObj.blur || 0);
+    const updateCardPreview = () => {
+      const selImg = pop.querySelector('.rm-fx-card.is-selected .rm-fx-thumb-img');
+      if (!selImg) return;
+      selImg.style.animation = 'none';
+      const tx = Number(draft.x || 0);
+      const ty = Number(draft.y || 0);
+      const rot = Number(draft.rotation || 0);
+      const sc = Number(draft.scale ?? 1);
+      const bl = Number(draft.blur || 0);
+      const gl = Number(draft.glow ?? 1);
+      const op = Number(draft.opacity ?? 1);
+      selImg.style.transform = `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(${sc})`;
+      const filters = [];
+      if (bl > 0) filters.push(`blur(${bl}px)`);
+      if (gl > 1.05) filters.push(`drop-shadow(0 0 ${Math.round(gl * 8)}px rgba(168,85,247,0.85)) brightness(${(1 + (gl - 1) * 0.12).toFixed(2)})`);
+      if (draft.blackSilhouette) filters.push('brightness(0.08) contrast(1.4)');
+      selImg.style.filter = filters.join(' ') || 'none';
+      selImg.style.opacity = String(op);
+    };
+    const syncControlsFromDraft = () => {
+      const rot = Number(draft.rotation || 0);
+      const sc = Number(draft.scale ?? 1);
+      const px = Number(draft.parallax ?? 1);
+      const off = Number(selectedItem?.id === 'slideleft' ? (draft.x || 0) : (draft.y || 0));
+      const gl = Number(draft.glow ?? 1);
+      const op = Number(draft.opacity ?? 1);
+      const bl = Number(draft.blur || 0);
       if (ctrlRot) ctrlRot.value = String(rot);
       if (ctrlScale) ctrlScale.value = String(sc);
       if (ctrlParallax) ctrlParallax.value = String(px);
@@ -6394,30 +6413,29 @@ document.addEventListener('click', (e) => {
       if (valBlur) valBlur.textContent = bl + 'px';
       pop.querySelectorAll('.rm-fx-ramp-btn').forEach(btn => btn.classList.toggle('is-active', btn.dataset.fxRamp === blurRamp));
     };
-    const applyCustomSliders = () => {
-      if (!layerObj) return;
+    const applyCustomSlidersToCard = () => {
       const allowed = new Set(selectedItem?.ctrls || []);
-      if (allowed.has('rot')) layerObj.rotation = Number(ctrlRot?.value || 0);
-      if (allowed.has('scale')) layerObj.scale = Number(ctrlScale?.value || 1);
-      if (allowed.has('parallax')) layerObj.parallax = Number(ctrlParallax?.value || 1);
+      if (allowed.has('rot')) draft.rotation = Number(ctrlRot?.value || 0);
+      if (allowed.has('scale')) draft.scale = Number(ctrlScale?.value || 1);
+      if (allowed.has('parallax')) draft.parallax = Number(ctrlParallax?.value || 1);
       if (allowed.has('offset')) {
-        if (selectedItem?.id === 'slideleft') layerObj.x = Number(ctrlOffset?.value || 0);
-        else layerObj.y = Number(ctrlOffset?.value || 0);
+        if (selectedItem?.id === 'slideleft') draft.x = Number(ctrlOffset?.value || 0);
+        else draft.y = Number(ctrlOffset?.value || 0);
       }
-      if (allowed.has('glow')) layerObj.glow = Number(ctrlGlow?.value || 1);
-      if (allowed.has('opacity')) layerObj.opacity = Number(ctrlOpacity?.value ?? 1);
-      if (allowed.has('blur')) layerObj.blur = Number(ctrlBlur?.value || 0);
-      if (allowed.has('ramp')) layerObj.blurRamp = blurRamp;
-      syncControlsFromLayer();
-      window.renderCustomizerFrame?.();
+      if (allowed.has('glow')) draft.glow = Number(ctrlGlow?.value || 1);
+      if (allowed.has('opacity')) draft.opacity = Number(ctrlOpacity?.value ?? 1);
+      if (allowed.has('blur')) draft.blur = Number(ctrlBlur?.value || 0);
+      if (allowed.has('ramp')) draft.blurRamp = blurRamp;
+      syncControlsFromDraft();
+      updateCardPreview();
     };
-    syncControlsFromLayer();
-    [ctrlRot, ctrlScale, ctrlParallax, ctrlOffset, ctrlGlow, ctrlOpacity, ctrlBlur].forEach(inp => inp?.addEventListener('input', applyCustomSliders));
+    syncControlsFromDraft();
+    [ctrlRot, ctrlScale, ctrlParallax, ctrlOffset, ctrlGlow, ctrlOpacity, ctrlBlur].forEach(inp => inp?.addEventListener('input', applyCustomSlidersToCard));
     pop.querySelectorAll('.rm-fx-ramp-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         blurRamp = btn.dataset.fxRamp;
         pop.querySelectorAll('.rm-fx-ramp-btn').forEach(b => b.classList.toggle('is-active', b === btn));
-        applyCustomSliders();
+        applyCustomSlidersToCard();
       });
     });
 
@@ -6438,28 +6456,23 @@ document.addEventListener('click', (e) => {
             <small class="rm-fx-card-kind">${it.kind}</small>
           </div>
         `;
-        b.addEventListener('pointerenter', () => {
-          if (selectedItem) return;
-          if (layerObj && snapshot) {
-            Object.keys(layerObj).forEach(k => { if (!(k in snapshot)) delete layerObj[k]; });
-            Object.assign(layerObj, snapshot);
-            it.apply(layerObj);
-            window.renderCustomizerFrame?.();
-          }
-        });
-        b.addEventListener('pointerleave', () => { if (!selectedItem) restoreSnapshot(); });
         b.addEventListener('click', () => {
           selectedItem = it;
           gridEl.querySelectorAll('.rm-fx-card').forEach(c => c.classList.toggle('is-selected', c === b));
           showRelevantControls(it);
-          if (layerObj && snapshot) {
-            Object.keys(layerObj).forEach(k => { if (!(k in snapshot)) delete layerObj[k]; });
-            Object.assign(layerObj, snapshot);
-            it.apply(layerObj);
-            syncControlsFromLayer();
-            window.renderCustomizerFrame?.();
+          draft = snapshot ? { ...snapshot } : { rotation: 0, scale: 1, parallax: 1, x: 0, y: 0, glow: 1, opacity: 1, blur: 0 };
+          it.apply(draft);
+          syncControlsFromDraft();
+          updateCardPreview();
+          if (!it.ctrls?.length) {
+            committed = true;
+            if (layerObj) {
+              Object.keys(layerObj).forEach(k => { if (!(k in draft)) delete layerObj[k]; });
+              Object.assign(layerObj, draft);
+              window.renderCustomizerFrameAtTime?.(window.topCustomizerState?.currentTime || 0);
+            }
+            closePop();
           }
-          if (!it.ctrls?.length) { committed = true; closePop(); }
         });
         gridEl.appendChild(b);
       });
@@ -6470,17 +6483,17 @@ document.addEventListener('click', (e) => {
       selectedItem = null;
       blurRamp = 'constant';
       showRelevantControls(null);
-      if (layerObj) {
-        layerObj.blur = 0; layerObj.opacity = 1; layerObj.rotation = 0; layerObj.scale = 1;
-        layerObj.x = 0; layerObj.y = 0; delete layerObj.animStyle; delete layerObj.blackSilhouette; delete layerObj.blurRamp;
-        syncControlsFromLayer();
-        window.renderCustomizerFrame?.();
-      }
+      draft = snapshot ? { ...snapshot } : { rotation: 0, scale: 1, parallax: 1, x: 0, y: 0, glow: 1, opacity: 1, blur: 0 };
+      syncControlsFromDraft();
       gridEl.querySelectorAll('.rm-fx-card').forEach(c => c.classList.remove('is-selected'));
     });
     pop.querySelector('.rm-fx-btn-apply')?.addEventListener('click', () => {
       committed = true;
-      applyCustomSliders();
+      if (layerObj) {
+        Object.keys(layerObj).forEach(k => { if (!(k in draft)) delete layerObj[k]; });
+        Object.assign(layerObj, draft);
+        window.renderCustomizerFrameAtTime?.(window.topCustomizerState?.currentTime || 0);
+      }
       closePop();
     });
     pop.querySelector('.rm-fx-pop-close')?.addEventListener('click', () => { restoreSnapshot(); closePop(); });
