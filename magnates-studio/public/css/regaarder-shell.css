@@ -2855,13 +2855,30 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 /* Fullscreen Preview Expansion & HUD Alignment */
-.canvas-wrapper:fullscreen #previewCanvas,
-.canvas-wrapper:-webkit-full-screen #previewCanvas,
-.canvas-wrapper.is-immersive-fallback #previewCanvas {
+.canvas-wrapper:fullscreen,
+.canvas-wrapper:-webkit-full-screen,
+.canvas-wrapper.is-immersive-fallback {
   width: 100vw !important;
   height: 100vh !important;
   max-width: 100vw !important;
   max-height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #000 !important;
+}
+
+.canvas-wrapper:fullscreen #previewCanvas,
+.canvas-wrapper:-webkit-full-screen #previewCanvas,
+.canvas-wrapper.is-immersive-fallback #previewCanvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
   object-fit: contain !important;
   border-radius: 0 !important;
   border: 0 !important;
