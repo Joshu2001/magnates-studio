@@ -690,14 +690,15 @@ body.rm-in-editor #rm-auth-actions,
 
 #canva-context-bar .canva-bar-btn,
 #canva-context-bar .apple-pill-btn {
-  background: rgba(255, 255, 255, 0.045) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
   color: #cbd5e1 !important;
   box-shadow: none !important;
-  border-radius: 8px !important;
+  border-radius: 7px !important;
   font-size: 11.5px !important;
   font-weight: 500 !important;
   height: 30px !important;
+  padding: 0 9px !important;
 }
 
 #canva-context-bar .canva-bar-btn svg,
@@ -709,9 +710,145 @@ body.rm-in-editor #rm-auth-actions,
 #canva-context-bar .canva-bar-btn:hover,
 #canva-context-bar .canva-bar-btn.active,
 #canva-context-bar .apple-pill-btn:hover {
-  background: rgba(139, 92, 246, 0.18) !important;
-  border-color: rgba(167, 139, 250, 0.45) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+/* Collapse redundant transport pill under video down to just the (...) ellipses button */
+#canvas-controls-bar {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin-top: 4px !important;
+}
+
+#canvas-controls-bar #btn-rewind,
+#canvas-controls-bar #btn-play,
+#canvas-controls-bar #btn-forward,
+#canvas-controls-bar #timecode,
+#canvas-controls-bar #btn-canvas-fullscreen,
+#canvas-controls-bar .stage-controls-divider {
+  display: none !important;
+}
+
+/* Docked Left Drawer (Resizes stage smoothly like Canva instead of floating over video) */
+#editor-workspace .sidebar#left-sidebar {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  height: 100% !important;
+  flex-shrink: 0 !important;
+  z-index: 20 !important;
+  box-shadow: none !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Decluttered Right Inspector & Visual Backdrop Cards */
+#right-sidebar .hint-text {
+  display: none !important;
+}
+
+#right-sidebar .fx-header .badge {
+  background: rgba(139, 92, 246, 0.14) !important;
+  border: 1px solid rgba(167, 139, 250, 0.25) !important;
+  color: #d8b4fe !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  padding: 2px 7px !important;
+  border-radius: 6px !important;
+}
+
+#right-sidebar #btn-chart-open-modal {
+  background: rgba(139, 92, 246, 0.22) !important;
+  border: 1px solid rgba(167, 139, 250, 0.42) !important;
   color: #f3e8ff !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+#right-sidebar #btn-chart-open-modal:hover {
+  background: rgba(139, 92, 246, 0.34) !important;
+}
+
+#right-sidebar #btn-delete-chart {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #fda4af !important;
+}
+
+#right-sidebar #btn-grid-color-default,
+#right-sidebar #btn-grid-color-cyan,
+#right-sidebar #btn-grid-color-red {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+  border-radius: 6px !important;
+}
+
+#right-sidebar #btn-grid-color-default.active,
+#right-sidebar #btn-grid-color-cyan.active,
+#right-sidebar #btn-grid-color-red.active {
+  background: rgba(139, 92, 246, 0.22) !important;
+  border-color: rgba(167, 139, 250, 0.5) !important;
+  color: #ffffff !important;
+}
+
+.rm-visual-select-hidden {
+  display: none !important;
+}
+
+.rm-visual-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.rm-visual-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rm-visual-card:hover {
+  border-color: rgba(167, 139, 250, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.rm-visual-card.is-active {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.18);
+  color: #ffffff;
+}
+
+.rm-visual-thumb {
+  width: 100%;
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+.rm-visual-card span {
+  font-size: 9.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Clean Studio Aspect Pill (Matches Customizer 16:9 YouTube) */

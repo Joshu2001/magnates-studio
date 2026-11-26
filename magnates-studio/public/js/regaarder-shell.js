@@ -270,6 +270,40 @@
    document.addEventListener('click',e=>{if(!helpWrap.contains(e.target))helpWrap.open=false;});
    document.addEventListener('keydown',e=>{if(e.key==='Escape')helpWrap.open=false;});
  }
+
+ // Visual Preview Cards for Studio Inspector Backdrop Style & Stage Overlay Effect
+ function mountVisualSelectCards(selectId,items){
+   const sel=document.getElementById(selectId);
+   if(!sel||sel.dataset.rmVisualCards)return;
+   sel.dataset.rmVisualCards='true';
+   sel.classList.add('rm-visual-select-hidden');
+   const grid=document.createElement('div');
+   grid.className='rm-visual-card-grid';
+   grid.innerHTML=items.map(it=>`<button type="button" class="rm-visual-card ${sel.value===it.value?'is-active':''}" data-val="${it.value}" title="${it.label}"><div class="rm-visual-thumb" style="${it.bg}"></div><span>${it.label}</span></button>`).join('');
+   sel.after(grid);
+   const sync=()=>{for(const b of grid.children)b.classList.toggle('is-active',b.dataset.val===sel.value);};
+   grid.addEventListener('click',e=>{
+     const btn=e.target.closest('.rm-visual-card');
+     if(!btn)return;
+     sel.value=btn.dataset.val;
+     sel.dispatchEvent(new Event('change',{bubbles:true}));
+     sync();
+   });
+   sel.addEventListener('change',sync);
+ }
+ mountVisualSelectCards('stage-bg-mode-select',[
+   {value:'cyber_grid',label:'Cyber Set',bg:'background:linear-gradient(180deg,#090d1a 0%,#141a33 60%,#1e1b4b 100%),repeating-linear-gradient(90deg,rgba(139,92,246,.22) 0 1px,transparent 1px 10px);'},
+   {value:'solid_black',label:'Solid Black',bg:'background:#050508;'},
+   {value:'none',label:'Transparent',bg:'background:repeating-conic-gradient(#242636 0% 25%,#141622 0% 50%) 50%/10px 10px;'},
+   {value:'color',label:'Studio Tint',bg:'background:linear-gradient(135deg,#1e1b4b,#312e81);'},
+   {value:'vox_cream',label:'Cream Doc',bg:'background:linear-gradient(135deg,#f5efe2,#e7decb);'}
+ ]);
+ mountVisualSelectCards('stage-fx-select',[
+   {value:'none',label:'Clean',bg:'background:#0d0e16;'},
+   {value:'grid',label:'3D Grid',bg:'background:linear-gradient(180deg,#090c18 20%,#1e1b4b 100%),repeating-linear-gradient(90deg,rgba(96,165,250,.28) 0 1px,transparent 1px 9px);'},
+   {value:'particles',label:'Embers',bg:'background:radial-gradient(circle at 30% 60%,#f97316 0%,transparent 35%),radial-gradient(circle at 70% 35%,#fb923c 0%,transparent 30%),#120c0a;'},
+   {value:'silhouette',label:'Silhouette',bg:'background:radial-gradient(circle at 50% 45%,#334155 0%,#05060a 70%);'}
+ ]);
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  function refineMeshInspector(section){
   if(section.dataset.rmPrecision||!section.querySelector('[data-n3d-prop="editTool"]'))return;
