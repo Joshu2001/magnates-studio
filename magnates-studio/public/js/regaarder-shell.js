@@ -444,9 +444,9 @@
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
  })();
 
- // Global #right-sidebar Polish: concise labels, strip inline emojis, collapse dense drawers
+ // Global #right-inspector Polish: concise labels, strip inline emojis, collapse dense drawers
  (function standardizeRightSidebar(){
-   const sidebar=document.getElementById('right-sidebar');
+   const sidebar=document.getElementById('right-inspector');
    if(!sidebar)return;
 
    const editChartBtn=document.getElementById('btn-chart-open-modal');
