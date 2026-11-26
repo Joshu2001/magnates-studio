@@ -3058,21 +3058,21 @@ body.rm-in-editor #rm-auth-actions,
 
 .rm-fx-pop-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  max-height: 260px;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-height: 310px;
   overflow-y: auto;
+  padding-right: 2px;
 }
 
 .rm-fx-card {
   border: 0;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 10px;
-  padding: 5px;
+  padding: 6px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
@@ -3084,7 +3084,7 @@ body.rm-in-editor #rm-auth-actions,
 
 .rm-fx-card-thumb {
   width: 100%;
-  height: 50px;
+  height: 98px;
   border-radius: 7px;
   background: #090b12;
   display: flex;
@@ -3094,32 +3094,57 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 .rm-fx-thumb-img {
-  max-width: 88%;
-  max-height: 88%;
+  max-width: 82%;
+  max-height: 82%;
   object-fit: contain;
   transition: transform 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
 }
 
-.rm-fx-card:hover .rm-fx-thumb-img.is-float { animation: rmFxFloat 1.6s ease-in-out infinite; }
-.rm-fx-card:hover .rm-fx-thumb-img.is-pulse { animation: rmFxPulse 1.2s ease-in-out infinite; }
-.rm-fx-card:hover .rm-fx-thumb-img.is-pop   { animation: rmFxPop 0.9s ease-out infinite; }
-.rm-fx-thumb-img.is-tilt     { transform: rotate(5deg); }
-.rm-fx-thumb-img.is-glow     { filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.85)) brightness(1.1); }
-.rm-fx-thumb-img.is-softblur { filter: blur(2.2px); }
-.rm-fx-thumb-img.is-dim      { opacity: 0.5; }
+.rm-fx-thumb-img.is-push       { animation: rmFxPush 2.2s ease-in-out infinite; }
+.rm-fx-thumb-img.is-pull       { animation: rmFxPull 2.2s ease-in-out infinite; }
+.rm-fx-thumb-img.is-float      { animation: rmFxFloat 2.0s ease-in-out infinite; }
+.rm-fx-thumb-img.is-parallax   { animation: rmFxParallax 2.4s ease-in-out infinite; }
+.rm-fx-thumb-img.is-pulse      { animation: rmFxPulse 1.5s ease-in-out infinite; }
+.rm-fx-thumb-img.is-pop        { animation: rmFxPop 1.4s ease-out infinite; }
+.rm-fx-thumb-img.is-slideup    { animation: rmFxSlideUp 1.8s ease-out infinite; }
+.rm-fx-thumb-img.is-slideleft  { animation: rmFxSlideLeft 1.8s ease-out infinite; }
+.rm-fx-thumb-img.is-tilt       { animation: rmFxTilt 2.2s ease-in-out infinite; }
+.rm-fx-thumb-img.is-glow       { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.85)) brightness(1.1); }
+.rm-fx-thumb-img.is-bloom      { filter: drop-shadow(0 0 16px rgba(196, 181, 253, 0.95)) brightness(1.22); }
+.rm-fx-thumb-img.is-softblur   { filter: blur(2.4px); }
+.rm-fx-thumb-img.is-silhouette { filter: brightness(0.08) contrast(1.4); }
+.rm-fx-thumb-img.is-dim        { opacity: 0.48; }
 
-@keyframes rmFxFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-@keyframes rmFxPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-@keyframes rmFxPop   { 0% { transform: scale(0.72); opacity: 0.4; } 70% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
+@keyframes rmFxPush      { 0%,100% { transform: scale(0.92); } 50% { transform: scale(1.16); } }
+@keyframes rmFxPull      { 0%,100% { transform: scale(1.16); } 50% { transform: scale(0.88); } }
+@keyframes rmFxFloat     { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes rmFxParallax  { 0%,100% { transform: translate(-6px, 2px) scale(1.03); } 50% { transform: translate(6px, -3px) scale(1.06); } }
+@keyframes rmFxPulse     { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+@keyframes rmFxPop       { 0% { transform: scale(0.65); opacity: 0.35; } 65% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes rmFxSlideUp   { 0% { transform: translateY(16px); opacity: 0.25; } 70%,100% { transform: translateY(0); opacity: 1; } }
+@keyframes rmFxSlideLeft { 0% { transform: translateX(18px); opacity: 0.25; } 70%,100% { transform: translateX(0); opacity: 1; } }
+@keyframes rmFxTilt      { 0%,100% { transform: rotate(-4deg); } 50% { transform: rotate(5deg); } }
+
+.rm-fx-card-meta {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
 
 .rm-fx-card-label {
-  font-size: 10.5px;
-  font-weight: 500;
-  color: #cbd5e1;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #e2e8f0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
+}
+
+.rm-fx-card-kind {
+  font-size: 10px;
+  color: #94a3b8;
 }
 
 .rm-fx-card:hover .rm-fx-card-label {

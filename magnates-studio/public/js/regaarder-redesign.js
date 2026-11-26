@@ -6272,14 +6272,21 @@ document.addEventListener('click', (e) => {
       window.renderCustomizerFrame?.();
     };
     const fxList = [
-      { id: 'float', label: 'Float Drift', kind: 'Motion', apply: (l) => { l.animStyle = 'float'; l.parallax = 1.2; } },
+      { id: 'push', label: 'Push In', kind: 'Motion', apply: (l) => { l.animStyle = 'push'; l.scale = 1.12; } },
+      { id: 'pull', label: 'Pull Out', kind: 'Motion', apply: (l) => { l.animStyle = 'pull'; l.scale = 0.92; } },
+      { id: 'float', label: 'Float Drift', kind: 'Motion', apply: (l) => { l.animStyle = 'float'; l.parallax = 1.25; } },
+      { id: 'parallax', label: 'Parallax Drift', kind: 'Motion', apply: (l) => { l.animStyle = 'parallax'; l.parallax = 1.5; l.depth = 1.2; } },
+      { id: 'pop', label: 'Pop Entrance', kind: 'Motion', apply: (l) => { l.animStyle = 'pop'; l.scale = 1.05; } },
       { id: 'pulse', label: 'Pulse Scale', kind: 'Motion', apply: (l) => { l.animStyle = 'pulse'; l.scale = 1.06; } },
-      { id: 'pop', label: 'Pop Entrance', kind: 'Motion', apply: (l) => { l.animStyle = 'pop'; l.scale = 1.04; } },
-      { id: 'tilt', label: 'Subtle Tilt', kind: 'Motion', apply: (l) => { l.rotation = 3; } },
-      { id: 'glow', label: 'Soft Glow', kind: 'Effect', apply: (l) => { l.opacity = 1; l.blur = 0; l.glow = 1.4; } },
-      { id: 'softblur', label: 'Soft Blur', kind: 'Effect', apply: (l) => { l.blur = 2.5; } },
+      { id: 'slideup', label: 'Slide Up', kind: 'Motion', apply: (l) => { l.animStyle = 'slideup'; l.y = (l.y || 0) - 8; } },
+      { id: 'slideleft', label: 'Slide Left', kind: 'Motion', apply: (l) => { l.animStyle = 'slideleft'; l.x = (l.x || 0) - 8; } },
+      { id: 'tilt', label: 'Subtle Tilt', kind: 'Motion', apply: (l) => { l.rotation = 3.5; } },
+      { id: 'glow', label: 'Soft Glow', kind: 'Effect', apply: (l) => { l.opacity = 1; l.blur = 0; l.glow = 1.5; } },
+      { id: 'bloom', label: 'Cinema Bloom', kind: 'Effect', apply: (l) => { l.opacity = 1; l.glow = 2.2; } },
+      { id: 'softblur', label: 'Depth Blur', kind: 'Effect', apply: (l) => { l.blur = 2.5; } },
+      { id: 'silhouette', label: 'Dark Silhouette', kind: 'Look', apply: (l) => { l.opacity = 0.85; l.blackSilhouette = true; } },
       { id: 'dim', label: 'Dim 70%', kind: 'Look', apply: (l) => { l.opacity = 0.7; } },
-      { id: 'reset', label: 'Reset', kind: 'Reset', apply: (l) => { l.blur = 0; l.opacity = 1; l.rotation = 0; l.scale = 1; delete l.animStyle; } }
+      { id: 'reset', label: 'Reset All', kind: 'Reset', apply: (l) => { l.blur = 0; l.opacity = 1; l.rotation = 0; l.scale = 1; l.x = 0; l.y = 0; delete l.animStyle; delete l.blackSilhouette; } }
     ];
     pop.innerHTML = `
       <div class="rm-fx-pop-head"><span>Cutout Effects &amp; Animations</span><button type="button" class="rm-fx-pop-close">&#x2715;</button></div>
@@ -6303,7 +6310,10 @@ document.addEventListener('click', (e) => {
           <div class="rm-fx-card-thumb">
             ${thumbSrc ? `<img src="${thumbSrc}" class="rm-fx-thumb-img is-${it.id}" alt="">` : `<span class="rm-fx-thumb-fallback is-${it.id}">&#10022;</span>`}
           </div>
-          <span class="rm-fx-card-label">${it.label}</span>
+          <div class="rm-fx-card-meta">
+            <span class="rm-fx-card-label">${it.label}</span>
+            <small class="rm-fx-card-kind">${it.kind}</small>
+          </div>
         `;
         b.addEventListener('pointerenter', () => {
           if (layerObj && snapshot) {
