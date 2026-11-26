@@ -665,6 +665,15 @@ body,
   cursor: pointer;
 }
 
+/* Decluttered Studio Editor Top Bar & Stage */
+body.rm-in-editor .top-nav-center-switcher,
+body.rm-in-editor #rm-auth-actions,
+#btn-top-share-project,
+#btn-app-fullscreen,
+#btn-stage-float-template {
+  display: none !important;
+}
+
 .rm-support-submit:disabled {
   opacity: 0.6;
   cursor: wait;

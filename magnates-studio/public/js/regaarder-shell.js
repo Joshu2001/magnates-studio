@@ -96,7 +96,12 @@
  if(stopHover)window.stopTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId||tpl?.id===luckinPart2Id||tpl?.id===barryOpeningId)return;return stopHover.call(this,card,tpl,...args);};
  window.renderHomepageTemplates?.();
  // Match homepage rail icons to the editor's thin outline icon language (no circles).
- const syncRail=()=>{if(home.style.display==='none')return;for(const button of rail.querySelectorAll('.rail-btn')){const active=button.dataset.railTab==='templates';if(button.classList.contains('active')!==active)button.classList.toggle('active',active);}};
+ const syncRail=()=>{
+   const inEditor=home.style.display==='none';
+   document.body.classList.toggle('rm-in-editor',inEditor);
+   if(inEditor)return;
+   for(const button of rail.querySelectorAll('.rail-btn')){const active=button.dataset.railTab==='templates';if(button.classList.contains('active')!==active)button.classList.toggle('active',active);}
+ };
  if(rail){new MutationObserver(syncRail).observe(rail,{attributes:true,attributeFilter:['class'],subtree:true});new MutationObserver(syncRail).observe(home,{attributes:true,attributeFilter:['style']});syncRail();}
  const icons={templates:'M3 4h18v16H3z M3 9h18',all:'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7',elements:'M5 20V10 M12 20V4 M19 20v-7',animate:'M8 4l12 8-12 8z',transitions:'M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z',text:'M4 5h16 M12 5v15',icons:'M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z',layers:'M12 3L2 8l10 5 10-5z M2 12l10 5 10-5 M2 16l10 5 10-5',projects:'M3 6h7l2 3h9v12H3z'};
  document.querySelectorAll('#main-nav-rail .rail-btn').forEach(button=>{
@@ -130,6 +135,7 @@
      secondary.forEach(btn=>menu.appendChild(btn));
      rail.appendChild(moreWrap);
      moreWrap.addEventListener('toggle',()=>{if(moreWrap.open)positionRailFlyout(moreWrap.querySelector('summary'),menu);});
+     moreWrap.querySelector('summary')?.addEventListener('click',e=>{e.stopPropagation();if(create)create.open=false;});
      document.addEventListener('click',e=>{
        if(!moreWrap.contains(e.target))moreWrap.open=false;
        else if(e.target.closest('.rm-rail-more-menu .rail-btn'))moreWrap.open=false;
@@ -143,6 +149,7 @@
    notifWrap.innerHTML='<summary class="rm-rail-action-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><span class="rm-notif-icon-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="rm-notif-badge" hidden>0</span></span><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><div class="rm-notif-head"><strong>Alerts</strong><button type="button" class="rm-notif-clear" data-notif-read-all>Mark all read</button></div><div class="rm-notif-list"><p class="rm-notif-empty">You\'re all caught up. Live alerts and support updates will appear here.</p></div></div>';
    rail.appendChild(notifWrap);
    notifWrap.addEventListener('toggle',()=>{if(notifWrap.open)positionRailFlyout(notifWrap.querySelector('summary'),notifWrap.querySelector('.rm-rail-notif-menu'));});
+   notifWrap.querySelector('summary')?.addEventListener('click',e=>{e.stopPropagation();if(create)create.open=false;const mw=rail.querySelector('.rm-rail-more');if(mw)mw.open=false;});
    document.addEventListener('click',e=>{if(!notifWrap.contains(e.target))notifWrap.open=false;});
    document.addEventListener('keydown',e=>{if(e.key==='Escape')notifWrap.open=false;});
 
