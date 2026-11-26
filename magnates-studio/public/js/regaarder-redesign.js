@@ -6246,51 +6246,88 @@ document.addEventListener('click', (e) => {
     if (pop) { pop.remove(); return; }
     pop = document.createElement('div');
     pop.id = 'rm-cutout-fx-popover';
+    const tplId = window.topCustomizerState?.currentTpl?.id || '';
+    const rt = window.REGAARDER_CHAPTER_RUNTIME?.[tplId];
+    const lid = rt?.selectedLayer;
+    const layerObj = rt && lid ? rt.config?.layers?.[lid] : null;
+    const getThumbSrc = () => {
+      if (layerObj?.customImageSrc) return layerObj.customImageSrc;
+      const m = rt?.media?.[lid];
+      if (m) {
+        if (typeof m.src === 'string' && m.src) return m.src;
+        if (m.img?.src) return m.img.src;
+        if (typeof m.toDataURL === 'function' && m.width > 0) {
+          try { return m.toDataURL('image/png'); } catch (_) {}
+        }
+      }
+      return '';
+    };
+    const thumbSrc = getThumbSrc();
+    const snapshot = layerObj ? { ...layerObj } : null;
+    let committed = false;
+    const restoreSnapshot = () => {
+      if (committed || !layerObj || !snapshot) return;
+      Object.keys(layerObj).forEach(k => { if (!(k in snapshot)) delete layerObj[k]; });
+      Object.assign(layerObj, snapshot);
+      window.renderCustomizerFrame?.();
+    };
     const fxList = [
       { id: 'float', label: 'Float Drift', kind: 'Motion', apply: (l) => { l.animStyle = 'float'; l.parallax = 1.2; } },
       { id: 'pulse', label: 'Pulse Scale', kind: 'Motion', apply: (l) => { l.animStyle = 'pulse'; l.scale = 1.06; } },
       { id: 'pop', label: 'Pop Entrance', kind: 'Motion', apply: (l) => { l.animStyle = 'pop'; l.scale = 1.04; } },
       { id: 'tilt', label: 'Subtle Tilt', kind: 'Motion', apply: (l) => { l.rotation = 3; } },
       { id: 'glow', label: 'Soft Glow', kind: 'Effect', apply: (l) => { l.opacity = 1; l.blur = 0; l.glow = 1.4; } },
-      { id: 'softblur', label: 'Soft Depth Blur', kind: 'Effect', apply: (l) => { l.blur = 2.5; } },
-      { id: 'dim', label: 'Muted Dim (70%)', kind: 'Look', apply: (l) => { l.opacity = 0.7; } },
-      { id: 'reset', label: 'Reset Effects', kind: 'Reset', apply: (l) => { l.blur = 0; l.opacity = 1; l.rotation = 0; l.scale = 1; delete l.animStyle; } }
+      { id: 'softblur', label: 'Soft Blur', kind: 'Effect', apply: (l) => { l.blur = 2.5; } },
+      { id: 'dim', label: 'Dim 70%', kind: 'Look', apply: (l) => { l.opacity = 0.7; } },
+      { id: 'reset', label: 'Reset', kind: 'Reset', apply: (l) => { l.blur = 0; l.opacity = 1; l.rotation = 0; l.scale = 1; delete l.animStyle; } }
     ];
     pop.innerHTML = `
       <div class="rm-fx-pop-head"><span>Cutout Effects &amp; Animations</span><button type="button" class="rm-fx-pop-close">&#x2715;</button></div>
       <input type="text" class="rm-fx-pop-search" placeholder="Search effects or animations...">
-      <div class="rm-fx-pop-list"></div>
+      <div class="rm-fx-pop-grid"></div>
     `;
     document.body.appendChild(pop);
     const r = fxBtn.getBoundingClientRect();
-    pop.style.left = Math.max(12, Math.min(window.innerWidth - 252, r.left - 250)) + 'px';
-    pop.style.top = Math.max(12, Math.min(window.innerHeight - 320, r.top - 40)) + 'px';
+    pop.style.left = Math.max(12, Math.min(window.innerWidth - 296, r.left - 288)) + 'px';
+    pop.style.top = Math.max(12, Math.min(window.innerHeight - 360, r.top - 60)) + 'px';
 
-    const listEl = pop.querySelector('.rm-fx-pop-list');
+    const gridEl = pop.querySelector('.rm-fx-pop-grid');
     const renderItems = (q = '') => {
       const needle = q.trim().toLowerCase();
-      listEl.innerHTML = '';
+      gridEl.innerHTML = '';
       fxList.filter(it => !needle || it.label.toLowerCase().includes(needle) || it.kind.toLowerCase().includes(needle)).forEach(it => {
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'rm-fx-pop-item';
-        b.innerHTML = `<span>${it.label}</span><small>${it.kind}</small>`;
+        b.className = 'rm-fx-card';
+        b.innerHTML = `
+          <div class="rm-fx-card-thumb">
+            ${thumbSrc ? `<img src="${thumbSrc}" class="rm-fx-thumb-img is-${it.id}" alt="">` : `<span class="rm-fx-thumb-fallback is-${it.id}">&#10022;</span>`}
+          </div>
+          <span class="rm-fx-card-label">${it.label}</span>
+        `;
+        b.addEventListener('pointerenter', () => {
+          if (layerObj && snapshot) {
+            Object.keys(layerObj).forEach(k => { if (!(k in snapshot)) delete layerObj[k]; });
+            Object.assign(layerObj, snapshot);
+            it.apply(layerObj);
+            window.renderCustomizerFrame?.();
+          }
+        });
+        b.addEventListener('pointerleave', restoreSnapshot);
         b.addEventListener('click', () => {
-          const tplId = window.topCustomizerState?.currentTpl?.id || '';
-          const rt = window.REGAARDER_CHAPTER_RUNTIME?.[tplId];
-          const lid = rt?.selectedLayer;
-          if (rt && lid && rt.config?.layers?.[lid]) {
-            it.apply(rt.config.layers[lid]);
+          committed = true;
+          if (layerObj) {
+            it.apply(layerObj);
             window.renderCustomizerFrame?.();
           }
           pop.remove();
         });
-        listEl.appendChild(b);
+        gridEl.appendChild(b);
       });
     };
     renderItems();
     pop.querySelector('.rm-fx-pop-search')?.addEventListener('input', (ev) => renderItems(ev.target.value));
-    pop.querySelector('.rm-fx-pop-close')?.addEventListener('click', () => pop.remove());
+    pop.querySelector('.rm-fx-pop-close')?.addEventListener('click', () => { restoreSnapshot(); pop.remove(); });
     return;
   }
   if (!e.target.closest('#rm-cutout-fx-popover')) {
