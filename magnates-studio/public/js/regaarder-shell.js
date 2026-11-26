@@ -429,20 +429,12 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
-     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
-     const headerLeft=exportModal.querySelector('.export-modal-header-left');
-     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
-       const backBtn=document.createElement('button');
-       backBtn.type='button';
-       backBtn.className='rm-export-back-btn';
-       backBtn.title='Back to Share';
-       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
-       backBtn.addEventListener('click',()=>{
-         exportModal.style.display='none';
-         window.openGlobalShareModal?.();
-       });
-       headerLeft.prepend(backBtn);
-     }
+     document.getElementById('btn-export-modal-share')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
+     document.getElementById('btn-top-share-project')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
    }
 
    // Unified Canva-style flat Share Popover (#modal-global-share-project)
@@ -459,7 +451,6 @@
          <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
        </div>
        <div class="rm-share-search">
-         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
          <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
        </div>
        <div class="rm-share-avatars">
@@ -672,20 +663,12 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
-     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
-     const headerLeft=exportModal.querySelector('.export-modal-header-left');
-     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
-       const backBtn=document.createElement('button');
-       backBtn.type='button';
-       backBtn.className='rm-export-back-btn';
-       backBtn.title='Back to Share';
-       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
-       backBtn.addEventListener('click',()=>{
-         exportModal.style.display='none';
-         window.openGlobalShareModal?.();
-       });
-       headerLeft.prepend(backBtn);
-     }
+     document.getElementById('btn-export-modal-share')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
+     document.getElementById('btn-top-share-project')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
    }
 
    // Unified Canva-style flat Share Popover (#modal-global-share-project)
@@ -702,7 +685,6 @@
          <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
        </div>
        <div class="rm-share-search">
-         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
          <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
        </div>
        <div class="rm-share-avatars">
@@ -900,20 +882,12 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
-     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
-     const headerLeft=exportModal.querySelector('.export-modal-header-left');
-     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
-       const backBtn=document.createElement('button');
-       backBtn.type='button';
-       backBtn.className='rm-export-back-btn';
-       backBtn.title='Back to Share';
-       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
-       backBtn.addEventListener('click',()=>{
-         exportModal.style.display='none';
-         window.openGlobalShareModal?.();
-       });
-       headerLeft.prepend(backBtn);
-     }
+     document.getElementById('btn-export-modal-share')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
+     document.getElementById('btn-top-share-project')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
    }
 
    // Unified Canva-style flat Share Popover (#modal-global-share-project)
@@ -930,7 +904,6 @@
          <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
        </div>
        <div class="rm-share-search">
-         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
          <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
        </div>
        <div class="rm-share-avatars">
@@ -1160,20 +1133,12 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
-     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
-     const headerLeft=exportModal.querySelector('.export-modal-header-left');
-     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
-       const backBtn=document.createElement('button');
-       backBtn.type='button';
-       backBtn.className='rm-export-back-btn';
-       backBtn.title='Back to Share';
-       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
-       backBtn.addEventListener('click',()=>{
-         exportModal.style.display='none';
-         window.openGlobalShareModal?.();
-       });
-       headerLeft.prepend(backBtn);
-     }
+     document.getElementById('btn-export-modal-share')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
+     document.getElementById('btn-top-share-project')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
    }
 
    // Unified Canva-style flat Share Popover (#modal-global-share-project)
@@ -1190,7 +1155,6 @@
          <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
        </div>
        <div class="rm-share-search">
-         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
          <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
        </div>
        <div class="rm-share-avatars">
@@ -1426,20 +1390,12 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
-     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
-     const headerLeft=exportModal.querySelector('.export-modal-header-left');
-     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
-       const backBtn=document.createElement('button');
-       backBtn.type='button';
-       backBtn.className='rm-export-back-btn';
-       backBtn.title='Back to Share';
-       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
-       backBtn.addEventListener('click',()=>{
-         exportModal.style.display='none';
-         window.openGlobalShareModal?.();
-       });
-       headerLeft.prepend(backBtn);
-     }
+     document.getElementById('btn-export-modal-share')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
+     document.getElementById('btn-top-share-project')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
    }
 
    // Unified Canva-style flat Share Popover (#modal-global-share-project)
@@ -1456,7 +1412,6 @@
          <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
        </div>
        <div class="rm-share-search">
-         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
          <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
        </div>
        <div class="rm-share-avatars">
@@ -1704,20 +1659,12 @@
          exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
        }
      });
-     // Add Back-to-Share arrow in Export header for seamless Share -> Download navigation
-     const headerLeft=exportModal.querySelector('.export-modal-header-left');
-     if(headerLeft&&!headerLeft.querySelector('.rm-export-back-btn')){
-       const backBtn=document.createElement('button');
-       backBtn.type='button';
-       backBtn.className='rm-export-back-btn';
-       backBtn.title='Back to Share';
-       backBtn.innerHTML='<svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor"><path d="M9.78 3.22a.75.75 0 0 1 0 1.06L6.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L4.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"/></svg>';
-       backBtn.addEventListener('click',()=>{
-         exportModal.style.display='none';
-         window.openGlobalShareModal?.();
-       });
-       headerLeft.prepend(backBtn);
-     }
+     document.getElementById('btn-export-modal-share')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
+     document.getElementById('btn-top-share-project')?.addEventListener('click',()=>{
+       exportModal.style.display='none';
+     });
    }
 
    // Unified Canva-style flat Share Popover (#modal-global-share-project)
@@ -1734,7 +1681,6 @@
          <button type="button" class="rm-share-close" aria-label="Close">&#x2715;</button>
        </div>
        <div class="rm-share-search">
-         <svg viewBox="0 0 16 16" width="13" height="13" fill="#64748b"><path d="M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm-.82 4.74a6 6 0 1 1 1.06-1.06l3.04 3.04a.75.75 0 1 1-1.06 1.06l-3.04-3.04Z"/></svg>
          <input type="text" id="rm-share-invite-input" placeholder="Add people, emails, or teams...">
        </div>
        <div class="rm-share-avatars">

@@ -677,7 +677,6 @@ body,
 /* Decluttered Studio Editor Top Bar & Stage */
 body.rm-in-editor .top-nav-center-switcher,
 body.rm-in-editor #rm-auth-actions,
-#btn-top-share-project,
 #btn-app-fullscreen,
 #btn-stage-float-template,
 #btn-cbar-animate,
@@ -1250,10 +1249,10 @@ body.rm-in-editor #rm-auth-actions,
   right: 20px !important;
   left: auto !important;
   margin: 0 !important;
-  width: min(370px, 92vw) !important;
+  width: min(360px, 92vw) !important;
   max-height: calc(100vh - 84px) !important;
   background: #141622 !important;
-  border: 1px solid rgba(139, 92, 246, 0.28) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
   border-radius: 14px !important;
   box-shadow: 0 22px 54px rgba(0, 0, 0, 0.78) !important;
   overflow-y: auto !important;
@@ -1310,8 +1309,8 @@ body.rm-in-editor #rm-auth-actions,
 
 #export-studio-modal .export-card-option {
   border: 0 !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.26) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  box-shadow: none !important;
   border-radius: 10px !important;
   padding: 6px !important;
   display: flex !important;
@@ -1319,17 +1318,17 @@ body.rm-in-editor #rm-auth-actions,
   align-items: center !important;
   gap: 6px !important;
   cursor: pointer;
-  transition: box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease;
+  transition: background 0.16s ease, color 0.16s ease;
 }
 
 #export-studio-modal .export-card-option:hover {
-  background: rgba(255, 255, 255, 0.065) !important;
-  box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.35), 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+  background: rgba(255, 255, 255, 0.075) !important;
+  box-shadow: none !important;
 }
 
 #export-studio-modal .export-card-option.active {
-  background: rgba(139, 92, 246, 0.18) !important;
-  box-shadow: 0 0 0 1.5px rgba(139, 92, 246, 0.8), 0 6px 18px rgba(109, 40, 217, 0.28) !important;
+  background: rgba(139, 92, 246, 0.22) !important;
+  box-shadow: none !important;
 }
 
 #export-studio-modal .export-card-preview {
@@ -1429,8 +1428,8 @@ body.rm-in-editor #rm-auth-actions,
 
 #export-studio-modal .export-radio-pill {
   border: 0 !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.22) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  box-shadow: none !important;
   border-radius: 9px !important;
   padding: 9px 12px !important;
   display: flex !important;
@@ -1440,8 +1439,8 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 #export-studio-modal .export-radio-pill.active {
-  background: rgba(139, 92, 246, 0.18) !important;
-  box-shadow: 0 0 0 1.5px rgba(139, 92, 246, 0.8), 0 6px 16px rgba(109, 40, 217, 0.25) !important;
+  background: rgba(139, 92, 246, 0.22) !important;
+  box-shadow: none !important;
   color: #ffffff !important;
 }
 
@@ -1450,10 +1449,7 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 #export-studio-modal .export-summary-panel {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-radius: 10px !important;
-  padding: 10px 12px !important;
+  display: none !important;
 }
 
 #export-studio-modal .summary-val.accent,
@@ -1614,21 +1610,38 @@ body.rm-in-editor #rm-auth-actions,
   color: #ffffff;
 }
 
-/* Top-Bar Quiet Restraint + Unified Canva-style Share Popover */
-#btn-save-project,
-#btn-top-turn-template,
-#btn-export {
+/* Top-Bar Hierarchy: Subtle Save, Purple Turn-into-Template & Export, Crisp Share CTA */
+#btn-save-project {
   background: transparent !important;
   border: 0 !important;
   color: #cbd5e1 !important;
   box-shadow: none !important;
 }
 
-#btn-save-project:hover,
-#btn-top-turn-template:hover,
-#btn-export:hover {
+#btn-save-project:hover {
   background: rgba(255, 255, 255, 0.06) !important;
   color: #ffffff !important;
+}
+
+#btn-top-turn-template {
+  background: rgba(168, 85, 247, 0.14) !important;
+  border: 1px solid rgba(168, 85, 247, 0.35) !important;
+  color: #d8b4fe !important;
+}
+
+#btn-top-turn-template:hover {
+  background: rgba(168, 85, 247, 0.22) !important;
+}
+
+#btn-export {
+  background: rgba(139, 92, 246, 0.18) !important;
+  border: 1px solid rgba(139, 92, 246, 0.38) !important;
+  color: #f3e8ff !important;
+  box-shadow: none !important;
+}
+
+#btn-export:hover {
+  background: rgba(139, 92, 246, 0.28) !important;
 }
 
 #btn-top-share-project {
