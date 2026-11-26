@@ -103,20 +103,6 @@
    for(const button of rail.querySelectorAll('.rail-btn')){const active=button.dataset.railTab==='templates';if(button.classList.contains('active')!==active)button.classList.toggle('active',active);}
  };
  if(rail){new MutationObserver(syncRail).observe(rail,{attributes:true,attributeFilter:['class'],subtree:true});new MutationObserver(syncRail).observe(home,{attributes:true,attributeFilter:['style']});syncRail();}
- const icons={templates:'M3 4h18v16H3z M3 9h18',all:'M12 16V3 M7 8l5-5 5 5 M4 14v7h16v-7',elements:'M5 20V10 M12 20V4 M19 20v-7',animate:'M8 4l12 8-12 8z',transitions:'M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.89-2-2-2zm-7 14H5V6h7v12zm7 0h-5V6h5v12z',text:'M4 5h16 M12 5v15',icons:'M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z',layers:'M12 3L2 8l10 5 10-5z M2 12l10 5 10-5 M2 16l10 5 10-5',projects:'M3 6h7l2 3h9v12H3z'};
- document.querySelectorAll('#main-nav-rail .rail-btn').forEach(button=>{
-   const path=icons[button.dataset.railTab];
-   const old=button.querySelector('svg');
-   if(path&&old){
-     const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-     svg.setAttribute('viewBox','0 0 24 24');
-     svg.setAttribute('aria-hidden','true');
-     const p=document.createElementNS(svg.namespaceURI,'path');
-     p.setAttribute('d',path);
-     svg.appendChild(p);
-     old.replaceWith(svg);
-   }
- });
 
  // Organize left rail: primary items (Create, Templates, Projects, Uploads) + More (...) + bottom Notifications.
  if(rail&&!rail.querySelector('.rm-rail-more')){
@@ -147,7 +133,7 @@
    // Bottom-pinned Real-Time Notifications bell on the rail
    const notifWrap=document.createElement('details');
    notifWrap.className='rm-rail-notif';
-   notifWrap.innerHTML='<summary class="rm-rail-action-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><span class="rm-notif-icon-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="rm-notif-badge" hidden>0</span></span><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><div class="rm-notif-head"><strong>Alerts</strong><button type="button" class="rm-notif-clear" data-notif-read-all>Mark all read</button></div><div class="rm-notif-list"><p class="rm-notif-empty">You\'re all caught up. Live alerts and support updates will appear here.</p></div></div>';
+   notifWrap.innerHTML='<summary class="rm-rail-action-btn rm-rail-notif-btn" title="Notifications" aria-label="Notifications"><span class="rm-notif-icon-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span class="rm-notif-badge" hidden>0</span></span><span class="rail-label">Alerts</span></summary><div class="rm-rail-notif-menu"><div class="rm-notif-head"><strong>Alerts</strong><button type="button" class="rm-notif-clear" data-notif-read-all>Mark all read</button></div><div class="rm-notif-list"><p class="rm-notif-empty">You\'re all caught up. Live alerts and support updates will appear here.</p></div></div>';
    rail.appendChild(notifWrap);
    notifWrap.addEventListener('toggle',()=>{if(notifWrap.open)positionRailFlyout(notifWrap.querySelector('summary'),notifWrap.querySelector('.rm-rail-notif-menu'));});
    notifWrap.querySelector('summary')?.addEventListener('click',e=>{e.stopPropagation();if(create)create.open=false;const mw=rail.querySelector('.rm-rail-more');if(mw)mw.open=false;});

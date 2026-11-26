@@ -183,11 +183,8 @@ body,
 #main-nav-rail .rm-rail-action-btn svg {
   width: 20px !important;
   height: 20px !important;
-  fill: none !important;
-  stroke: currentColor !important;
-  stroke-width: 1.85 !important;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  fill: currentColor !important;
+  stroke: none !important;
 }
 
 #main-nav-rail .rail-label {
@@ -208,12 +205,12 @@ body,
 
 #main-nav-rail .rail-btn.active svg {
   box-sizing: border-box !important;
-  width: 42px !important;
-  height: 30px !important;
-  padding: 5px 11px !important;
-  border-radius: 9px !important;
-  background: rgba(139, 92, 246, 0.24) !important;
-  color: #c4b5fd !important;
+  width: 34px !important;
+  height: 34px !important;
+  padding: 7px !important;
+  border-radius: 10px !important;
+  background: rgba(139, 92, 246, 0.28) !important;
+  color: #f3e8ff !important;
 }
 
 #main-nav-rail .rail-btn.active .rail-label {
