@@ -2427,8 +2427,18 @@ body.rm-in-editor #rm-auth-actions,
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.36) !important;
 }
 
+#home-templates-count {
+  background: rgba(139, 92, 246, 0.2) !important;
+  color: #c4b5fd !important;
+  border: 1px solid rgba(139, 92, 246, 0.35) !important;
+}
+
 .home-tpl-card {
-  background: var(--rm-surface-elevated) !important;
+  overflow: hidden !important;
+  border-radius: 12px !important;
+  background: rgba(24, 27, 40, 0.72) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(255, 255, 255, 0.085) !important;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34) !important;
 }
