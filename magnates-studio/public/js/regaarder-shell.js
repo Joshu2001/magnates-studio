@@ -553,6 +553,30 @@
    };
    cleanText(sidebar);
    new MutationObserver(()=>cleanText(sidebar)).observe(sidebar,{childList:true,subtree:true});
+
+   // Embed + upload button inside .media-search-input-wrap (single container)
+   const searchWrap=document.querySelector('#left-sidebar .media-search-input-wrap');
+   const dropZone=document.getElementById('drop-zone');
+   if(searchWrap&&dropZone&&dropZone.parentElement!==searchWrap){
+     searchWrap.appendChild(dropZone);
+   }
+
+   // Default charts to transparent overlay with an optional "Chart Background" toggle
+   const chartBody=document.querySelector('#card-chart-inspector .fx-body');
+   if(chartBody&&!document.getElementById('rm-chart-bg-toggle')){
+     const row=document.createElement('div');
+     row.className='control-row';
+     row.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;"><label style="margin:0;">Chart Background</label><label class="switch" style="width:26px;height:15px;"><input type="checkbox" id="rm-chart-bg-toggle"><span class="slider"></span></label></div>';
+     chartBody.prepend(row);
+     const toggle=row.querySelector('#rm-chart-bg-toggle');
+     toggle?.addEventListener('change',()=>{
+       const clip=window.selectedTimelineClip||window.activeTimelineClip;
+       if(clip&&clip.chartData){
+         clip.chartData.transparentBg=!toggle.checked;
+         window.renderStudioFrame?.();
+       }
+     });
+   }
  })();
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  function refineMeshInspector(section){
