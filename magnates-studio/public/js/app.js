@@ -4254,8 +4254,6 @@ function renderAllTimelineTracks() {
       if (isFilmstripClip || isChartClip) {
         // Pristine filmstrip: title text is completely removed from on top of the filmstrip frames
         contentEl.innerHTML = '';
-      } else if (isCompact && miniBadges) {
-        contentEl.innerHTML = `${iconSvg} <span style="font-size:9px; font-weight:700; display:inline-flex; align-items:center;">${miniBadges}</span>`;
       } else {
         contentEl.innerHTML = `${iconSvg} <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${label}</span>`;
       }
