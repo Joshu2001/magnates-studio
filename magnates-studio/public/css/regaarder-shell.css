@@ -1284,7 +1284,7 @@ body.rm-in-editor #rm-auth-actions,
   display: none !important;
 }
 
-#export-studio-modal .export-ratio-card {
+#export-studio-modal .export-card-option {
   border: 0 !important;
   background: rgba(255, 255, 255, 0.035) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.26) !important;
@@ -1292,14 +1292,20 @@ body.rm-in-editor #rm-auth-actions,
   padding: 10px 8px !important;
 }
 
-#export-studio-modal .export-ratio-card.active {
+#export-studio-modal .export-card-option.active {
   background: rgba(139, 92, 246, 0.18) !important;
   box-shadow: 0 0 0 1.5px rgba(139, 92, 246, 0.8), 0 6px 18px rgba(109, 40, 217, 0.28) !important;
 }
 
-#export-studio-modal .export-ratio-card small,
-#export-studio-modal .export-ratio-sub {
+#export-studio-modal .export-card-sub {
   display: none !important;
+}
+
+#export-studio-modal .export-modal-header-left .export-icon-badge,
+#export-studio-modal .export-modal-icon {
+  background: rgba(139, 92, 246, 0.18) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(167, 139, 250, 0.35) !important;
 }
 
 .rm-export-select {

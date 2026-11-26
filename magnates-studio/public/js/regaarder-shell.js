@@ -342,11 +342,15 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
-   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns + hover tooltips on aspect cards
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
-     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+     exportModal.querySelectorAll('.export-card-option').forEach(card=>{
+       const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
+       if(sub&&!card.title)card.title=sub;
+     });
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
@@ -398,11 +402,15 @@
      inp.addEventListener('change',sync);
      document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
    });
-   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns + hover tooltips on aspect cards
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
-     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+     exportModal.querySelectorAll('.export-card-option').forEach(card=>{
+       const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
+       if(sub&&!card.title)card.title=sub;
+     });
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
@@ -439,11 +447,15 @@
      presetLabel.textContent='Color Presets';
      presetLabel.style.whiteSpace='nowrap';
    }
-   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns + hover tooltips on aspect cards
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
-     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+     exportModal.querySelectorAll('.export-card-option').forEach(card=>{
+       const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
+       if(sub&&!card.title)card.title=sub;
+     });
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
@@ -512,11 +524,15 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
-   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns + hover tooltips on aspect cards
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
-     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+     exportModal.querySelectorAll('.export-card-option').forEach(card=>{
+       const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
+       if(sub&&!card.title)card.title=sub;
+     });
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
@@ -591,11 +607,15 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
-   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns + hover tooltips on aspect cards
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
-     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+     exportModal.querySelectorAll('.export-card-option').forEach(card=>{
+       const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
+       if(sub&&!card.title)card.title=sub;
+     });
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
@@ -682,11 +702,15 @@
        }
      });
    }
-   // Convert Export Modal Resolution & FPS button grids into clean dropdowns
+   // Convert Export Modal Resolution & FPS button grids into clean dropdowns + hover tooltips on aspect cards
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
-     exportModal.querySelectorAll('.export-res-grid, .export-fps-grid').forEach(grid=>{
+     exportModal.querySelectorAll('.export-card-option').forEach(card=>{
+       const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
+       if(sub&&!card.title)card.title=sub;
+     });
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
