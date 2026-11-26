@@ -342,7 +342,7 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
-   // Convert Export Modal Resolution, FPS & Bitrate preset button grids into clean dropdowns + hover tooltips on aspect cards
+   // Convert Export Modal Resolution, FPS & Bitrate presets into custom Regaarder dropdowns + compact 2x2 grid arrangement
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
@@ -350,21 +350,84 @@
        const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
        if(sub&&!card.title)card.title=sub;
      });
-     exportModal.querySelectorAll('.export-two-col .export-form-group > div, .export-bitrate-presets').forEach(grid=>{
+     const buildCustomSelect=(btns,onPick)=>{
+       const wrap=document.createElement('div');
+       wrap.className='rm-custom-select';
+       const trigger=document.createElement('button');
+       trigger.type='button';
+       trigger.className='rm-custom-select-trigger';
+       const activeBtn=btns.find(b=>b.classList.contains('active'))||btns[0];
+       const labelSpan=document.createElement('span');
+       labelSpan.className='rm-custom-select-label';
+       labelSpan.textContent=activeBtn?activeBtn.textContent.trim():'';
+       const chev=document.createElementNS('http://www.w3.org/2000/svg','svg');
+       chev.setAttribute('viewBox','0 0 16 16');
+       chev.setAttribute('class','rm-custom-select-chev');
+       chev.innerHTML='<path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z" fill="currentColor"/>';
+       trigger.append(labelSpan,chev);
+       const menu=document.createElement('div');
+       menu.className='rm-custom-select-menu';
+       btns.forEach((b,idx)=>{
+         const opt=document.createElement('button');
+         opt.type='button';
+         opt.className='rm-custom-select-opt'+(b.classList.contains('active')?' is-selected':'');
+         opt.textContent=b.textContent.trim();
+         opt.addEventListener('click',e=>{
+           e.stopPropagation();
+           b.click();
+           labelSpan.textContent=b.textContent.trim();
+           menu.querySelectorAll('.rm-custom-select-opt').forEach((o,j)=>o.classList.toggle('is-selected',j===idx));
+           wrap.classList.remove('is-open');
+           if(onPick)onPick(b);
+         });
+         menu.appendChild(opt);
+       });
+       trigger.addEventListener('click',e=>{
+         e.stopPropagation();
+         const wasOpen=wrap.classList.contains('is-open');
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+         if(!wasOpen)wrap.classList.add('is-open');
+       });
+       wrap.append(trigger,menu);
+       return{wrap,labelSpan,menu};
+     };
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
-       const sel=document.createElement('select');
-       sel.className='rm-export-select';
-       btns.forEach((b,i)=>{
-         const opt=document.createElement('option');
-         opt.value=String(i);
-         opt.textContent=b.textContent.trim();
-         if(b.classList.contains('active'))opt.selected=true;
-         sel.appendChild(opt);
-       });
-       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
-       grid.after(sel);
+       grid.after(buildCustomSelect(btns).wrap);
+     });
+     const twoCol=exportModal.querySelector('.export-two-col');
+     const presetGrid=exportModal.querySelector('.export-bitrate-presets');
+     const codecGroup=exportModal.querySelector('.export-codec-toggle')?.closest('.export-form-group');
+     if(twoCol&&presetGrid&&codecGroup){
+       const presetBtns=[...presetGrid.querySelectorAll('button')];
+       if(presetBtns.length){
+         presetGrid.classList.add('rm-visual-select-hidden');
+         const qualityGroup=document.createElement('div');
+         qualityGroup.className='export-form-group';
+         const lbl=document.createElement('label');
+         lbl.className='export-section-label';
+         lbl.textContent='Quality Preset';
+         const qSelect=buildCustomSelect(presetBtns);
+         qualityGroup.append(lbl,qSelect.wrap);
+         const settingsRow=document.createElement('div');
+         settingsRow.className='rm-export-settings-row';
+         twoCol.after(settingsRow);
+         settingsRow.append(qualityGroup,codecGroup);
+         const slider=exportModal.querySelector('#export-bitrate-slider');
+         if(slider){
+           slider.addEventListener('input',()=>{
+             const active=presetBtns.find(b=>b.classList.contains('active'));
+             qSelect.labelSpan.textContent=active?active.textContent.trim():`Custom (${slider.value}M)`;
+           });
+         }
+       }
+     }
+     document.addEventListener('click',e=>{
+       if(!e.target.closest?.('.rm-custom-select')){
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+       }
      });
    }
  })();
@@ -402,7 +465,7 @@
      inp.addEventListener('change',sync);
      document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
    });
-   // Convert Export Modal Resolution, FPS & Bitrate preset button grids into clean dropdowns + hover tooltips on aspect cards
+   // Convert Export Modal Resolution, FPS & Bitrate presets into custom Regaarder dropdowns + compact 2x2 grid arrangement
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
@@ -410,21 +473,84 @@
        const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
        if(sub&&!card.title)card.title=sub;
      });
-     exportModal.querySelectorAll('.export-two-col .export-form-group > div, .export-bitrate-presets').forEach(grid=>{
+     const buildCustomSelect=(btns,onPick)=>{
+       const wrap=document.createElement('div');
+       wrap.className='rm-custom-select';
+       const trigger=document.createElement('button');
+       trigger.type='button';
+       trigger.className='rm-custom-select-trigger';
+       const activeBtn=btns.find(b=>b.classList.contains('active'))||btns[0];
+       const labelSpan=document.createElement('span');
+       labelSpan.className='rm-custom-select-label';
+       labelSpan.textContent=activeBtn?activeBtn.textContent.trim():'';
+       const chev=document.createElementNS('http://www.w3.org/2000/svg','svg');
+       chev.setAttribute('viewBox','0 0 16 16');
+       chev.setAttribute('class','rm-custom-select-chev');
+       chev.innerHTML='<path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z" fill="currentColor"/>';
+       trigger.append(labelSpan,chev);
+       const menu=document.createElement('div');
+       menu.className='rm-custom-select-menu';
+       btns.forEach((b,idx)=>{
+         const opt=document.createElement('button');
+         opt.type='button';
+         opt.className='rm-custom-select-opt'+(b.classList.contains('active')?' is-selected':'');
+         opt.textContent=b.textContent.trim();
+         opt.addEventListener('click',e=>{
+           e.stopPropagation();
+           b.click();
+           labelSpan.textContent=b.textContent.trim();
+           menu.querySelectorAll('.rm-custom-select-opt').forEach((o,j)=>o.classList.toggle('is-selected',j===idx));
+           wrap.classList.remove('is-open');
+           if(onPick)onPick(b);
+         });
+         menu.appendChild(opt);
+       });
+       trigger.addEventListener('click',e=>{
+         e.stopPropagation();
+         const wasOpen=wrap.classList.contains('is-open');
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+         if(!wasOpen)wrap.classList.add('is-open');
+       });
+       wrap.append(trigger,menu);
+       return{wrap,labelSpan,menu};
+     };
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
-       const sel=document.createElement('select');
-       sel.className='rm-export-select';
-       btns.forEach((b,i)=>{
-         const opt=document.createElement('option');
-         opt.value=String(i);
-         opt.textContent=b.textContent.trim();
-         if(b.classList.contains('active'))opt.selected=true;
-         sel.appendChild(opt);
-       });
-       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
-       grid.after(sel);
+       grid.after(buildCustomSelect(btns).wrap);
+     });
+     const twoCol=exportModal.querySelector('.export-two-col');
+     const presetGrid=exportModal.querySelector('.export-bitrate-presets');
+     const codecGroup=exportModal.querySelector('.export-codec-toggle')?.closest('.export-form-group');
+     if(twoCol&&presetGrid&&codecGroup){
+       const presetBtns=[...presetGrid.querySelectorAll('button')];
+       if(presetBtns.length){
+         presetGrid.classList.add('rm-visual-select-hidden');
+         const qualityGroup=document.createElement('div');
+         qualityGroup.className='export-form-group';
+         const lbl=document.createElement('label');
+         lbl.className='export-section-label';
+         lbl.textContent='Quality Preset';
+         const qSelect=buildCustomSelect(presetBtns);
+         qualityGroup.append(lbl,qSelect.wrap);
+         const settingsRow=document.createElement('div');
+         settingsRow.className='rm-export-settings-row';
+         twoCol.after(settingsRow);
+         settingsRow.append(qualityGroup,codecGroup);
+         const slider=exportModal.querySelector('#export-bitrate-slider');
+         if(slider){
+           slider.addEventListener('input',()=>{
+             const active=presetBtns.find(b=>b.classList.contains('active'));
+             qSelect.labelSpan.textContent=active?active.textContent.trim():`Custom (${slider.value}M)`;
+           });
+         }
+       }
+     }
+     document.addEventListener('click',e=>{
+       if(!e.target.closest?.('.rm-custom-select')){
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+       }
      });
    }
  })();
@@ -447,7 +573,7 @@
      presetLabel.textContent='Color Presets';
      presetLabel.style.whiteSpace='nowrap';
    }
-   // Convert Export Modal Resolution, FPS & Bitrate preset button grids into clean dropdowns + hover tooltips on aspect cards
+   // Convert Export Modal Resolution, FPS & Bitrate presets into custom Regaarder dropdowns + compact 2x2 grid arrangement
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
@@ -455,21 +581,84 @@
        const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
        if(sub&&!card.title)card.title=sub;
      });
-     exportModal.querySelectorAll('.export-two-col .export-form-group > div, .export-bitrate-presets').forEach(grid=>{
+     const buildCustomSelect=(btns,onPick)=>{
+       const wrap=document.createElement('div');
+       wrap.className='rm-custom-select';
+       const trigger=document.createElement('button');
+       trigger.type='button';
+       trigger.className='rm-custom-select-trigger';
+       const activeBtn=btns.find(b=>b.classList.contains('active'))||btns[0];
+       const labelSpan=document.createElement('span');
+       labelSpan.className='rm-custom-select-label';
+       labelSpan.textContent=activeBtn?activeBtn.textContent.trim():'';
+       const chev=document.createElementNS('http://www.w3.org/2000/svg','svg');
+       chev.setAttribute('viewBox','0 0 16 16');
+       chev.setAttribute('class','rm-custom-select-chev');
+       chev.innerHTML='<path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z" fill="currentColor"/>';
+       trigger.append(labelSpan,chev);
+       const menu=document.createElement('div');
+       menu.className='rm-custom-select-menu';
+       btns.forEach((b,idx)=>{
+         const opt=document.createElement('button');
+         opt.type='button';
+         opt.className='rm-custom-select-opt'+(b.classList.contains('active')?' is-selected':'');
+         opt.textContent=b.textContent.trim();
+         opt.addEventListener('click',e=>{
+           e.stopPropagation();
+           b.click();
+           labelSpan.textContent=b.textContent.trim();
+           menu.querySelectorAll('.rm-custom-select-opt').forEach((o,j)=>o.classList.toggle('is-selected',j===idx));
+           wrap.classList.remove('is-open');
+           if(onPick)onPick(b);
+         });
+         menu.appendChild(opt);
+       });
+       trigger.addEventListener('click',e=>{
+         e.stopPropagation();
+         const wasOpen=wrap.classList.contains('is-open');
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+         if(!wasOpen)wrap.classList.add('is-open');
+       });
+       wrap.append(trigger,menu);
+       return{wrap,labelSpan,menu};
+     };
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
-       const sel=document.createElement('select');
-       sel.className='rm-export-select';
-       btns.forEach((b,i)=>{
-         const opt=document.createElement('option');
-         opt.value=String(i);
-         opt.textContent=b.textContent.trim();
-         if(b.classList.contains('active'))opt.selected=true;
-         sel.appendChild(opt);
-       });
-       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
-       grid.after(sel);
+       grid.after(buildCustomSelect(btns).wrap);
+     });
+     const twoCol=exportModal.querySelector('.export-two-col');
+     const presetGrid=exportModal.querySelector('.export-bitrate-presets');
+     const codecGroup=exportModal.querySelector('.export-codec-toggle')?.closest('.export-form-group');
+     if(twoCol&&presetGrid&&codecGroup){
+       const presetBtns=[...presetGrid.querySelectorAll('button')];
+       if(presetBtns.length){
+         presetGrid.classList.add('rm-visual-select-hidden');
+         const qualityGroup=document.createElement('div');
+         qualityGroup.className='export-form-group';
+         const lbl=document.createElement('label');
+         lbl.className='export-section-label';
+         lbl.textContent='Quality Preset';
+         const qSelect=buildCustomSelect(presetBtns);
+         qualityGroup.append(lbl,qSelect.wrap);
+         const settingsRow=document.createElement('div');
+         settingsRow.className='rm-export-settings-row';
+         twoCol.after(settingsRow);
+         settingsRow.append(qualityGroup,codecGroup);
+         const slider=exportModal.querySelector('#export-bitrate-slider');
+         if(slider){
+           slider.addEventListener('input',()=>{
+             const active=presetBtns.find(b=>b.classList.contains('active'));
+             qSelect.labelSpan.textContent=active?active.textContent.trim():`Custom (${slider.value}M)`;
+           });
+         }
+       }
+     }
+     document.addEventListener('click',e=>{
+       if(!e.target.closest?.('.rm-custom-select')){
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+       }
      });
    }
  })();
@@ -524,7 +713,7 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
-   // Convert Export Modal Resolution, FPS & Bitrate preset button grids into clean dropdowns + hover tooltips on aspect cards
+   // Convert Export Modal Resolution, FPS & Bitrate presets into custom Regaarder dropdowns + compact 2x2 grid arrangement
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
@@ -532,21 +721,84 @@
        const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
        if(sub&&!card.title)card.title=sub;
      });
-     exportModal.querySelectorAll('.export-two-col .export-form-group > div, .export-bitrate-presets').forEach(grid=>{
+     const buildCustomSelect=(btns,onPick)=>{
+       const wrap=document.createElement('div');
+       wrap.className='rm-custom-select';
+       const trigger=document.createElement('button');
+       trigger.type='button';
+       trigger.className='rm-custom-select-trigger';
+       const activeBtn=btns.find(b=>b.classList.contains('active'))||btns[0];
+       const labelSpan=document.createElement('span');
+       labelSpan.className='rm-custom-select-label';
+       labelSpan.textContent=activeBtn?activeBtn.textContent.trim():'';
+       const chev=document.createElementNS('http://www.w3.org/2000/svg','svg');
+       chev.setAttribute('viewBox','0 0 16 16');
+       chev.setAttribute('class','rm-custom-select-chev');
+       chev.innerHTML='<path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z" fill="currentColor"/>';
+       trigger.append(labelSpan,chev);
+       const menu=document.createElement('div');
+       menu.className='rm-custom-select-menu';
+       btns.forEach((b,idx)=>{
+         const opt=document.createElement('button');
+         opt.type='button';
+         opt.className='rm-custom-select-opt'+(b.classList.contains('active')?' is-selected':'');
+         opt.textContent=b.textContent.trim();
+         opt.addEventListener('click',e=>{
+           e.stopPropagation();
+           b.click();
+           labelSpan.textContent=b.textContent.trim();
+           menu.querySelectorAll('.rm-custom-select-opt').forEach((o,j)=>o.classList.toggle('is-selected',j===idx));
+           wrap.classList.remove('is-open');
+           if(onPick)onPick(b);
+         });
+         menu.appendChild(opt);
+       });
+       trigger.addEventListener('click',e=>{
+         e.stopPropagation();
+         const wasOpen=wrap.classList.contains('is-open');
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+         if(!wasOpen)wrap.classList.add('is-open');
+       });
+       wrap.append(trigger,menu);
+       return{wrap,labelSpan,menu};
+     };
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
-       const sel=document.createElement('select');
-       sel.className='rm-export-select';
-       btns.forEach((b,i)=>{
-         const opt=document.createElement('option');
-         opt.value=String(i);
-         opt.textContent=b.textContent.trim();
-         if(b.classList.contains('active'))opt.selected=true;
-         sel.appendChild(opt);
-       });
-       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
-       grid.after(sel);
+       grid.after(buildCustomSelect(btns).wrap);
+     });
+     const twoCol=exportModal.querySelector('.export-two-col');
+     const presetGrid=exportModal.querySelector('.export-bitrate-presets');
+     const codecGroup=exportModal.querySelector('.export-codec-toggle')?.closest('.export-form-group');
+     if(twoCol&&presetGrid&&codecGroup){
+       const presetBtns=[...presetGrid.querySelectorAll('button')];
+       if(presetBtns.length){
+         presetGrid.classList.add('rm-visual-select-hidden');
+         const qualityGroup=document.createElement('div');
+         qualityGroup.className='export-form-group';
+         const lbl=document.createElement('label');
+         lbl.className='export-section-label';
+         lbl.textContent='Quality Preset';
+         const qSelect=buildCustomSelect(presetBtns);
+         qualityGroup.append(lbl,qSelect.wrap);
+         const settingsRow=document.createElement('div');
+         settingsRow.className='rm-export-settings-row';
+         twoCol.after(settingsRow);
+         settingsRow.append(qualityGroup,codecGroup);
+         const slider=exportModal.querySelector('#export-bitrate-slider');
+         if(slider){
+           slider.addEventListener('input',()=>{
+             const active=presetBtns.find(b=>b.classList.contains('active'));
+             qSelect.labelSpan.textContent=active?active.textContent.trim():`Custom (${slider.value}M)`;
+           });
+         }
+       }
+     }
+     document.addEventListener('click',e=>{
+       if(!e.target.closest?.('.rm-custom-select')){
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+       }
      });
    }
  })();
@@ -607,7 +859,7 @@
    });
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
-   // Convert Export Modal Resolution, FPS & Bitrate preset button grids into clean dropdowns + hover tooltips on aspect cards
+   // Convert Export Modal Resolution, FPS & Bitrate presets into custom Regaarder dropdowns + compact 2x2 grid arrangement
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
@@ -615,21 +867,84 @@
        const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
        if(sub&&!card.title)card.title=sub;
      });
-     exportModal.querySelectorAll('.export-two-col .export-form-group > div, .export-bitrate-presets').forEach(grid=>{
+     const buildCustomSelect=(btns,onPick)=>{
+       const wrap=document.createElement('div');
+       wrap.className='rm-custom-select';
+       const trigger=document.createElement('button');
+       trigger.type='button';
+       trigger.className='rm-custom-select-trigger';
+       const activeBtn=btns.find(b=>b.classList.contains('active'))||btns[0];
+       const labelSpan=document.createElement('span');
+       labelSpan.className='rm-custom-select-label';
+       labelSpan.textContent=activeBtn?activeBtn.textContent.trim():'';
+       const chev=document.createElementNS('http://www.w3.org/2000/svg','svg');
+       chev.setAttribute('viewBox','0 0 16 16');
+       chev.setAttribute('class','rm-custom-select-chev');
+       chev.innerHTML='<path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z" fill="currentColor"/>';
+       trigger.append(labelSpan,chev);
+       const menu=document.createElement('div');
+       menu.className='rm-custom-select-menu';
+       btns.forEach((b,idx)=>{
+         const opt=document.createElement('button');
+         opt.type='button';
+         opt.className='rm-custom-select-opt'+(b.classList.contains('active')?' is-selected':'');
+         opt.textContent=b.textContent.trim();
+         opt.addEventListener('click',e=>{
+           e.stopPropagation();
+           b.click();
+           labelSpan.textContent=b.textContent.trim();
+           menu.querySelectorAll('.rm-custom-select-opt').forEach((o,j)=>o.classList.toggle('is-selected',j===idx));
+           wrap.classList.remove('is-open');
+           if(onPick)onPick(b);
+         });
+         menu.appendChild(opt);
+       });
+       trigger.addEventListener('click',e=>{
+         e.stopPropagation();
+         const wasOpen=wrap.classList.contains('is-open');
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+         if(!wasOpen)wrap.classList.add('is-open');
+       });
+       wrap.append(trigger,menu);
+       return{wrap,labelSpan,menu};
+     };
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
-       const sel=document.createElement('select');
-       sel.className='rm-export-select';
-       btns.forEach((b,i)=>{
-         const opt=document.createElement('option');
-         opt.value=String(i);
-         opt.textContent=b.textContent.trim();
-         if(b.classList.contains('active'))opt.selected=true;
-         sel.appendChild(opt);
-       });
-       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
-       grid.after(sel);
+       grid.after(buildCustomSelect(btns).wrap);
+     });
+     const twoCol=exportModal.querySelector('.export-two-col');
+     const presetGrid=exportModal.querySelector('.export-bitrate-presets');
+     const codecGroup=exportModal.querySelector('.export-codec-toggle')?.closest('.export-form-group');
+     if(twoCol&&presetGrid&&codecGroup){
+       const presetBtns=[...presetGrid.querySelectorAll('button')];
+       if(presetBtns.length){
+         presetGrid.classList.add('rm-visual-select-hidden');
+         const qualityGroup=document.createElement('div');
+         qualityGroup.className='export-form-group';
+         const lbl=document.createElement('label');
+         lbl.className='export-section-label';
+         lbl.textContent='Quality Preset';
+         const qSelect=buildCustomSelect(presetBtns);
+         qualityGroup.append(lbl,qSelect.wrap);
+         const settingsRow=document.createElement('div');
+         settingsRow.className='rm-export-settings-row';
+         twoCol.after(settingsRow);
+         settingsRow.append(qualityGroup,codecGroup);
+         const slider=exportModal.querySelector('#export-bitrate-slider');
+         if(slider){
+           slider.addEventListener('input',()=>{
+             const active=presetBtns.find(b=>b.classList.contains('active'));
+             qSelect.labelSpan.textContent=active?active.textContent.trim():`Custom (${slider.value}M)`;
+           });
+         }
+       }
+     }
+     document.addEventListener('click',e=>{
+       if(!e.target.closest?.('.rm-custom-select')){
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+       }
      });
    }
  })();
@@ -702,7 +1017,7 @@
        }
      });
    }
-   // Convert Export Modal Resolution, FPS & Bitrate preset button grids into clean dropdowns + hover tooltips on aspect cards
+   // Convert Export Modal Resolution, FPS & Bitrate presets into custom Regaarder dropdowns + compact 2x2 grid arrangement
    const exportModal=document.getElementById('export-studio-modal');
    if(exportModal&&!exportModal.dataset.rmDropdowns){
      exportModal.dataset.rmDropdowns='true';
@@ -710,21 +1025,84 @@
        const sub=card.querySelector('.export-card-sub')?.textContent?.trim();
        if(sub&&!card.title)card.title=sub;
      });
-     exportModal.querySelectorAll('.export-two-col .export-form-group > div, .export-bitrate-presets').forEach(grid=>{
+     const buildCustomSelect=(btns,onPick)=>{
+       const wrap=document.createElement('div');
+       wrap.className='rm-custom-select';
+       const trigger=document.createElement('button');
+       trigger.type='button';
+       trigger.className='rm-custom-select-trigger';
+       const activeBtn=btns.find(b=>b.classList.contains('active'))||btns[0];
+       const labelSpan=document.createElement('span');
+       labelSpan.className='rm-custom-select-label';
+       labelSpan.textContent=activeBtn?activeBtn.textContent.trim():'';
+       const chev=document.createElementNS('http://www.w3.org/2000/svg','svg');
+       chev.setAttribute('viewBox','0 0 16 16');
+       chev.setAttribute('class','rm-custom-select-chev');
+       chev.innerHTML='<path d="M4.2 6.2a.75.75 0 0 1 1.06 0L8 8.94l2.74-2.74a.75.75 0 1 1 1.06 1.06l-3.27 3.27a.75.75 0 0 1-1.06 0L4.2 7.26a.75.75 0 0 1 0-1.06Z" fill="currentColor"/>';
+       trigger.append(labelSpan,chev);
+       const menu=document.createElement('div');
+       menu.className='rm-custom-select-menu';
+       btns.forEach((b,idx)=>{
+         const opt=document.createElement('button');
+         opt.type='button';
+         opt.className='rm-custom-select-opt'+(b.classList.contains('active')?' is-selected':'');
+         opt.textContent=b.textContent.trim();
+         opt.addEventListener('click',e=>{
+           e.stopPropagation();
+           b.click();
+           labelSpan.textContent=b.textContent.trim();
+           menu.querySelectorAll('.rm-custom-select-opt').forEach((o,j)=>o.classList.toggle('is-selected',j===idx));
+           wrap.classList.remove('is-open');
+           if(onPick)onPick(b);
+         });
+         menu.appendChild(opt);
+       });
+       trigger.addEventListener('click',e=>{
+         e.stopPropagation();
+         const wasOpen=wrap.classList.contains('is-open');
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+         if(!wasOpen)wrap.classList.add('is-open');
+       });
+       wrap.append(trigger,menu);
+       return{wrap,labelSpan,menu};
+     };
+     exportModal.querySelectorAll('.export-two-col .export-form-group > div').forEach(grid=>{
        const btns=[...grid.querySelectorAll('button')];
        if(!btns.length)return;
        grid.classList.add('rm-visual-select-hidden');
-       const sel=document.createElement('select');
-       sel.className='rm-export-select';
-       btns.forEach((b,i)=>{
-         const opt=document.createElement('option');
-         opt.value=String(i);
-         opt.textContent=b.textContent.trim();
-         if(b.classList.contains('active'))opt.selected=true;
-         sel.appendChild(opt);
-       });
-       sel.addEventListener('change',()=>{btns[Number(sel.value)]?.click();});
-       grid.after(sel);
+       grid.after(buildCustomSelect(btns).wrap);
+     });
+     const twoCol=exportModal.querySelector('.export-two-col');
+     const presetGrid=exportModal.querySelector('.export-bitrate-presets');
+     const codecGroup=exportModal.querySelector('.export-codec-toggle')?.closest('.export-form-group');
+     if(twoCol&&presetGrid&&codecGroup){
+       const presetBtns=[...presetGrid.querySelectorAll('button')];
+       if(presetBtns.length){
+         presetGrid.classList.add('rm-visual-select-hidden');
+         const qualityGroup=document.createElement('div');
+         qualityGroup.className='export-form-group';
+         const lbl=document.createElement('label');
+         lbl.className='export-section-label';
+         lbl.textContent='Quality Preset';
+         const qSelect=buildCustomSelect(presetBtns);
+         qualityGroup.append(lbl,qSelect.wrap);
+         const settingsRow=document.createElement('div');
+         settingsRow.className='rm-export-settings-row';
+         twoCol.after(settingsRow);
+         settingsRow.append(qualityGroup,codecGroup);
+         const slider=exportModal.querySelector('#export-bitrate-slider');
+         if(slider){
+           slider.addEventListener('input',()=>{
+             const active=presetBtns.find(b=>b.classList.contains('active'));
+             qSelect.labelSpan.textContent=active?active.textContent.trim():`Custom (${slider.value}M)`;
+           });
+         }
+       }
+     }
+     document.addEventListener('click',e=>{
+       if(!e.target.closest?.('.rm-custom-select')){
+         exportModal.querySelectorAll('.rm-custom-select.is-open').forEach(el=>el.classList.remove('is-open'));
+       }
      });
    }
  })();
