@@ -2069,3 +2069,224 @@
  setInterval(()=>{for(const shell of document.querySelectorAll('.rg-inspector-shell'))if(shell.getClientRects().length)syncContext(shell);},300);
  schedule();
 })();
+
+(() => {
+  if (window.__rmCanvaTimelineInit) return;
+  window.__rmCanvaTimelineInit = true;
+
+  function initCanvaTimelineAndDrawer() {
+    const tlBody = document.getElementById('timeline-body');
+    const tlContainer = tlBody?.closest('.canva-timeline-container');
+    const tlScroll = document.getElementById('timeline-scroll-col');
+    const addAudioStrip = document.getElementById('canva-add-audio-strip');
+
+    // 1. Default to Multi-Track stacked layers when entering editor
+    const multiBtn = document.getElementById('btn-mode-multi');
+    if (multiBtn && !multiBtn.dataset.rmAutoSwitched) {
+      const observer = new MutationObserver(() => {
+        if (document.body.classList.contains('rm-in-editor') && !multiBtn.dataset.rmAutoSwitched) {
+          multiBtn.dataset.rmAutoSwitched = 'true';
+          if (tlBody?.classList.contains('consolidated-storyline-mode')) {
+            multiBtn.click();
+          }
+        }
+      });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // 2. Left-anchored Play button in Timeline
+    if (tlBody && !tlBody.querySelector('.rm-tl-play-col')) {
+      const playCol = document.createElement('div');
+      playCol.className = 'rm-tl-play-col';
+      const playBtn = document.createElement('button');
+      playBtn.type = 'button';
+      playBtn.id = 'rm-tl-play-btn';
+      playBtn.title = 'Play / Pause (Space)';
+      const playSvg = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      const pauseSvg = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+      playBtn.innerHTML = playSvg;
+      playBtn.addEventListener('click', () => document.getElementById('btn-play')?.click());
+      playCol.appendChild(playBtn);
+      tlBody.prepend(playCol);
+
+      const mainPlayText = document.getElementById('play-btn-text');
+      if (mainPlayText) {
+        new MutationObserver(() => {
+          const playing = /pause/i.test(mainPlayText.textContent || '');
+          playBtn.innerHTML = playing ? pauseSvg : playSvg;
+        }).observe(mainPlayText, { childList: true, characterData: true, subtree: true });
+      }
+    }
+
+    // 3. Resizable Stage <-> Timeline split handle
+    if (tlContainer && !document.getElementById('rm-stage-timeline-resizer')) {
+      const resizer = document.createElement('div');
+      resizer.id = 'rm-stage-timeline-resizer';
+      resizer.title = 'Drag to resize preview & timeline';
+      tlContainer.parentElement?.insertBefore(resizer, tlContainer);
+
+      const savedH = Number(localStorage.getItem('rm_timeline_height'));
+      if (savedH >= 140 && savedH <= 440) {
+        tlContainer.style.height = savedH + 'px';
+        tlContainer.style.flex = '0 0 auto';
+      }
+
+      let startY = 0, startH = 0, dragging = false;
+      resizer.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        startY = e.clientY;
+        startH = tlContainer.getBoundingClientRect().height;
+        resizer.classList.add('is-dragging');
+        document.body.style.userSelect = 'none';
+        resizer.setPointerCapture?.(e.pointerId);
+      });
+      window.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const nextH = Math.max(140, Math.min(440, Math.round(startH + (startY - e.clientY))));
+        tlContainer.style.height = nextH + 'px';
+        tlContainer.style.flex = '0 0 auto';
+      });
+      window.addEventListener('pointerup', () => {
+        if (!dragging) return;
+        dragging = false;
+        resizer.classList.remove('is-dragging');
+        document.body.style.userSelect = '';
+        localStorage.setItem('rm_timeline_height', String(Math.round(tlContainer.getBoundingClientRect().height)));
+      });
+    }
+
+    // 4. Big + Quick-Add Button & Popover (Uploads, Stock videos, Stock photos, Blank)
+    if (tlScroll && !document.getElementById('rm-tl-add-btn')) {
+      const addWrap = document.createElement('div');
+      addWrap.className = 'rm-tl-add-wrap';
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.id = 'rm-tl-add-btn';
+      addBtn.title = 'Add media or blank page';
+      addBtn.textContent = '+';
+      addWrap.appendChild(addBtn);
+
+      const pop = document.createElement('div');
+      pop.id = 'rm-tl-add-popover';
+      pop.innerHTML = `
+        <button type="button" class="rm-tl-add-opt" data-add-act="uploads"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg><span>Uploads</span></button>
+        <button type="button" class="rm-tl-add-opt" data-add-act="videos"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg><span>Stock videos</span></button>
+        <button type="button" class="rm-tl-add-opt" data-add-act="images"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>Stock photos</span></button>
+        <button type="button" class="rm-tl-add-opt" data-add-act="blank"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg><span>Blank</span></button>
+      `;
+      document.body.appendChild(pop);
+
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const r = addBtn.getBoundingClientRect();
+        pop.style.left = Math.min(window.innerWidth - 185, Math.max(12, r.left)) + 'px';
+        pop.style.top = Math.max(12, r.top - 160) + 'px';
+        pop.classList.toggle('is-open');
+      });
+
+      pop.querySelectorAll('.rm-tl-add-opt').forEach((opt) => {
+        opt.addEventListener('click', () => {
+          const act = opt.dataset.addAct;
+          pop.classList.remove('is-open');
+          if (act === 'uploads' || act === 'videos' || act === 'images') {
+            document.getElementById('left-sidebar')?.classList.remove('rm-templates-mode');
+            document.querySelector('.nav-rail .rail-btn[data-rail-tab="all"]')?.click();
+            if (act === 'videos' || act === 'images') {
+              setTimeout(() => {
+                document.querySelector(`#left-sidebar .media-pill-btn[data-type="${act}"]`)?.click();
+              }, 40);
+            }
+          } else if (act === 'blank') {
+            if (Array.isArray(window.projectScenes)) {
+              const last = window.projectScenes[window.projectScenes.length - 1];
+              const start = last ? (last.start + last.duration) : 0;
+              window.projectScenes.push({ id: 'scene-' + (window.projectScenes.length + 1), title: 'Scene ' + (window.projectScenes.length + 1), start, duration: 5 });
+              window.refreshTimelineScenesUI?.();
+              window.renderCanvas?.();
+            }
+          }
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!pop.contains(e.target) && e.target !== addBtn) pop.classList.remove('is-open');
+      });
+
+      if (addAudioStrip) addAudioStrip.before(addWrap);
+      else tlScroll.appendChild(addWrap);
+    }
+
+    // 5. In-Editor Templates Side Drawer (#left-sidebar.rm-templates-mode)
+    const leftSidebar = document.getElementById('left-sidebar');
+    if (leftSidebar && !document.getElementById('rm-editor-templates-drawer')) {
+      const drawer = document.createElement('div');
+      drawer.id = 'rm-editor-templates-drawer';
+      drawer.innerHTML = `
+        <div class="rm-tpl-drawer-head">
+          <h4>Templates</h4>
+          <button type="button" class="rm-tpl-drawer-close" aria-label="Close">&#x2715;</button>
+        </div>
+        <input type="text" id="rm-tpl-drawer-search" placeholder="Search templates...">
+        <div class="rm-tpl-drawer-grid" id="rm-tpl-drawer-grid"></div>
+      `;
+      leftSidebar.prepend(drawer);
+
+      const populateTemplates = (q = '') => {
+        const grid = drawer.querySelector('#rm-tpl-drawer-grid');
+        const sourceCards = [...document.querySelectorAll('#home-templates-grid .home-tpl-card')];
+        if (!grid) return;
+        const needle = q.trim().toLowerCase();
+        grid.innerHTML = '';
+        sourceCards.forEach((src) => {
+          const title = src.querySelector('.home-tpl-title, h4, h3')?.textContent?.trim() || 'Template';
+          if (needle && !title.toLowerCase().includes(needle)) return;
+          const img = src.querySelector('img')?.getAttribute('src') || '';
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'rm-tpl-mini-card';
+          card.innerHTML = `
+            <div class="rm-tpl-mini-thumb">
+              ${img ? `<img src="${img}" alt="">` : ''}
+              <span class="rm-tpl-mini-play">&#9654;</span>
+            </div>
+            <div class="rm-tpl-mini-title">${title}</div>
+          `;
+          card.addEventListener('click', () => {
+            const useBtn = src.querySelector('button, .btn-use-template');
+            if (useBtn) useBtn.click();
+            else src.click();
+          });
+          grid.appendChild(card);
+        });
+      };
+
+      drawer.querySelector('.rm-tpl-drawer-close')?.addEventListener('click', () => {
+        leftSidebar.classList.remove('rm-templates-mode');
+      });
+      drawer.querySelector('#rm-tpl-drawer-search')?.addEventListener('input', (e) => {
+        populateTemplates(e.target.value);
+      });
+
+      document.addEventListener('click', (e) => {
+        const tplRailBtn = e.target.closest?.('.nav-rail .rail-btn[data-rail-tab="templates"]');
+        if (tplRailBtn && document.body.classList.contains('rm-in-editor')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          leftSidebar.classList.add('rm-templates-mode');
+          leftSidebar.style.display = 'flex';
+          leftSidebar.classList.remove('collapsed');
+          populateTemplates(drawer.querySelector('#rm-tpl-drawer-search')?.value || '');
+          document.querySelectorAll('.nav-rail .rail-btn').forEach((b) => b.classList.toggle('active', b === tplRailBtn));
+          return;
+        }
+        const otherRailBtn = e.target.closest?.('.nav-rail .rail-btn:not([data-rail-tab="templates"])');
+        if (otherRailBtn) {
+          leftSidebar.classList.remove('rm-templates-mode');
+        }
+      }, true);
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCanvaTimelineAndDrawer);
+  else initCanvaTimelineAndDrawer();
+})();
