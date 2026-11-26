@@ -25987,6 +25987,20 @@ const EFFECT_TEMPLATES_DATA = [
     defaultImage: '/jani_forbes_cover_thumb.svg',
     secondaryImage: '/portrait_cutout_clean.png'
   },
+  {
+    id: 'ponzi-minute7-documentary',
+    title: 'Ponzi Minute 7',
+    category: 'Documentary',
+    origCategory: 'Documentary',
+    badge: 'MINUTE 7 • 07:00-08:00',
+    difficulty: '1-Click',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(28, 22, 16, 0.95), rgba(8, 6, 4, 0.95))',
+    description: 'Full 60-second Ponzi Minute 7 documentary sequence (07:00–08:00) with letter-by-letter write-ons, light leaks, and layered foreground/background scenes.',
+    tags: ['Ponzi', 'Documentary', 'Minute 7', 'Write-On Text', 'Light Leak', 'MagnatesMedia'],
+    defaultImage: '/assets/ponzi-min7/fg_ponzi_magazine.svg',
+    secondaryImage: '/assets/ponzi-min7/bg_dollar_bills.svg'
+  },
     {
     id: 'creator-cinematic-studio',
     title: 'Creator Studio',
