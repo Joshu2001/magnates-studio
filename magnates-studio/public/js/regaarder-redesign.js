@@ -6292,11 +6292,80 @@ document.addEventListener('click', (e) => {
       <div class="rm-fx-pop-head"><span>Cutout Effects &amp; Animations</span><button type="button" class="rm-fx-pop-close">&#x2715;</button></div>
       <input type="text" class="rm-fx-pop-search" placeholder="Search effects or animations...">
       <div class="rm-fx-pop-grid"></div>
+      <div class="rm-fx-custom-panel">
+        <div class="rm-fx-custom-row">
+          <label>Tilt <span data-fx-val="rot">0°</span></label>
+          <input type="range" data-fx-ctrl="rot" min="-25" max="25" step="0.5" value="0">
+        </div>
+        <div class="rm-fx-custom-row">
+          <label>Zoom <span data-fx-val="scale">1.00×</span></label>
+          <input type="range" data-fx-ctrl="scale" min="0.6" max="1.8" step="0.02" value="1">
+        </div>
+        <div class="rm-fx-custom-row">
+          <label>Blur <span data-fx-val="blur">0px</span></label>
+          <input type="range" data-fx-ctrl="blur" min="0" max="12" step="0.5" value="0">
+        </div>
+        <div class="rm-fx-custom-row">
+          <label>Blur Ramp</label>
+          <div class="rm-fx-ramp-pills">
+            <button type="button" class="rm-fx-ramp-btn is-active" data-fx-ramp="constant">Constant</button>
+            <button type="button" class="rm-fx-ramp-btn" data-fx-ramp="blur-to-clear">Blur → Clear</button>
+            <button type="button" class="rm-fx-ramp-btn" data-fx-ramp="clear-to-blur">Clear → Blur</button>
+          </div>
+        </div>
+        <div class="rm-fx-custom-actions">
+          <button type="button" class="rm-fx-btn-reset">Reset</button>
+          <button type="button" class="rm-fx-btn-apply">Apply</button>
+        </div>
+      </div>
     `;
     document.body.appendChild(pop);
     const r = fxBtn.getBoundingClientRect();
-    pop.style.left = Math.max(12, Math.min(window.innerWidth - 296, r.left - 288)) + 'px';
-    pop.style.top = Math.max(12, Math.min(window.innerHeight - 360, r.top - 60)) + 'px';
+    pop.style.left = Math.max(12, Math.min(window.innerWidth - 472, r.left - 460)) + 'px';
+    pop.style.top = Math.max(12, Math.min(window.innerHeight - 520, r.top - 100)) + 'px';
+
+    let selectedItem = null;
+    const ctrlRot = pop.querySelector('[data-fx-ctrl="rot"]');
+    const ctrlScale = pop.querySelector('[data-fx-ctrl="scale"]');
+    const ctrlBlur = pop.querySelector('[data-fx-ctrl="blur"]');
+    const valRot = pop.querySelector('[data-fx-val="rot"]');
+    const valScale = pop.querySelector('[data-fx-val="scale"]');
+    const valBlur = pop.querySelector('[data-fx-val="blur"]');
+    let blurRamp = layerObj?.blurRamp || 'constant';
+
+    const syncControlsFromLayer = () => {
+      if (!layerObj) return;
+      const rot = Number(layerObj.rotation || 0);
+      const sc = Number(layerObj.scale ?? 1);
+      const bl = Number(layerObj.blur || 0);
+      if (ctrlRot) ctrlRot.value = String(rot);
+      if (ctrlScale) ctrlScale.value = String(sc);
+      if (ctrlBlur) ctrlBlur.value = String(bl);
+      if (valRot) valRot.textContent = rot + '°';
+      if (valScale) valScale.textContent = sc.toFixed(2) + '×';
+      if (valBlur) valBlur.textContent = bl + 'px';
+      pop.querySelectorAll('.rm-fx-ramp-btn').forEach(btn => btn.classList.toggle('is-active', btn.dataset.fxRamp === blurRamp));
+    };
+    const applyCustomSliders = () => {
+      if (!layerObj) return;
+      layerObj.rotation = Number(ctrlRot?.value || 0);
+      layerObj.scale = Number(ctrlScale?.value || 1);
+      layerObj.blur = Number(ctrlBlur?.value || 0);
+      layerObj.blurRamp = blurRamp;
+      if (valRot) valRot.textContent = layerObj.rotation + '°';
+      if (valScale) valScale.textContent = layerObj.scale.toFixed(2) + '×';
+      if (valBlur) valBlur.textContent = layerObj.blur + 'px';
+      window.renderCustomizerFrame?.();
+    };
+    syncControlsFromLayer();
+    [ctrlRot, ctrlScale, ctrlBlur].forEach(inp => inp?.addEventListener('input', applyCustomSliders));
+    pop.querySelectorAll('.rm-fx-ramp-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        blurRamp = btn.dataset.fxRamp;
+        pop.querySelectorAll('.rm-fx-ramp-btn').forEach(b => b.classList.toggle('is-active', b === btn));
+        applyCustomSliders();
+      });
+    });
 
     const gridEl = pop.querySelector('.rm-fx-pop-grid');
     const renderItems = (q = '') => {
@@ -6305,7 +6374,7 @@ document.addEventListener('click', (e) => {
       fxList.filter(it => !needle || it.label.toLowerCase().includes(needle) || it.kind.toLowerCase().includes(needle)).forEach(it => {
         const b = document.createElement('button');
         b.type = 'button';
-        b.className = 'rm-fx-card';
+        b.className = 'rm-fx-card' + (selectedItem?.id === it.id ? ' is-selected' : '');
         b.innerHTML = `
           <div class="rm-fx-card-thumb">
             ${thumbSrc ? `<img src="${thumbSrc}" class="rm-fx-thumb-img is-${it.id}" alt="">` : `<span class="rm-fx-thumb-fallback is-${it.id}">&#10022;</span>`}
@@ -6316,6 +6385,7 @@ document.addEventListener('click', (e) => {
           </div>
         `;
         b.addEventListener('pointerenter', () => {
+          if (selectedItem) return;
           if (layerObj && snapshot) {
             Object.keys(layerObj).forEach(k => { if (!(k in snapshot)) delete layerObj[k]; });
             Object.assign(layerObj, snapshot);
@@ -6323,20 +6393,39 @@ document.addEventListener('click', (e) => {
             window.renderCustomizerFrame?.();
           }
         });
-        b.addEventListener('pointerleave', restoreSnapshot);
+        b.addEventListener('pointerleave', () => { if (!selectedItem) restoreSnapshot(); });
         b.addEventListener('click', () => {
-          committed = true;
-          if (layerObj) {
+          selectedItem = it;
+          gridEl.querySelectorAll('.rm-fx-card').forEach(c => c.classList.toggle('is-selected', c === b));
+          if (layerObj && snapshot) {
+            Object.keys(layerObj).forEach(k => { if (!(k in snapshot)) delete layerObj[k]; });
+            Object.assign(layerObj, snapshot);
             it.apply(layerObj);
+            syncControlsFromLayer();
             window.renderCustomizerFrame?.();
           }
-          pop.remove();
         });
         gridEl.appendChild(b);
       });
     };
     renderItems();
     pop.querySelector('.rm-fx-pop-search')?.addEventListener('input', (ev) => renderItems(ev.target.value));
+    pop.querySelector('.rm-fx-btn-reset')?.addEventListener('click', () => {
+      selectedItem = null;
+      blurRamp = 'constant';
+      if (layerObj) {
+        layerObj.blur = 0; layerObj.opacity = 1; layerObj.rotation = 0; layerObj.scale = 1;
+        layerObj.x = 0; layerObj.y = 0; delete layerObj.animStyle; delete layerObj.blackSilhouette; delete layerObj.blurRamp;
+        syncControlsFromLayer();
+        window.renderCustomizerFrame?.();
+      }
+      gridEl.querySelectorAll('.rm-fx-card').forEach(c => c.classList.remove('is-selected'));
+    });
+    pop.querySelector('.rm-fx-btn-apply')?.addEventListener('click', () => {
+      committed = true;
+      applyCustomSliders();
+      pop.remove();
+    });
     pop.querySelector('.rm-fx-pop-close')?.addEventListener('click', () => { restoreSnapshot(); pop.remove(); });
     return;
   }
