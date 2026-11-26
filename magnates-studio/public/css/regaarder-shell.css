@@ -166,17 +166,17 @@ body,
   justify-content: center;
   cursor: pointer;
   border-radius: 10px !important;
-  border: 1px solid transparent !important;
+  border: 0 !important;
   background: transparent !important;
-  color: #929bb1 !important;
+  color: #cbd5e1 !important;
   box-shadow: none !important;
-  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease !important;
+  transition: background 0.16s ease, color 0.16s ease !important;
 }
 
 #main-nav-rail .rail-btn:hover,
 #main-nav-rail .rm-rail-action-btn:hover {
   background: rgba(255, 255, 255, 0.06) !important;
-  color: #f1f5f9 !important;
+  color: #ffffff !important;
 }
 
 #main-nav-rail .rail-btn svg,
@@ -185,7 +185,7 @@ body,
   height: 20px !important;
   fill: none !important;
   stroke: currentColor !important;
-  stroke-width: 1.7 !important;
+  stroke-width: 1.85 !important;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -198,16 +198,26 @@ body,
 }
 
 #main-nav-rail .rail-btn.active {
-  background: linear-gradient(180deg, rgba(124, 58, 237, 0.28) 0%, rgba(91, 33, 182, 0.18) 100%) !important;
-  border: 1px solid rgba(139, 92, 246, 0.55) !important;
+  background: transparent !important;
+  border: 0 !important;
   border-radius: 10px !important;
-  color: #e9d5ff !important;
+  color: #ffffff !important;
   font-weight: 600 !important;
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.18), inset 0 0 8px rgba(168, 85, 247, 0.1) !important;
+  box-shadow: none !important;
+}
+
+#main-nav-rail .rail-btn.active svg {
+  box-sizing: border-box !important;
+  width: 42px !important;
+  height: 30px !important;
+  padding: 5px 11px !important;
+  border-radius: 9px !important;
+  background: rgba(139, 92, 246, 0.24) !important;
+  color: #c4b5fd !important;
 }
 
 #main-nav-rail .rail-btn.active .rail-label {
-  color: #e9d5ff !important;
+  color: #ffffff !important;
   font-weight: 600 !important;
 }
 
@@ -2499,7 +2509,11 @@ body.rm-in-editor #rm-auth-actions,
   flex: 1 !important;
   min-width: 0 !important;
   overflow-x: auto !important;
-  overflow-y: auto !important;
+  overflow-y: hidden !important;
+}
+
+#canva-footer-duration {
+  display: none !important;
 }
 
 #timeline-tracks {
@@ -2654,13 +2668,13 @@ body.rm-in-editor #rm-auth-actions,
 }
 
 #rm-tl-add-btn {
-  width: 34px;
-  height: 28px;
-  border-radius: 7px;
+  width: 38px;
+  height: 44px;
+  border-radius: 8px;
   border: 0;
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
-  font-size: 16px;
+  background: rgba(255, 255, 255, 0.085);
+  color: #f1f5f9;
+  font-size: 18px;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
