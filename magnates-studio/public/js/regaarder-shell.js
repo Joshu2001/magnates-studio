@@ -443,6 +443,52 @@
    sel.addEventListener('change',sync);
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
  })();
+
+ // Global #right-sidebar Polish: concise labels, strip inline emojis, collapse dense drawers
+ (function standardizeRightSidebar(){
+   const sidebar=document.getElementById('right-sidebar');
+   if(!sidebar)return;
+
+   const editChartBtn=document.getElementById('btn-chart-open-modal');
+   if(editChartBtn){
+     const icon=editChartBtn.querySelector('svg');
+     editChartBtn.textContent='';
+     if(icon)editChartBtn.appendChild(icon);
+     editChartBtn.appendChild(document.createTextNode('Edit'));
+   }
+
+   const motionBlurSec=document.getElementById('inspector-motionblur-flash-section');
+   if(motionBlurSec&&!motionBlurSec.dataset.rmCollapsed){
+     motionBlurSec.dataset.rmCollapsed='true';
+     const headRow=motionBlurSec.firstElementChild;
+     const bodyKids=[...motionBlurSec.children].slice(1);
+     const details=document.createElement('details');
+     details.className='rm-sub-drawer';
+     const summary=document.createElement('summary');
+     summary.textContent='Motion Blur & Camera Flash';
+     const body=document.createElement('div');
+     body.className='rm-sub-drawer-body';
+     bodyKids.forEach(k=>body.appendChild(k));
+     if(headRow)headRow.remove();
+     details.appendChild(summary);
+     details.appendChild(body);
+     motionBlurSec.appendChild(details);
+   }
+
+   const emojiRe=/[\u{1F300}-\u{1FAFF}\u2600-\u27BF\u2300-\u23FF\u2B50\uFE0F]/gu;
+   const cleanText=(root)=>{
+     const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+     let node;
+     while((node=walker.nextNode())){
+       if(!node.parentElement||node.parentElement.closest('script, style, input, textarea, select'))continue;
+       if(emojiRe.test(node.nodeValue)){
+         node.nodeValue=node.nodeValue.replace(emojiRe,'').replace(/\s{2,}/g,' ').trimStart();
+       }
+     }
+   };
+   cleanText(sidebar);
+   new MutationObserver(()=>cleanText(sidebar)).observe(sidebar,{childList:true,subtree:true});
+ })();
  function refineToggle(button){if(button.dataset.rmRefined)return;button.dataset.rmRefined='true';const label=button.querySelector('#label-3d-mode');if(!label)return;const update=()=>{const active=window.topCustomizerState?.is3DMode??(window.topCustomizerState?.paperPreviewMode==='3d');const text=active?'Edit mode':'Enable editing';if(label.textContent!==text)label.textContent=text;button.setAttribute('aria-pressed',String(active));button.title=active?'Editing enabled — click to return to playback':'Enable direct object editing';};new MutationObserver(update).observe(label,{childList:true,subtree:true});update();}
  function refineMeshInspector(section){
   if(section.dataset.rmPrecision||!section.querySelector('[data-n3d-prop="editTool"]'))return;
