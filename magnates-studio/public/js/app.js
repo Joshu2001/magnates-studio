@@ -35554,6 +35554,15 @@ function openTopTemplateCustomizer(tpl) {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountForbes3DStage(stage, cData);
       }
+    } else if (tpl.id === 'ponzi-minute7-documentary') {
+      topCustomizerState.primaryUrl = '/assets/ponzi-min7/fg_ponzi_closeup.svg';
+      topCustomizerState.secondaryUrl = '/assets/ponzi-min7/bg_dollar_bills.svg';
+      topCustomizerState.originalPhotoUrl = '/assets/ponzi-min7/fg_ponzi_magazine.svg';
+      if (typeof window.tplMountPonziMinute7Stage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountPonziMinute7Stage(stage, cData);
+      }
     } else if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
       topCustomizerState.primaryUrl = '';
       topCustomizerState.primaryIsVideo = false;

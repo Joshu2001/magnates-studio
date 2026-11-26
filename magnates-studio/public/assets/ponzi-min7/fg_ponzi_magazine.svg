@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 560">
+  <rect x="10" y="10" width="400" height="540" fill="#f5eedc" stroke="#ffffff" stroke-width="14"/>
+  <text x="210" y="95" text-anchor="middle" font-family="Georgia, serif" font-size="64" font-weight="bold" fill="#1a1a1a">PONZI</text>
+  <text x="210" y="132" text-anchor="middle" font-family="Georgia, serif" font-size="24" letter-spacing="4" fill="#333">MAGAZINE</text>
+  <circle cx="210" cy="320" r="135" fill="#c8a878" stroke="#5a4228" stroke-width="4"/>
+  <rect x="130" y="310" width="160" height="80" rx="12" fill="#8a2b2b"/>
+  <circle cx="160" cy="395" r="28" fill="#222"/><circle cx="260" cy="395" r="28" fill="#222"/>
+</svg>

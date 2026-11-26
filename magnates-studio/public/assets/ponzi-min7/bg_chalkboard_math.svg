@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#0e1210"/>
+  <g fill="#ffffff" opacity="0.22" font-family="Georgia, serif" font-size="36" font-style="italic">
+    <text x="120" y="130">s = ut + 1/2 at²</text>
+    <text x="820" y="150">E = mc²</text>
+    <text x="140" y="560">f(x) = Σ aₙ xⁿ</text>
+    <text x="850" y="540">ΔP / Δt = R·I</text>
+  </g>
+</svg>
