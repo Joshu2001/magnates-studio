@@ -369,15 +369,15 @@
   }
   function renderAt(canvas,t,data){
     canvas._ponziTime=t;
-    if(t<15){drawOpening(canvas,t,data);}
+    if(t<15&&(!data||data.ponziOpeningEnabled!==false)){drawOpening(canvas,t,data);}
     else{canvas._opening=null;canvas.innerHTML=renderBeat(t);}
   }
   // The existing contextual inspector calls this builder; it stores editable scene
   // data through the same contextual data API used by other Studio templates.
   window.tplBuildPonziMinute7Inspector=function(container,data,tplId){
     if(!container)return;
-    let cfg=config(data),selected=cfg.layers[0].id;
-    const save=()=>{if(typeof window.tplSetContextualData==='function')window.tplSetContextualData(tplId,{ponziOpeningV2:copy(cfg)});else if(data)data.ponziOpeningV2=copy(cfg);};
+    let cfg=config(data),selected=cfg.layers[0].id,enabled=!data||data.ponziOpeningEnabled!==false;
+    const save=()=>{if(typeof window.tplSetContextualData==='function')window.tplSetContextualData(tplId,{ponziOpeningV2:copy(cfg),ponziOpeningEnabled:enabled});else if(data){data.ponziOpeningV2=copy(cfg);data.ponziOpeningEnabled=enabled;}};
     function field(parent,label,value,type,onChange,opts){
       const row=document.createElement('label');row.style.cssText='display:flex;flex-direction:column;gap:4px;font-size:12px;color:#ddd;margin:6px 0';row.textContent=label;
       const input=document.createElement(type==='textarea'?'textarea':'input');
@@ -392,6 +392,7 @@
       container.replaceChildren();
       const panel=document.createElement('div');panel.style.cssText='display:flex;flex-direction:column;gap:7px;width:100%;padding:8px 0';
       const h=document.createElement('strong');h.textContent='Ponzi · 07:00–07:15';panel.appendChild(h);
+      field(panel,'Use editable opening (off = original)',enabled,'checkbox',v=>{enabled=v;});
       const select=document.createElement('select');select.style.cssText='width:100%;background:#171722;color:#eee;padding:8px;border-radius:6px';
       for(const l of cfg.layers){const opt=document.createElement('option');opt.value=l.id;opt.textContent=l.name+' · '+l.start.toFixed(2)+'–'+l.end.toFixed(2)+'s';select.appendChild(opt);}
       select.value=selected;select.onchange=()=>{selected=select.value;build();};panel.appendChild(select);
