@@ -671,12 +671,16 @@ body.rm-in-editor #rm-auth-actions,
 #btn-top-share-project,
 #btn-app-fullscreen,
 #btn-stage-float-template,
+#btn-cbar-animate,
+#btn-cbar-transition,
+#cbar-media-bg-remover,
+#canva-context-bar .canva-cut-cluster,
 #cbar-act-visual-guide {
   display: none !important;
 }
 
-/* Calm, Pro-Grade Stage Contextual Bar (Neutralize rainbow pills) */
-#canva-top-toolbar {
+/* Calm, Pro-Grade Stage Contextual Bar (Neutralize inline rainbow pills) */
+#canva-context-bar {
   background: #0e0f17 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
   padding: 0 14px !important;
@@ -684,13 +688,8 @@ body.rm-in-editor #rm-auth-actions,
   height: 46px !important;
 }
 
-#canva-top-toolbar .canva-bar-btn,
-#canva-top-toolbar .canva-bar-btn.highlight-purple,
-#canva-top-toolbar .canva-bar-btn.highlight-blue,
-#canva-top-toolbar .canva-bar-btn.highlight-teal,
-#canva-top-toolbar .canva-bar-btn.highlight-gold,
-#canva-top-toolbar .canva-bar-btn.highlight-pink,
-#canva-top-toolbar .canva-bar-btn.highlight-crown {
+#canva-context-bar .canva-bar-btn,
+#canva-context-bar .apple-pill-btn {
   background: rgba(255, 255, 255, 0.045) !important;
   border: 1px solid rgba(255, 255, 255, 0.09) !important;
   color: #cbd5e1 !important;
@@ -701,8 +700,15 @@ body.rm-in-editor #rm-auth-actions,
   height: 30px !important;
 }
 
-#canva-top-toolbar .canva-bar-btn:hover,
-#canva-top-toolbar .canva-bar-btn.active {
+#canva-context-bar .canva-bar-btn svg,
+#canva-context-bar .apple-pill-btn svg {
+  fill: currentColor !important;
+  color: currentColor !important;
+}
+
+#canva-context-bar .canva-bar-btn:hover,
+#canva-context-bar .canva-bar-btn.active,
+#canva-context-bar .apple-pill-btn:hover {
   background: rgba(139, 92, 246, 0.18) !important;
   border-color: rgba(167, 139, 250, 0.45) !important;
   color: #f3e8ff !important;
@@ -725,21 +731,21 @@ body.rm-in-editor #rm-auth-actions,
   display: none !important;
 }
 
-/* Compact Radial Wheel for Ink & Draw (Replaces wide horizontal bar) */
+/* Free-Floating Radial Wheel for Ink & Draw (No enclosing circle, zero overlap) */
 #canvas-drawing-dock {
   position: absolute !important;
-  top: 56px !important;
-  left: 18px !important;
+  top: 54px !important;
+  left: 20px !important;
   bottom: auto !important;
   transform: none !important;
-  width: 152px !important;
-  height: 152px !important;
+  width: 148px !important;
+  height: 148px !important;
   padding: 0 !important;
-  border-radius: 9999px !important;
-  background: rgba(16, 17, 26, 0.88) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(14px);
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -766,28 +772,49 @@ body.rm-in-editor #rm-auth-actions,
   position: absolute !important;
   top: 50%;
   left: 50%;
-  width: 34px !important;
-  height: 34px !important;
+  width: 36px !important;
+  height: 36px !important;
   padding: 0 !important;
-  margin: -17px 0 0 -17px !important;
+  margin: -18px 0 0 -18px !important;
   border-radius: 9999px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(16, 17, 26, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
   color: #cbd5e1 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(10px);
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease !important;
 }
 
 #canvas-drawing-dock .dock-pen-group .dock-btn span {
   display: none !important;
 }
 
+#canvas-drawing-dock .dock-pen-group .dock-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #141622;
+  color: #f8fafc;
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 300;
+}
+
 #canvas-drawing-dock .dock-pen-group .dock-btn.active {
   background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;
-  border-color: rgba(216, 180, 254, 0.7) !important;
+  border-color: rgba(216, 180, 254, 0.75) !important;
   color: #ffffff !important;
-  box-shadow: 0 0 14px rgba(139, 92, 246, 0.5) !important;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.55) !important;
 }
 
 #canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(1) { transform: translate(0, -52px); }
@@ -798,25 +825,27 @@ body.rm-in-editor #rm-auth-actions,
 #canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(6) { transform: translate(-45px, -26px); }
 
 #canvas-drawing-dock .dock-stroke-group {
-  position: relative;
-  z-index: 2;
+  position: static;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 #canvas-drawing-dock #draw-color-picker {
-  width: 28px !important;
-  height: 28px !important;
+  position: relative;
+  z-index: 3;
+  width: 32px !important;
+  height: 32px !important;
   border-radius: 9999px !important;
-  border: 2px solid rgba(255, 255, 255, 0.65) !important;
+  border: 2px solid rgba(255, 255, 255, 0.75) !important;
   padding: 0 !important;
   cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5) !important;
 }
 
 #canvas-drawing-dock .dock-size-pill {
   position: absolute;
-  top: 106px;
+  top: 158px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(16, 17, 26, 0.92);
@@ -827,11 +856,12 @@ body.rm-in-editor #rm-auth-actions,
   align-items: center;
   gap: 6px;
   white-space: nowrap;
+  z-index: 2;
 }
 
 #canvas-drawing-dock .dock-action-group {
   position: absolute;
-  top: 162px;
+  top: 196px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(16, 17, 26, 0.92);
@@ -840,9 +870,10 @@ body.rm-in-editor #rm-auth-actions,
   padding: 4px 8px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   white-space: nowrap;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  z-index: 2;
 }
 
 #canvas-drawing-dock #btn-draw-vectorize span {
@@ -856,6 +887,7 @@ body.rm-in-editor #rm-auth-actions,
   border-radius: 9999px !important;
   padding: 3px 10px !important;
   font-size: 11px !important;
+  min-width: 44px !important;
 }
 
 .rm-support-submit:disabled {
