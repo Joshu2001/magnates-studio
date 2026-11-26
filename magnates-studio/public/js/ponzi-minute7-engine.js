@@ -357,6 +357,7 @@
     }
   }
   function renderAt(canvas,t,data){
+    canvas._ponziTime=t;
     if(t<15){drawOpening(canvas,t,data);}
     else{canvas._opening=null;canvas.innerHTML=renderBeat(t);}
   }
@@ -383,8 +384,24 @@
       const select=document.createElement('select');select.style.cssText='width:100%;background:#171722;color:#eee;padding:8px;border-radius:6px';
       for(const l of cfg.layers){const opt=document.createElement('option');opt.value=l.id;opt.textContent=l.name+' · '+l.start.toFixed(2)+'–'+l.end.toFixed(2)+'s';select.appendChild(opt);}
       select.value=selected;select.onchange=()=>{selected=select.value;build();};panel.appendChild(select);
+      const timeline=document.createElement('div');timeline.style.cssText='max-height:230px;overflow:auto;padding:5px;border:1px solid #383849;border-radius:6px;';
+      const legend=document.createElement('div');legend.textContent='Layer timing • 0 — 15 s';legend.style.cssText='font-size:11px;color:#aaa;padding-bottom:6px;';timeline.appendChild(legend);
+      for(const layer of cfg.layers.slice().sort((a,b)=>a.start-b.start||a.z-b.z)){
+        const lane=document.createElement('button');lane.type='button';lane.title=layer.name+' '+layer.start+'–'+layer.end+'s';lane.style.cssText='display:flex;align-items:center;gap:6px;width:100%;height:24px;background:'+(layer.id===selected?'#36304c':'transparent')+';color:#ddd;border:0;cursor:pointer;text-align:left;';
+        const name=document.createElement('span');name.textContent=layer.name;name.style.cssText='width:45%;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+        const track=document.createElement('span');track.style.cssText='position:relative;flex:1;background:#252534;height:10px;border-radius:2px;';
+        const bar=document.createElement('span');bar.style.cssText='position:absolute;height:100%;border-radius:2px;left:'+Math.max(0,Math.min(100,layer.start/15*100))+'%;width:'+Math.max(0,Math.min(100-layer.start/15*100,(layer.end-layer.start)/15*100))+'%;background:'+(layer.visible===false?'#444':layer.type==='image'?'#7296b8':layer.type==='text'||layer.type==='words'?'#e0b94c':'#8d70bd')+';';
+        track.appendChild(bar);lane.append(name,track);lane.onclick=()=>{selected=layer.id;build();};timeline.appendChild(lane);
+      }panel.appendChild(timeline);
       const l=cfg.layers.find(x=>x.id===selected);
-      const f=(key,label,type='number',d=0)=>field(panel,label,l[key]??d,type,v=>{if(type==='number'&&!Number.isFinite(v))throw Error('Enter a finite number');l[key]=v;},type==='number'?{step:'any'}:null);
+      const f=(key,label,type='number',d=0)=>field(panel,label,l[key]??d,type,v=>{
+        if(type==='number'&&!Number.isFinite(v))throw Error('Enter a finite number');
+        if(key==='start'||key==='end'){if(v<0||v>15||(key==='start'&&v>l.end)||(key==='end'&&v<l.start))throw Error('Use an ordered time within 0–15 seconds');}
+        if(['x','y','scale','rotation','blur','opacity'].includes(key)&&Array.isArray(l.keys)){
+          const previous=num(l[key],d),delta=v-previous;
+          l.keys.forEach(k=>{if(Number.isFinite(k[key]))k[key]=key==='scale'&&previous!==0?k[key]*v/previous:k[key]+delta;});
+        }l[key]=v;
+      },type==='number'?{step:'any'}:null);
       f('visible','Visible','checkbox',true);f('start','In point (s)');f('end','Out point (s)');f('z','Layer order');f('depth','Parallax depth');f('x','Position X');f('y','Position Y');f('w','Width');f('h','Height');f('scale','Scale','number',1);f('rotation','Rotation (°)');f('opacity','Opacity','number',1);f('blur','Focus blur (px)');f('brightness','Brightness','number',1);f('contrast','Contrast','number',1);f('saturation','Saturation','number',1);f('fadeIn','Fade in (s)');f('fadeOut','Fade out (s)');
       if(l.type==='image'||l.type==='cash'){f('url','Replace image URL','text','');const upload=document.createElement('input');upload.type='file';upload.accept='image/*';upload.onchange=()=>{const file=upload.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{l.url=String(reader.result);save();build();};reader.readAsDataURL(file);};panel.appendChild(upload);}
       if(l.type==='text'||l.type==='words'){f('text','Text','text','');f('font','Font family','text','');f('size','Font size');f('weight','Font weight');f('color','Color','color','#ffffff');f('glow','Text glow');if(l.type==='words'){f('emphasis','Highlighted words','text','');f('accent','Accent','color','#f5df00');field(panel,'Word timing offsets (JSON)',JSON.stringify(l.wordTimes||[]),'textarea',v=>{const a=JSON.parse(v);if(!Array.isArray(a)||a.some(n=>!Number.isFinite(n)))throw Error('Expected numeric array');l.wordTimes=a;});}else{f('reveal','Reveal: character or none','text','none');f('revealDuration','Reveal duration (s)');}}
@@ -400,6 +417,12 @@
       container.appendChild(panel);
     }build();
   };
+  window.tplRefreshPonziMinute7Stage=function(stageEl,data){
+    if(!stageEl)return;
+    stageEl._ponziOpeningData=data||{};
+    const canvas=stageEl.querySelector('.ponzi-min7-canvas');
+    if(canvas)renderAt(canvas,canvas._ponziTime||0,stageEl._ponziOpeningData);
+  };
   window.PonziMinute7Opening={defaults:()=>copy(defaults),sample,config,maskPath,renderAt};
 
   window.tplMountPonziMinute7Stage = function (stageEl, data) {
@@ -408,6 +431,7 @@
       cancelAnimationFrame(stageEl._ponziMin7Raf);
     }
 
+    stageEl._ponziOpeningData=data || {};
     stageEl.innerHTML = '';
     stageEl.style.position = 'relative';
     stageEl.style.overflow = 'hidden';
@@ -426,7 +450,7 @@
     function tick(now) {
       const elapsed = ((now - startTime) / 1000) % 60;
       if (!stageEl.isConnected) return;
-      renderAt(canvas, elapsed, data);
+      renderAt(canvas, elapsed, stageEl._ponziOpeningData || data);
       const sec = Math.floor(elapsed);
       hud.textContent = `07:${String(sec).padStart(2, '0')} / 08:00`;
       stageEl._ponziMin7Raf = requestAnimationFrame(tick);
@@ -453,6 +477,7 @@
       stageEl.appendChild(canvas);
     }
     const t = Math.max(0, Number(localSceneT) || 0) % 60;
-    renderAt(canvas, t, data);
+    stageEl._ponziOpeningData=data || {};
+    renderAt(canvas, t, stageEl._ponziOpeningData);
   };
 })();
