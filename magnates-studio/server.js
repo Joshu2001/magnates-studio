@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const zlib = require('zlib');
 const multer = require('multer');
 const { exec } = require('child_process');
 
@@ -46,22 +47,63 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(express.json({ limit: '100mb' }));
-// Never cache JS/CSS/HTML and always enforce explicit UTF-8 charset to prevent multi-byte codepage corruption
-app.use((req, res, next) => {
-  if (/\.(js|css|html)(\?|$)/.test(req.path)) {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    if (/\.html(\?|$)/.test(req.path)) res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    else if (/\.js(\?|$)/.test(req.path)) res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-    else if (/\.css(\?|$)/.test(req.path)) res.setHeader('Content-Type', 'text/css; charset=utf-8');
-  } else if (req.path === '/' || req.path === '') {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+// Fast in-memory gzip + ETag revalidation for static text assets (cuts ~5MB transfer by ~75%)
+const publicRoot = path.join(__dirname, 'public');
+const gzipCache = new Map();
+const MIME_TYPES = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'application/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml'
+};
+
+app.use(async (req, res, next) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  const reqPath = req.path === '/' || req.path === '' ? '/index.html' : req.path;
+  const ext = path.extname(reqPath).toLowerCase();
+  const mime = MIME_TYPES[ext];
+  if (!mime) return next();
+
+  const resolved = path.resolve(publicRoot, '.' + reqPath);
+  if (!resolved.startsWith(publicRoot)) return next();
+
+  try {
+    const stat = await fs.promises.stat(resolved);
+    if (!stat.isFile()) return next();
+
+    const etag = `W/"${stat.size}-${Math.floor(stat.mtimeMs)}"`;
+    res.setHeader('Content-Type', mime);
+    res.setHeader('ETag', etag);
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    res.setHeader('Vary', 'Accept-Encoding');
+
+    if (req.headers['if-none-match'] === etag) {
+      return res.sendStatus(304);
+    }
+
+    const acceptsGzip = /\bgzip\b/i.test(req.headers['accept-encoding'] || '');
+    if (!acceptsGzip || stat.size < 1024) {
+      return res.sendFile(resolved);
+    }
+
+    const cacheKey = `${resolved}:${stat.mtimeMs}`;
+    let gz = gzipCache.get(cacheKey);
+    if (!gz) {
+      const raw = await fs.promises.readFile(resolved);
+      gz = zlib.gzipSync(raw, { level: 6 });
+      if (gzipCache.size > 150) gzipCache.clear();
+      gzipCache.set(cacheKey, gz);
+    }
+
+    res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Content-Length', String(gz.length));
+    return res.end(req.method === 'HEAD' ? undefined : gz);
+  } catch {
+    return next();
   }
-  next();
 });
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(publicRoot));
 // Restored documentary assets are immutable source files from the user's original
 // repository. Keep the 550 MB media pack out of the editor's deployment bundle.
 // Local vendored media wins above; otherwise stream the pinned original asset.

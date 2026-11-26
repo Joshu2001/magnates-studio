@@ -2054,7 +2054,7 @@
  });
  observer.observe(document.body,{childList:true,subtree:true});
  window.RegaarderInspector={refresh:schedule};
- setInterval(()=>{for(const shell of document.querySelectorAll('.rg-inspector-shell'))if(shell.getClientRects().length)syncContext(shell);},300);
+ document.addEventListener('click',()=>{queueMicrotask(schedule);},true);
  schedule();
 })();
 
