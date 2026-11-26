@@ -2592,10 +2592,29 @@ body.rm-in-editor #rm-auth-actions,
 
 #timeline-body:not(.consolidated-storyline-mode) #track-text .clip,
 #timeline-body:not(.consolidated-storyline-mode) #track-chart .clip {
-  background: rgba(139, 92, 246, 0.24) !important;
-  border: 1px solid rgba(167, 139, 250, 0.36) !important;
+  background: rgba(139, 92, 246, 0.28) !important;
+  border: 0 !important;
+  box-shadow: none !important;
   border-radius: 7px !important;
   color: #f3e8ff !important;
+  padding: 0 8px !important;
+}
+
+#timeline-tracks .clip .clip-handle {
+  opacity: 0 !important;
+  transition: opacity 0.14s ease;
+}
+
+#timeline-tracks .clip:hover .clip-handle {
+  opacity: 1 !important;
+}
+
+#timeline-tracks #track-text .clip .clip-block-content svg {
+  display: none !important;
+}
+
+#timeline-tracks .timeline-add-clip-btn {
+  display: none !important;
 }
 
 #timeline-body:not(.consolidated-storyline-mode) #track-image .clip,

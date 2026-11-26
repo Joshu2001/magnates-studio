@@ -4254,15 +4254,10 @@ function renderAllTimelineTracks() {
       if (isFilmstripClip || isChartClip) {
         // Pristine filmstrip: title text is completely removed from on top of the filmstrip frames
         contentEl.innerHTML = '';
-      } else if (isCompact) {
-        let miniBadges = '';
-        if (clip.zoomEffect) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>';
-        if (clip.docFocus) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2;vertical-align:-1px;margin-right:2px;"><circle cx="12" cy="12" r="9"/></svg>';
-        if (clip.highlights?.length) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>';
-        if (clip.docScroll) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
-        contentEl.innerHTML = `${iconSvg} <span style="font-size:9px; font-weight:700; display:inline-flex; align-items:center;">${miniBadges || label.slice(0, 5)}</span>`;
+      } else if (isCompact && miniBadges) {
+        contentEl.innerHTML = `${iconSvg} <span style="font-size:9px; font-weight:700; display:inline-flex; align-items:center;">${miniBadges}</span>`;
       } else {
-        contentEl.innerHTML = `${iconSvg} <span style="overflow: hidden; text-overflow: ellipsis; flex: 1;">${label}</span>`;
+        contentEl.innerHTML = `${iconSvg} <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">${label}</span>`;
       }
 
       // Effect subtrack overlay container (positioned over actual temporal span)
@@ -4608,6 +4603,15 @@ function openCanvaAddMenu(atTimeSec, triggerEl) {
       action: () => {
         popover.remove();
         openChartCreatorModal(atTimeSec);
+      }
+    },
+    {
+      id: 'opt-audio',
+      icon: `<svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`,
+      label: 'Add audio',
+      action: () => {
+        popover.remove();
+        document.getElementById('canva-btn-add-audio')?.click();
       }
     }
   ];

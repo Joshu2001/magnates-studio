@@ -2172,6 +2172,7 @@
         <button type="button" class="rm-tl-add-opt" data-add-act="uploads"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg><span>Uploads</span></button>
         <button type="button" class="rm-tl-add-opt" data-add-act="videos"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg><span>Stock videos</span></button>
         <button type="button" class="rm-tl-add-opt" data-add-act="images"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><span>Stock photos</span></button>
+        <button type="button" class="rm-tl-add-opt" data-add-act="audio"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg><span>Add audio</span></button>
         <button type="button" class="rm-tl-add-opt" data-add-act="blank"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg><span>Blank</span></button>
       `;
       document.body.appendChild(pop);
@@ -2188,10 +2189,10 @@
         opt.addEventListener('click', () => {
           const act = opt.dataset.addAct;
           pop.classList.remove('is-open');
-          if (act === 'uploads' || act === 'videos' || act === 'images') {
+          if (act === 'uploads' || act === 'videos' || act === 'images' || act === 'audio') {
             document.getElementById('left-sidebar')?.classList.remove('rm-templates-mode');
             document.querySelector('.nav-rail .rail-btn[data-rail-tab="all"]')?.click();
-            if (act === 'videos' || act === 'images') {
+            if (act === 'videos' || act === 'images' || act === 'audio') {
               setTimeout(() => {
                 document.querySelector(`#left-sidebar .media-pill-btn[data-type="${act}"]`)?.click();
               }, 40);
