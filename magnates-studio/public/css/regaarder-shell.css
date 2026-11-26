@@ -1220,6 +1220,69 @@ body.rm-in-editor #rm-auth-actions,
   color: #64748b !important;
 }
 
+#left-sidebar #media-library-search {
+  flex: 1 !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 6px 4px !important;
+  outline: none !important;
+  color: #f1f5f9 !important;
+  font-size: 12px !important;
+}
+
+/* Export Studio Video -> Top-Right Dropdown in Regaarder Purple */
+#export-studio-modal {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  pointer-events: auto;
+}
+
+#export-studio-modal .export-modal-box {
+  position: fixed !important;
+  top: 60px !important;
+  right: 20px !important;
+  left: auto !important;
+  margin: 0 !important;
+  width: min(410px, 92vw) !important;
+  max-height: calc(100vh - 84px) !important;
+  background: #141622 !important;
+  border: 1px solid rgba(139, 92, 246, 0.28) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.78) !important;
+  overflow-y: auto !important;
+}
+
+#export-studio-modal .export-modal-header-left svg,
+#export-studio-modal .export-modal-header-left .export-icon-badge {
+  background: rgba(139, 92, 246, 0.18) !important;
+  color: #c4b5fd !important;
+  border-color: rgba(167, 139, 250, 0.35) !important;
+}
+
+#export-studio-modal .active,
+#export-studio-modal .is-active,
+#export-studio-modal [aria-selected="true"] {
+  border-color: #8b5cf6 !important;
+  background: rgba(139, 92, 246, 0.18) !important;
+  color: #f3e8ff !important;
+  box-shadow: none !important;
+}
+
+#export-studio-modal [style*="00f0ff"],
+#export-studio-modal .export-bitrate-val {
+  color: #c4b5fd !important;
+}
+
+#export-studio-modal #btn-export-start {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;
+  border: 0 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.4) !important;
+}
+
 #left-sidebar #drop-zone {
   width: 26px !important;
   height: 26px !important;
