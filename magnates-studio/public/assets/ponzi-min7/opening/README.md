@@ -9,7 +9,10 @@ Copy the separately supplied generated asset ZIP's `magnates-studio/public/asset
 - office.jpg, city.jpg, table.jpg, currency.jpg, amber.jpg
 - handshake.png, balcony-man.png, watermelon.png, watermelon-slices.png, weights.png
 - banknote-1.png, banknote-2.png
-- merchant.png, cash-man.png, portrait.png, glass.png (still require corrected independent generated cutouts; do not treat the supplied concepts as verified historical likenesses)
+- merchant.png (corrected generated grayscale merchant, included in the revised asset pack)
+- cash-man.png, portrait.png, distressed-man.png (still require corrected independent generated cutouts; do not treat the supplied concepts as verified historical likenesses)
+
+The final amber reveal is a distressed man blended with three independent banknote layers, not a glass vessel. The lens flare and masks remain procedural. The new blend-mode control is editable in the inspector.
 
 Existing template images are fallback assets where specified. Uninstalled optional cutouts can be missing from the preview; install the generated images before visual acceptance. Do not extract replacement images from reference video frames.
 
