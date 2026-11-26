@@ -670,8 +670,192 @@ body.rm-in-editor .top-nav-center-switcher,
 body.rm-in-editor #rm-auth-actions,
 #btn-top-share-project,
 #btn-app-fullscreen,
-#btn-stage-float-template {
+#btn-stage-float-template,
+#cbar-act-visual-guide {
   display: none !important;
+}
+
+/* Calm, Pro-Grade Stage Contextual Bar (Neutralize rainbow pills) */
+#canva-top-toolbar {
+  background: #0e0f17 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 0 14px !important;
+  min-height: 46px !important;
+  height: 46px !important;
+}
+
+#canva-top-toolbar .canva-bar-btn,
+#canva-top-toolbar .canva-bar-btn.highlight-purple,
+#canva-top-toolbar .canva-bar-btn.highlight-blue,
+#canva-top-toolbar .canva-bar-btn.highlight-teal,
+#canva-top-toolbar .canva-bar-btn.highlight-gold,
+#canva-top-toolbar .canva-bar-btn.highlight-pink,
+#canva-top-toolbar .canva-bar-btn.highlight-crown {
+  background: rgba(255, 255, 255, 0.045) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  font-size: 11.5px !important;
+  font-weight: 500 !important;
+  height: 30px !important;
+}
+
+#canva-top-toolbar .canva-bar-btn:hover,
+#canva-top-toolbar .canva-bar-btn.active {
+  background: rgba(139, 92, 246, 0.18) !important;
+  border-color: rgba(167, 139, 250, 0.45) !important;
+  color: #f3e8ff !important;
+}
+
+/* Clean Studio Aspect Pill (Matches Customizer 16:9 YouTube) */
+#studio-btn-aspect {
+  background: rgba(15, 16, 24, 0.86) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  padding: 5px 10px !important;
+  color: #e2e8f0 !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(10px);
+}
+
+#studio-btn-aspect .aspect-icon-badge {
+  display: none !important;
+}
+
+/* Compact Radial Wheel for Ink & Draw (Replaces wide horizontal bar) */
+#canvas-drawing-dock {
+  position: absolute !important;
+  top: 56px !important;
+  left: 18px !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: 152px !important;
+  height: 152px !important;
+  padding: 0 !important;
+  border-radius: 9999px !important;
+  background: rgba(16, 17, 26, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(14px);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: visible !important;
+}
+
+#canvas-drawing-dock[style*="display: none"] {
+  display: none !important;
+}
+
+#canvas-drawing-dock .dock-drag-handle,
+#canvas-drawing-dock .dock-divider {
+  display: none !important;
+}
+
+#canvas-drawing-dock .dock-pen-group {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+}
+
+#canvas-drawing-dock .dock-pen-group .dock-btn {
+  position: absolute !important;
+  top: 50%;
+  left: 50%;
+  width: 34px !important;
+  height: 34px !important;
+  padding: 0 !important;
+  margin: -17px 0 0 -17px !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+}
+
+#canvas-drawing-dock .dock-pen-group .dock-btn span {
+  display: none !important;
+}
+
+#canvas-drawing-dock .dock-pen-group .dock-btn.active {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%) !important;
+  border-color: rgba(216, 180, 254, 0.7) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.5) !important;
+}
+
+#canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(1) { transform: translate(0, -52px); }
+#canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(2) { transform: translate(45px, -26px); }
+#canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(3) { transform: translate(45px, 26px); }
+#canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(4) { transform: translate(0, 52px); }
+#canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(5) { transform: translate(-45px, 26px); }
+#canvas-drawing-dock .dock-pen-group .dock-btn:nth-child(6) { transform: translate(-45px, -26px); }
+
+#canvas-drawing-dock .dock-stroke-group {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#canvas-drawing-dock #draw-color-picker {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 9999px !important;
+  border: 2px solid rgba(255, 255, 255, 0.65) !important;
+  padding: 0 !important;
+  cursor: pointer;
+}
+
+#canvas-drawing-dock .dock-size-pill {
+  position: absolute;
+  top: 106px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(16, 17, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+#canvas-drawing-dock .dock-action-group {
+  position: absolute;
+  top: 162px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(16, 17, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+
+#canvas-drawing-dock #btn-draw-vectorize span {
+  display: none !important;
+}
+
+#canvas-drawing-dock #btn-draw-close {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #e2e8f0 !important;
+  border-radius: 9999px !important;
+  padding: 3px 10px !important;
+  font-size: 11px !important;
 }
 
 .rm-support-submit:disabled {
