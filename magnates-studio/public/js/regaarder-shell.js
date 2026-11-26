@@ -103,6 +103,8 @@
    for(const button of rail.querySelectorAll('.rail-btn')){const active=button.dataset.railTab==='templates';if(button.classList.contains('active')!==active)button.classList.toggle('active',active);}
  };
  if(rail){new MutationObserver(syncRail).observe(rail,{attributes:true,attributeFilter:['class'],subtree:true});new MutationObserver(syncRail).observe(home,{attributes:true,attributeFilter:['style']});syncRail();}
+ const tplSvg=rail?.querySelector('.rail-btn[data-rail-tab="templates"] svg');
+ if(tplSvg){tplSvg.setAttribute('viewBox','0 0 24 24');tplSvg.innerHTML='<path d="M3 3h8v8H3V3zm10 0h8v5h-8V3zM3 13h8v8H3v-8zm10-3h8v11h-8V10z"/>';}
 
  // Organize left rail: primary items (Create, Templates, Projects, Uploads) + More (...) + bottom Notifications.
  if(rail&&!rail.querySelector('.rm-rail-more')){
