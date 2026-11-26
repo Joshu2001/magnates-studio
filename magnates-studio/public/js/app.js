@@ -7299,8 +7299,8 @@ function syncMainStudioHud() {
   const hud = document.getElementById('studio-main-player-hud');
   if (!cv || !hud || !cv.parentElement) return;
 
-  // In fullscreen or fallback immersive mode, CSS handles 100% width
-  if (document.fullscreenElement || cv.parentElement.classList.contains('is-immersive-fallback')) {
+  // Only expand HUD to 100% when .canvas-wrapper itself is fullscreen (not when whole app/document is fullscreen)
+  if (document.fullscreenElement === cv.parentElement || cv.parentElement.classList.contains('is-immersive-fallback')) {
     hud.style.width = '';
     hud.style.maxWidth = '';
     hud.style.left = '';

@@ -2264,7 +2264,7 @@
         selBox.style.width = Math.round(cRect.width) + 'px';
         selBox.style.height = Math.round(cRect.height) + 'px';
         if (hudEl) {
-          const isFs = !!(document.fullscreenElement || canvasWrap.classList.contains('is-immersive-fallback'));
+          const isFs = document.fullscreenElement === canvasWrap || canvasWrap.classList.contains('is-immersive-fallback');
           if (isFs) {
             hudEl.style.removeProperty('left');
             hudEl.style.removeProperty('bottom');
