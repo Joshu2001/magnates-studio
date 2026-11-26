@@ -142,6 +142,7 @@
      });
      document.addEventListener('keydown',e=>{if(e.key==='Escape')moreWrap.open=false;});
    }
+   rail.classList.add('rm-ready');
 
    // Bottom-pinned Real-Time Notifications bell on the rail
    const notifWrap=document.createElement('details');
@@ -384,11 +385,17 @@
    const frontBtn=document.getElementById('btn-text-layer-front');
    if(backBtn&&!backBtn.dataset.rmVisual){
      backBtn.dataset.rmVisual='true';
-     backBtn.innerHTML='<svg viewBox="0 0 36 24" width="32" height="22" aria-hidden="true"><text x="6" y="16" fill="currentColor" opacity="0.5" font-size="13" font-weight="800">T</text><rect x="11" y="4" width="18" height="15" rx="3" fill="#181b28" stroke="currentColor" stroke-width="1.5"/></svg><span>Behind Media</span>';
+     backBtn.innerHTML='<svg viewBox="0 0 38 24" width="34" height="22" aria-hidden="true"><text x="4" y="17" fill="#cbd5e1" opacity="0.75" font-size="14" font-weight="800">T</text><rect x="12" y="4" width="20" height="15" rx="3" fill="#1e2235" stroke="currentColor" stroke-width="1.4"/><path d="M15 16l4-4 3 3 4-5 3 6z" fill="currentColor" opacity="0.65"/></svg><span>Behind Media</span>';
    }
    if(frontBtn&&!frontBtn.dataset.rmVisual){
      frontBtn.dataset.rmVisual='true';
-     frontBtn.innerHTML='<svg viewBox="0 0 36 24" width="32" height="22" aria-hidden="true"><rect x="7" y="4" width="18" height="15" rx="3" fill="#181b28" stroke="currentColor" stroke-opacity="0.5" stroke-width="1.3"/><text x="15" y="17" fill="currentColor" font-size="13" font-weight="900">T</text></svg><span>In Front</span>';
+     frontBtn.innerHTML='<svg viewBox="0 0 38 24" width="34" height="22" aria-hidden="true"><rect x="6" y="4" width="20" height="15" rx="3" fill="#1e2235" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.2"/><path d="M9 16l4-4 3 3 4-5 3 6z" fill="currentColor" opacity="0.28"/><text x="17" y="18" fill="#ffffff" font-size="14" font-weight="900">T</text></svg><span>In Front</span>';
+   }
+   const saveBtn=document.getElementById('btn-save-color-template');
+   const presetLabel=saveBtn?.previousElementSibling;
+   if(presetLabel&&/Color Presets/i.test(presetLabel.textContent)){
+     presetLabel.textContent='Color Presets';
+     presetLabel.style.whiteSpace='nowrap';
    }
  })();
 

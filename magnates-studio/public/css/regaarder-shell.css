@@ -128,6 +128,15 @@ body,
   height: calc(100vh - 56px) !important;
 }
 
+/* Prevent FOUC flash before regaarder-shell.js moves Create & secondary rail items */
+#top-nav-bar > .rm-create-menu {
+  display: none !important;
+}
+
+#main-nav-rail:not(.rm-ready) > .rail-btn:not([data-rail-tab="templates"]):not([data-rail-tab="projects"]):not([data-rail-tab="all"]) {
+  display: none !important;
+}
+
 /* Recessed Left Vertical Rail — Clean Bare Icons (Image 2 active treatment) */
 #main-nav-rail {
   width: var(--rm-rail-width) !important;
@@ -1106,8 +1115,32 @@ body.rm-in-editor #rm-auth-actions,
   border-radius: 6px !important;
 }
 
-#card-chart-inspector .fx-header .badge {
+#card-chart-inspector .fx-header .badge,
+#card-stage-backdrop .fx-header .badge,
+#badge-bg-mode {
   display: none !important;
+}
+
+#right-inspector #btn-save-color-template {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  padding: 4px 10px !important;
+  font-size: 10.5px !important;
+}
+
+#right-inspector #color-palette-presets {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 7px !important;
+}
+
+#right-inspector #color-palette-presets .palette-chip {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  justify-content: flex-start !important;
+  padding: 7px 10px !important;
+  font-size: 11px !important;
+  gap: 6px !important;
 }
 
 #right-inspector #btn-chart-open-modal {
