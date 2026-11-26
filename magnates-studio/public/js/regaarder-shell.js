@@ -451,6 +451,64 @@
    document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
  })();
 
+ // Side-Opening Visual SFX Picker for #text-sfx
+ (function initSfxVisualPicker(){
+   const sel=document.getElementById('text-sfx');
+   if(!sel||sel.dataset.rmSfxPicker)return;
+   sel.dataset.rmSfxPicker='true';
+   sel.classList.add('rm-visual-select-hidden');
+   const shortNames={
+     whoosh:'Cinematic Whoosh',gentle_wind:'Gentle Wind',pencil_circle:'Pencil Circle',
+     pencil_scribble:'Pencil Scribble',marker_swipe:'Marker Swipe',paper_tear:'Paper Tear',
+     pop_cork:'Bubble Pop',bass_thud:'Bass Impact',camera_click:'Camera Click',
+     glitch_burst:'Digital Glitch',none:'Silent'
+   };
+   const items=[...sel.options].map(o=>({value:o.value,label:shortNames[o.value]||o.textContent}));
+   const getLabel=(v)=>items.find(i=>i.value===v)?.label||'Sound Effect';
+   const wrap=document.createElement('details');
+   wrap.className='rm-sfx-picker';
+   wrap.innerHTML=`
+     <summary class="rm-anim-trigger"><span class="rm-sfx-current">${getLabel(sel.value)}</span><em>Preview ▾</em></summary>
+     <div class="rm-sfx-popover">
+       <div class="rm-anim-popover-head"><strong>Sound Effect (SFX)</strong><span>Click to select</span></div>
+       <div class="rm-sfx-list">
+         ${items.map(it=>`<div class="rm-sfx-row ${sel.value===it.value?'is-active':''}" data-val="${it.value}"><button type="button" class="rm-sfx-select"><span class="rm-sfx-bars" aria-hidden="true"><i></i><i></i><i></i></span><span>${it.label}</span></button>${it.value!=='none'?`<button type="button" class="rm-sfx-play" title="Play preview">▶</button>`:''}</div>`).join('')}
+       </div>
+     </div>`;
+   sel.after(wrap);
+   const pop=wrap.querySelector('.rm-sfx-popover');
+   const cur=wrap.querySelector('.rm-sfx-current');
+   wrap.addEventListener('toggle',()=>{
+     if(wrap.open&&pop){
+       const r=wrap.getBoundingClientRect();
+       pop.style.left=Math.max(12,Math.round(r.left-270))+'px';
+       pop.style.top=Math.max(12,Math.min(Math.round(r.top-80),window.innerHeight-340))+'px';
+     }
+   });
+   const sync=()=>{
+     if(cur)cur.textContent=getLabel(sel.value);
+     wrap.querySelectorAll('.rm-sfx-row').forEach(row=>row.classList.toggle('is-active',row.dataset.val===sel.value));
+   };
+   wrap.querySelectorAll('.rm-sfx-select').forEach(btn=>{
+     btn.addEventListener('click',()=>{
+       sel.value=btn.closest('.rm-sfx-row').dataset.val;
+       sel.dispatchEvent(new Event('change',{bubbles:true}));
+       wrap.open=false;sync();
+     });
+   });
+   wrap.querySelectorAll('.rm-sfx-play').forEach(btn=>{
+     btn.addEventListener('click',e=>{
+       e.stopPropagation();
+       sel.value=btn.closest('.rm-sfx-row').dataset.val;
+       sel.dispatchEvent(new Event('change',{bubbles:true}));
+       sync();
+       document.getElementById('btn-preview-text-sfx')?.click();
+     });
+   });
+   sel.addEventListener('change',sync);
+   document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.open=false;});
+ })();
+
  // Global #right-inspector Polish: concise labels, strip inline emojis, collapse dense drawers
  (function standardizeRightSidebar(){
    const sidebar=document.getElementById('right-inspector');

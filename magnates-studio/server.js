@@ -169,6 +169,7 @@ app.get('/api/media', (req, res) => {
         const fullPath = path.join(uploadsDir, f);
         try {
           const stat = fs.statSync(fullPath);
+          if (!stat.isFile()) continue;
           seen.add(f.toLowerCase());
           result.push({
             name: f,

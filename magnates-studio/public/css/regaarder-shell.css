@@ -1168,6 +1168,188 @@ body.rm-in-editor #rm-auth-actions,
   border-color: rgba(253, 164, 175, 0.35) !important;
 }
 
+/* Media Library (#left-sidebar) Apple-Style Polish */
+#left-sidebar {
+  background: #141622 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.65) !important;
+}
+
+#left-sidebar .subtitle,
+#btn-canva-edge-chevron {
+  display: none !important;
+}
+
+#btn-collapse-left-sidebar {
+  background: transparent !important;
+  border: 0 !important;
+  color: #94a3b8 !important;
+  box-shadow: none !important;
+}
+
+#btn-collapse-left-sidebar:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+#left-sidebar .media-search-bar-row {
+  display: flex !important;
+  align-items: center !important;
+  background: #0d0e16 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  padding: 2px 4px 2px 10px !important;
+  gap: 6px !important;
+}
+
+#left-sidebar .media-search-input-wrap {
+  flex: 1 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+#left-sidebar #drop-zone {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  border-radius: 7px !important;
+  background: rgba(139, 92, 246, 0.2) !important;
+  border: 0 !important;
+  color: #e9d5ff !important;
+}
+
+#left-sidebar #drop-zone:hover {
+  background: rgba(139, 92, 246, 0.35) !important;
+}
+
+#left-sidebar .media-filter-segmented {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  background: rgba(0, 0, 0, 0.35) !important;
+  padding: 3px !important;
+  border-radius: 9px !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  gap: 2px !important;
+}
+
+#left-sidebar .media-pill-btn {
+  border: 0 !important;
+  background: transparent !important;
+  color: #94a3b8 !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  padding: 5px 4px !important;
+}
+
+#left-sidebar .media-pill-btn.active {
+  background: rgba(139, 92, 246, 0.24) !important;
+  color: #f3e8ff !important;
+  font-weight: 600 !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+#left-sidebar .media-item-thumb.audio-thumb,
+#left-sidebar .media-thumb-audio {
+  background: rgba(139, 92, 246, 0.16) !important;
+  color: #c4b5fd !important;
+  border: 1px solid rgba(139, 92, 246, 0.28) !important;
+}
+
+/* Side-Opening SFX Picker */
+.rm-sfx-picker {
+  position: relative;
+  width: 100%;
+}
+
+.rm-sfx-popover {
+  position: fixed;
+  width: 260px;
+  z-index: 2500;
+  padding: 12px;
+  background: #141622;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.78);
+}
+
+.rm-sfx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 270px;
+  overflow-y: auto;
+}
+
+.rm-sfx-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.025);
+  padding: 4px 6px;
+}
+
+.rm-sfx-row.is-active {
+  border-color: rgba(139, 92, 246, 0.65);
+  background: rgba(139, 92, 246, 0.16);
+}
+
+.rm-sfx-select {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 0;
+  color: #e2e8f0;
+  font-size: 11.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  padding: 3px 2px;
+}
+
+.rm-sfx-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.rm-sfx-bars i {
+  display: block;
+  width: 2px;
+  border-radius: 1px;
+  background: #a78bfa;
+}
+
+.rm-sfx-bars i:nth-child(1) { height: 6px; }
+.rm-sfx-bars i:nth-child(2) { height: 12px; }
+.rm-sfx-bars i:nth-child(3) { height: 8px; }
+
+.rm-sfx-play {
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f3e8ff;
+  font-size: 9px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rm-sfx-play:hover {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+}
+
 /* Global #right-inspector Color, Spacing & Restraint Standardization */
 #right-inspector .fx-card {
   background: #141622 !important;
