@@ -7299,29 +7299,18 @@ function syncMainStudioHud() {
   const hud = document.getElementById('studio-main-player-hud');
   if (!cv || !hud || !cv.parentElement) return;
 
-  // Only expand HUD to 100% when .canvas-wrapper itself is fullscreen (not when whole app/document is fullscreen)
-  if (document.fullscreenElement === cv.parentElement || cv.parentElement.classList.contains('is-immersive-fallback')) {
-    hud.style.width = '';
-    hud.style.maxWidth = '';
-    hud.style.left = '';
-    hud.style.right = '';
-    hud.style.bottom = '';
-    hud.style.transform = '';
-    hud.style.borderRadius = '';
-    return;
-  }
-
+  // Always align HUD to #previewCanvas bounds (including fullscreen)
   const cvRect = cv.getBoundingClientRect();
   const parentRect = cv.parentElement.getBoundingClientRect();
 
   if (cvRect.width > 0) {
-    hud.style.width = Math.round(cvRect.width) + 'px';
-    hud.style.maxWidth = Math.round(cvRect.width) + 'px';
-    hud.style.left = Math.round(cvRect.left - parentRect.left) + 'px';
-    hud.style.right = 'auto';
-    hud.style.transform = 'none';
+    hud.style.setProperty('width', Math.round(cvRect.width) + 'px', 'important');
+    hud.style.setProperty('max-width', Math.round(cvRect.width) + 'px', 'important');
+    hud.style.setProperty('left', Math.round(cvRect.left - parentRect.left) + 'px', 'important');
+    hud.style.setProperty('right', 'auto', 'important');
+    hud.style.setProperty('transform', 'none', 'important');
     const bottomOffset = Math.max(0, Math.round(parentRect.bottom - cvRect.bottom));
-    hud.style.bottom = bottomOffset + 'px';
+    hud.style.setProperty('bottom', bottomOffset + 'px', 'important');
     hud.style.borderRadius = '0 0 8px 8px';
   }
 }
