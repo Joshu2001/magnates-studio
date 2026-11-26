@@ -2254,6 +2254,7 @@
       });
       canvasWrap.appendChild(selBox);
 
+      const hudEl = document.getElementById('studio-main-player-hud');
       const syncSelBox = () => {
         const wRect = canvasWrap.getBoundingClientRect();
         const cRect = previewCanvas.getBoundingClientRect();
@@ -2262,7 +2263,29 @@
         selBox.style.top = Math.round(cRect.top - wRect.top) + 'px';
         selBox.style.width = Math.round(cRect.width) + 'px';
         selBox.style.height = Math.round(cRect.height) + 'px';
+        if (hudEl) {
+          const isFs = !!(document.fullscreenElement || canvasWrap.classList.contains('is-immersive-fallback'));
+          if (isFs) {
+            hudEl.style.removeProperty('left');
+            hudEl.style.removeProperty('bottom');
+            hudEl.style.removeProperty('width');
+            hudEl.style.removeProperty('max-width');
+            hudEl.style.removeProperty('transform');
+          } else {
+            hudEl.style.left = Math.round(cRect.left - wRect.left) + 'px';
+            hudEl.style.bottom = Math.max(0, Math.round(wRect.bottom - cRect.bottom)) + 'px';
+            hudEl.style.width = Math.round(cRect.width) + 'px';
+            hudEl.style.maxWidth = Math.round(cRect.width) + 'px';
+            hudEl.style.transform = 'none';
+          }
+        }
       };
+      if (hudEl && window.ResizeObserver) {
+        new ResizeObserver(syncSelBox).observe(previewCanvas);
+        new ResizeObserver(syncSelBox).observe(canvasWrap);
+      }
+      document.addEventListener('fullscreenchange', () => setTimeout(syncSelBox, 50));
+      syncSelBox();
 
       previewCanvas.addEventListener('click', (e) => {
         e.stopPropagation();
