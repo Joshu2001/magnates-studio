@@ -3718,6 +3718,10 @@
     panes.look.appendChild(createLookPresetsCard(() => document.getElementById('tpl-modal-preview-stage')));
 
     const activeTplId = ((typeof topCustomizerState !== 'undefined' ? topCustomizerState : window.topCustomizerState)?.currentTpl?.id) || '';
+    if (activeTplId === 'ponzi-minute7-documentary' && typeof window.tplBuildPonziMinute7NativePanes === 'function') {
+      window.tplBuildPonziMinute7NativePanes(panes, advDrawer);
+      return;
+    }
     if (activeTplId === 'regaarder-origins-slow-reveal' && typeof window.tplBuildOriginsSlowRevealRegaarderPanes === 'function') {
       window.tplBuildOriginsSlowRevealRegaarderPanes(panes, advDrawer, universalShellRefs);
       return;
@@ -6242,6 +6246,33 @@ document.addEventListener('click', (e) => {
   const fxBtn = e.target.closest('[data-ctx-fx-trigger]');
   if (fxBtn) {
     e.stopPropagation();
+    const activeId = ((typeof topCustomizerState !== 'undefined' ? topCustomizerState : window.topCustomizerState)?.currentTpl?.id) || '';
+    if (activeId === 'ponzi-minute7-documentary') {
+      const existing = document.getElementById('rm-cutout-fx-popover');
+      if (existing) { existing.remove(); document.body.classList.remove('rm-fx-popover-open'); return; }
+      const pop = document.createElement('div');
+      pop.id = 'rm-cutout-fx-popover';
+      const header=document.createElement('div');header.className='rm-fx-pop-head';
+      const title=document.createElement('span');title.textContent='Cutout Effects & Animations';
+      const close=document.createElement('button');close.type='button';close.className='rm-fx-pop-close';close.textContent='×';
+      const dismiss=()=>{pop.remove();document.body.classList.remove('rm-fx-popover-open');};
+      close.onclick=dismiss;header.append(title,close);pop.appendChild(header);
+      const cfg=window.PonziMinute7Opening?.config(window.tplGetContextualData?.(activeId));
+      const layer=cfg?.layers.find(l=>l.id===window.PonziMinute7SelectedLayer)||cfg?.layers[0];
+      const label=document.createElement('div');label.style.cssText='padding:10px;font-size:12px;color:inherit;';label.textContent=layer?.name||'Selected layer';pop.appendChild(label);
+      for(const [tab,name,summary] of [
+        ['effects','Effects & transitions',[layer?.mask&&layer.mask+' reveal',layer?.glow&&'Glow',layer?.blur&&'Depth blur',layer?.type==='dust'&&'Atmospheric dust',layer?.type==='cash'&&'Banknote particles',layer?.type==='flare'&&'Lens flare'].filter(Boolean).join(' · ')],
+        ['motion','Animation',[(layer?.keys?.length||0)+' keyframes',layer?.motionPreset&&layer.motionPreset!=='none'&&layer.motionPreset,layer?.reveal&&layer.reveal+' reveal'].filter(Boolean).join(' · ')]
+      ]){
+        const button=document.createElement('button');button.type='button';button.className='rg-btn-secondary';button.style.cssText='display:block;width:calc(100% - 20px);margin:6px 10px;padding:10px;text-align:left;';
+        button.textContent=name+(summary?' — '+summary:'');
+        button.onclick=()=>{dismiss();document.querySelector('#modal-top-template-customizer .rg-inspector-tab[data-tab="'+tab+'"]')?.click();};
+        pop.appendChild(button);
+      }
+      document.body.appendChild(pop);document.body.classList.add('rm-fx-popover-open');
+      const rect=fxBtn.getBoundingClientRect();pop.style.left=Math.max(12,Math.min(window.innerWidth-472,rect.left-380))+'px';pop.style.top=Math.max(12,Math.min(window.innerHeight-220,rect.top))+'px';
+      return;
+    }
     let pop = document.getElementById('rm-cutout-fx-popover');
     if (pop) { pop.remove(); return; }
     pop = document.createElement('div');
@@ -6755,6 +6786,7 @@ setInterval(() => {
       return promptAIDirector(`Comment on ${label}: `);
     }
     if (actionId === 'cutout-bg') return promptAIDirector(`Cut out and isolate ${label} (remove background)`);
+    if(actionId==='animate-item' && ((typeof topCustomizerState !== 'undefined' ? topCustomizerState : window.topCustomizerState)?.currentTpl?.id)==='ponzi-minute7-documentary') return switchInspectorTab('motion');
     if (actionId === 'animate-item') return promptAIDirector(`Animate ${label} smoothly`);
     if (actionId === 'ai-rewrite') return promptAIDirector(`Rewrite and tighten ${label}`);
     if (actionId === 'highlight-line') return promptAIDirector(`Highlight the key line in ${label}`);
