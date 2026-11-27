@@ -201,9 +201,9 @@
       {id:'office',name:'Conference room',type:'image',asset:'office.jpg',fallback:'bg_office_handshake.svg',start:0,end:1.72,x:640,y:360,w:1280,h:720,z:0,depth:0,fadeOut:.6},
       {id:'city',name:'City and balcony',type:'image',asset:'city.jpg',fallback:'bg_city_balcony.jpg',start:1.12,end:3.72,x:640,y:360,w:1280,h:720,z:1,depth:0,fadeIn:.5,keys:[{t:3.24,x:640},{t:3.72,x:1920}]},
       {id:'balcony-man',name:'Businessman · rear view',type:'image',asset:'balcony-man.png',fallback:'fg_man_back_suit.svg',start:1.12,end:3.72,x:445,y:460,w:700,h:610,z:4,depth:.35,fadeIn:.48,keys:[{t:3.24,x:445},{t:3.72,x:1725}]},
-      {id:'six-months',name:'Six months',type:'text',text:'Six months',font:'Georgia, serif',size:152,weight:700,color:'#e6d800',glow:14,start:0,end:1.68,x:640,y:310,w:1200,h:200,z:5,depth:.4,fadeOut:.55,keys:[{t:0,rotation:0},{t:1.68,rotation:-13}]},
+      {id:'six-months',name:'Six months',type:'text',text:'Six months',font:'Georgia, serif',size:152,weight:700,color:'#e6d800',glow:14,reveal:'character',revealDuration:.65,start:.28,end:1.68,x:640,y:310,w:1200,h:200,z:5,depth:.4,fadeOut:.55,keys:[{t:.28,rotation:0},{t:1.68,rotation:-13}]},
       {id:'looking',name:'Looking for something new to do',type:'text',text:'looking for something new to do',font:'Brush Script MT, Segoe Script, cursive',size:63,weight:700,color:'#f5df00',glow:9,reveal:'character',revealDuration:.48,start:1.60,end:3.72,x:650,y:346,w:1200,h:110,z:6,depth:.5,rotation:-29,keys:[{t:3.24,x:650},{t:3.72,x:1930}]},
-      {id:'handshake',name:'Handshake',type:'image',asset:'handshake.png',fallback:'fg_handshake.svg',start:0,end:3.55,x:640,y:315,w:1420,h:570,z:12,depth:1,rotation:-19,keys:[{t:0,x:640,y:315,scale:1,blur:0},{t:1.12,x:665,y:350,scale:1.08,blur:0},{t:2.08,x:1030,y:535,scale:1.35,blur:8},{t:3.12,x:1100,y:585,scale:1.4,blur:10},{t:3.55,x:2110,y:740,scale:1.45,blur:15}]},
+      {id:'handshake',name:'Handshake',type:'image',asset:'handshake.png',fallback:'fg_handshake.svg',start:0,end:3.55,x:640,y:330,w:1920,h:600,z:12,depth:1,rotation:-16,keys:[{t:0,x:640,y:330,scale:.92,blur:0},{t:1.12,x:660,y:355,scale:.98,blur:0},{t:2.08,x:860,y:495,scale:1.18,blur:7},{t:3.12,x:960,y:545,scale:1.24,blur:10},{t:3.55,x:1960,y:710,scale:1.3,blur:15}]},
       {id:'table',name:'Fruit market background',type:'image',asset:'table.jpg',fallback:'bg_watermelon_table.jpg',start:3.24,end:11.16,x:640,y:360,w:1280,h:720,z:2,depth:0,keys:[{t:3.24,x:-640},{t:3.72,x:640},{t:7.32,x:640},{t:8.2,x:860}],fadeOut:.35},
       {id:'melon',name:'Whole watermelon',type:'image',asset:'watermelon.png',start:3.24,end:11.16,x:690,y:255,w:450,h:460,z:5,depth:.3,keys:[{t:3.24,x:-590},{t:3.72,x:690},{t:7.32,x:690},{t:8.6,x:1420}],fadeOut:.4},
       {id:'slices',name:'Watermelon slices',type:'image',asset:'watermelon-slices.png',start:3.24,end:11.16,x:585,y:515,w:400,h:300,z:6,depth:.45,keys:[{t:3.24,x:-695},{t:3.72,x:585},{t:7.32,x:585},{t:8.6,x:1315}],fadeOut:.4},
@@ -413,18 +413,56 @@
       const panel=document.createElement('div');panel.style.cssText='display:flex;flex-direction:column;gap:7px;width:100%;padding:8px 0';
       const h=document.createElement('strong');h.textContent='Ponzi · 07:00–07:15';panel.appendChild(h);
       field(panel,'Use editable opening (off = original)',enabled,'checkbox',v=>{enabled=v;});
+
+      // Jump to Scene Beat cards (Cargo-style)
+      const beatsWrap=document.createElement('div');
+      beatsWrap.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:4px 0 8px;';
+      const beats=[
+        {label:'0:00 Office',t:0,img:NEW+'office.jpg'},
+        {label:'0:01 Balcony',t:1.4,img:NEW+'city.jpg'},
+        {label:'0:03 Market',t:3.8,img:NEW+'table.jpg'},
+        {label:'0:08 Cash Rain',t:8.6,img:NEW+'cash-man.png'},
+        {label:'0:10 Portrait',t:10.8,img:NEW+'portrait.png'},
+        {label:'0:13 Bankrupt',t:13.2,img:NEW+'amber.jpg'}
+      ];
+      for(const b of beats){
+        const card=document.createElement('button');card.type='button';
+        card.style.cssText='position:relative;height:48px;border-radius:6px;overflow:hidden;border:1px solid #383849;background:#111;cursor:pointer;padding:0;';
+        card.innerHTML=`<img src="${b.img}" style="width:100%;height:100%;object-fit:cover;opacity:.8;"/><span style="position:absolute;right:4px;bottom:3px;background:rgba(0,0,0,.75);color:#fff;font:600 10px/1.2 sans-serif;padding:2px 4px;border-radius:3px;">${b.label}</span>`;
+        card.onclick=()=>{
+          if(window.topCustomizerState){window.topCustomizerState.currentTime=b.t;window.topCustomizerState.isPlaying=false;}
+          const st=document.getElementById('tpl-modal-preview-stage');
+          if(st&&typeof window.stepPonziMinute7Animation==='function')window.stepPonziMinute7Animation(st,'ponzi-minute7-documentary',b.t,data);
+        };
+        beatsWrap.appendChild(card);
+      }
+      panel.appendChild(beatsWrap);
+
+      // Scene Layers grid with Show All toggle
+      let showAll=window._ponziShowAllLayers||false;
+      const curT=(window.topCustomizerState&&Number.isFinite(window.topCustomizerState.currentTime))?window.topCustomizerState.currentTime:0;
+      const activeLayers=cfg.layers.filter(x=>curT>=x.start&&curT<=x.end);
+      const visibleList=showAll?cfg.layers:(activeLayers.length?activeLayers:cfg.layers.slice(0,6));
+      const hdr=document.createElement('div');hdr.style.cssText='display:flex;justify-content:space-between;align-items:center;margin:4px 0;';
+      const hdrTitle=document.createElement('span');hdrTitle.textContent=`Scene Layers (${activeLayers.length})`;hdrTitle.style.cssText='font:600 12px/1.2 sans-serif;color:#eee;';
+      const showBtn=document.createElement('button');showBtn.type='button';showBtn.textContent=showAll?'Active Only':`Show All (${cfg.layers.length})`;
+      showBtn.style.cssText='background:#232333;color:#ddd;border:1px solid #383849;border-radius:5px;padding:4px 8px;font-size:11px;cursor:pointer;';
+      showBtn.onclick=()=>{window._ponziShowAllLayers=!showAll;build();};
+      hdr.append(hdrTitle,showBtn);panel.appendChild(hdr);
+
+      const grid=document.createElement('div');grid.style.cssText='display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:220px;overflow:auto;margin-bottom:6px;';
+      for(const layer of visibleList){
+        const lc=document.createElement('button');lc.type='button';
+        lc.style.cssText='display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;height:54px;padding:6px;border-radius:6px;cursor:pointer;text-align:left;background:'+(layer.id===selected?'#2c2448':'#171722')+';border:1px solid '+(layer.id===selected?'#8b5cf6':'#383849')+';color:#eee;';
+        lc.innerHTML=`<span style="font:600 11px/1.2 sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;">${layer.name}</span><span style="font:500 10px/1 sans-serif;color:#9ca3af;">${layer.start.toFixed(1)}–${layer.end.toFixed(1)}s · ${layer.type}</span>`;
+        lc.onclick=()=>{selected=layer.id;window.PonziMinute7SelectedLayer=selected;build();};
+        grid.appendChild(lc);
+      }
+      panel.appendChild(grid);
+
       const select=document.createElement('select');select.style.cssText='width:100%;background:#171722;color:#eee;padding:8px;border-radius:6px';
       for(const l of cfg.layers){const opt=document.createElement('option');opt.value=l.id;opt.textContent=l.name+' · '+l.start.toFixed(2)+'–'+l.end.toFixed(2)+'s';select.appendChild(opt);}
       select.value=selected;select.onchange=()=>{selected=select.value;window.PonziMinute7SelectedLayer=selected;build();};panel.appendChild(select);
-      const timeline=document.createElement('div');timeline.style.cssText='max-height:230px;overflow:auto;padding:5px;border:1px solid #383849;border-radius:6px;';
-      const legend=document.createElement('div');legend.textContent='Layer timing • 0 — 15 s';legend.style.cssText='font-size:11px;color:#aaa;padding-bottom:6px;';timeline.appendChild(legend);
-      for(const layer of cfg.layers.slice().sort((a,b)=>a.start-b.start||a.z-b.z)){
-        const lane=document.createElement('button');lane.type='button';lane.title=layer.name+' '+layer.start+'–'+layer.end+'s';lane.style.cssText='display:flex;align-items:center;gap:6px;width:100%;height:24px;background:'+(layer.id===selected?'#36304c':'transparent')+';color:#ddd;border:0;cursor:pointer;text-align:left;';
-        const name=document.createElement('span');name.textContent=layer.name;name.style.cssText='width:45%;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-        const track=document.createElement('span');track.style.cssText='position:relative;flex:1;background:#252534;height:10px;border-radius:2px;';
-        const bar=document.createElement('span');bar.style.cssText='position:absolute;height:100%;border-radius:2px;left:'+Math.max(0,Math.min(100,layer.start/15*100))+'%;width:'+Math.max(0,Math.min(100-layer.start/15*100,(layer.end-layer.start)/15*100))+'%;background:'+(layer.visible===false?'#444':layer.type==='image'?'#7296b8':layer.type==='text'||layer.type==='words'?'#e0b94c':'#8d70bd')+';';
-        track.appendChild(bar);lane.append(name,track);lane.onclick=()=>{selected=layer.id;window.PonziMinute7SelectedLayer=selected;build();};timeline.appendChild(lane);
-      }panel.appendChild(timeline);
       const l=cfg.layers.find(x=>x.id===selected);
       window.PonziMinute7SelectedLayer=selected;
       const f=(key,label,type='number',d=0)=>field(panel,label,l[key]??d,type,v=>{
@@ -466,7 +504,7 @@
           dest.appendChild(sec);sections[key]=sec;
         }
         function bucket(node){
-          if(node===h||node===select||node===timeline||node===reset||node.tagName==='INPUT')return 'content';
+          if(node===h||node===select||node===beatsWrap||node===hdr||node===grid||node===reset||node.tagName==='INPUT')return 'content';
           const label=(node.firstChild?.textContent||'').trim();
           if(/keyframes|In point|Out point|Parallax|Position|Width|Height|Scale|Rotation|Fade in|Fade out|timing offsets|Reveal duration|Draw duration|Animation|Fall \/ drift speed|Camera enabled/i.test(label))return 'motion';
           if(/Opacity|Brightness|Contrast|Saturation|Blend mode/i.test(label))return 'look';
