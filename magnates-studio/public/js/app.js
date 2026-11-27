@@ -35654,7 +35654,10 @@ function openTopTemplateCustomizer(tpl) {
     }
   }
   topCustomizerState.depth = 65;
-  if (window.REGAARDER_CHAPTER_RUNTIME && window.REGAARDER_CHAPTER_RUNTIME[tpl.id]) {
+  if (tpl.id === 'ponzi-minute7-documentary') {
+    // timeToApply is library metadata, not playback length. Preserve the legacy 15–60s sequence.
+    topCustomizerState.duration = 60;
+  } else if (window.REGAARDER_CHAPTER_RUNTIME && window.REGAARDER_CHAPTER_RUNTIME[tpl.id]) {
     topCustomizerState.duration = window.REGAARDER_CHAPTER_RUNTIME[tpl.id].duration || parseFloat(tpl.timeToApply) || 6;
   } else {
     topCustomizerState.duration = parseFloat(tpl.timeToApply) || 6;
