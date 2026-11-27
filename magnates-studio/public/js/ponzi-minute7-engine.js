@@ -320,6 +320,39 @@
   calibrate('headline-3',{fitTextWidth:true,w:880,wordFadeDuration:.09});
   calibrate('cash-front',{saturation:.25,amberTint:.15});
 
+
+  // V5 candidate: isolated Chromium comparison; retain explicit user edits.
+  const openingV4Baseline=JSON.parse(JSON.stringify(defaults));
+  defaults.version=5;
+  const slideKeys=(a,b)=>[{t:3.16,x:a},{t:3.68,x:b,ease:'linear'}];
+  const scriptFace='Brush Script MT, Segoe Script, Lobster Two, Z003, Apple Chancery, URW Chancery L, cursive';
+  calibrate('city',{keys:[{t:1.12,x:640},...slideKeys(640,1920)]});
+  calibrate('balcony-man',{keys:[{t:1.12,x:485},...slideKeys(485,1765)]});
+  calibrate('looking',{font:scriptFace,keys:[{t:1.60,x:635},...slideKeys(635,1915)]});
+  calibrate('table',{start:3.16,keys:[...slideKeys(-768,640),{t:7.12,x:640},{t:7.68,x:710},{t:10.28,x:720}]});
+  calibrate('melon',{start:3.16,w:595,h:468,x:705,y:288,keys:[...slideKeys(-360,705),{t:6.3,x:705},{t:7.12,x:705},{t:7.68,x:1215},{t:8.6,x:1435}]});
+  calibrate('slices',{start:3.16,w:365,h:151,x:455,y:550,keys:[...slideKeys(-610,455),{t:7.12,x:455},{t:7.68,x:965},{t:8.6,x:1185}]});
+  calibrate('weights',{start:3.16,w:300,h:207,x:994,y:552,keys:[...slideKeys(-71,994),{t:7.12,x:994},{t:7.68,x:1504},{t:8.6,x:1724}]});
+  calibrate('merchant',{start:3.16,w:900,h:700,x:205,y:446,keys:[
+    {t:3.16,x:-1075,y:446,scale:1,blur:0},{t:3.68,x:205,y:446,scale:1,blur:0,ease:'linear'},
+    {t:6.28,x:205,y:446,scale:1,blur:0},{t:6.94,x:38,y:446,scale:1,blur:0},
+    {t:7.32,x:190,y:446,scale:1.10,blur:2},{t:7.68,x:650,y:483,scale:1.31,blur:5,ease:'linear'},
+    {t:8.36,x:940,y:510,scale:1.43,blur:7,ease:'linear'},{t:9.20,x:1000,y:510,scale:1.48,blur:8},
+    {t:10.28,x:1000,y:510,scale:1.48,blur:8}
+  ]});
+  calibrate('fruit-title',{font:scriptFace,size:76});
+  calibrate('genius',{font:scriptFace,x:378,y:343});
+  for(const id of ['arrow-left','arrow-right']){const a=defaults.layers.find(l=>l.id===id);calibrate(id,{h:245,y:a.y-12});}
+  calibrate('arrow-center',{h:320,y:448});
+  calibrate('ponzi-standing',{w:620,h:790,x:112,y:400,keys:[{t:7.92,x:-250},{t:8.36,x:72},{t:8.72,x:112},{t:10.28,x:112}]});
+  for(const id of ['headline-1','headline-2','headline-3'])calibrate(id,{font:'Arial Black, Impact, Arial, sans-serif',textStroke:1.15});
+  calibrate('amber',{brightness:.65});
+  calibrate('amber-note-left',{opacity:.44});
+  calibrate('amber-note-right',{opacity:.38});
+  calibrate('amber-note-center',{opacity:.69});
+  calibrate('distressed-man',{w:670,h:837,x:633,y:405,blend:'normal',brightness:.86,contrast:1.12,opacity:.58,keys:[{t:12.76,opacity:.05},{t:14.28,opacity:.58},{t:15,opacity:.62}]});
+  calibrate('flare',{start:12.76,fadeIn:.16});
+
   const copy=o=>JSON.parse(JSON.stringify(o));
   const num=(x,d)=>Number.isFinite(Number(x))?Number(x):d;
   const smooth=x=>{x=clamp01(x);return x*x*(3-2*x);};
@@ -332,15 +365,15 @@
     const overrides=saved&&Array.isArray(saved.layers)?saved.layers:[];
     const migrate=(current,previous,override)=>{
       if(!override)return copy(current);
-      if(saved&&saved.version===4)return Object.assign(copy(current),override);
+      if(saved&&saved.version===5)return Object.assign(copy(current),override);
       const patch={};
       for(const [key,value] of Object.entries(override)){
         if(!previous||JSON.stringify(value)!==JSON.stringify(previous[key]))patch[key]=value;
       }
       return Object.assign(copy(current),patch);
     };
-    const baseline=saved&&saved.version===3?openingV3Baseline:openingV2Baseline;
-    return {version:4,camera:migrate(defaults.camera,baseline.camera,saved&&saved.camera),layers:defaults.layers.map(l=>migrate(l,baseline.layers.find(o=>o.id===l.id),overrides.find(o=>o.id===l.id)))};
+    const baseline=saved&&saved.version===4?openingV4Baseline:saved&&saved.version===3?openingV3Baseline:openingV2Baseline;
+    return {version:5,camera:migrate(defaults.camera,baseline.camera,saved&&saved.camera),layers:defaults.layers.map(l=>migrate(l,baseline.layers.find(o=>o.id===l.id),overrides.find(o=>o.id===l.id)))};
 
   }
   function sample(obj,t){
@@ -432,7 +465,7 @@
       }
       if(l.type==='words'){
         const terms=String(l.text).split(/\s+/),em=new Set(String(l.emphasis||'').split(/\s+/));
-        terms.forEach((word,i)=>{const hot=em.has(word),s=svg('tspan',{fill:hot?l.accent:l.color,'font-size':hot?l.size*1.17:l.size*.8},r.text);s.textContent=(i?' ':'')+word;r.parts.push(s);});
+        terms.forEach((word,i)=>{const hot=em.has(word),fill=hot?l.accent:l.color,s=svg('tspan',{fill,stroke:fill,'stroke-width':num(l.textStroke,0),'stroke-linejoin':'round','paint-order':'stroke fill','font-size':hot?l.size*1.17:l.size*.8},r.text);s.textContent=(i?' ':'')+word;r.parts.push(s);});
         try{const measured=r.text.getComputedTextLength();if(l.fitTextWidth||measured>l.w)attr(r.text,{textLength:l.w,lengthAdjust:'spacingAndGlyphs'});}catch(_){}
       }
     }
@@ -612,7 +645,7 @@
       if(l.id==='handshake'){f('sleeveOverscan','Sleeve extension (px)','number',280);f('sleeveSourceWidth','Sleeve source width','number',1376);f('sleeveSourceHeight','Sleeve source height','number',768);}
       if(l.id==='balcony-man')f('cleanCrop','Remove stray cutout fragment','checkbox',true);
       if(l.type==='image'||l.type==='cash'){f('url','Replace image URL','text','');const upload=document.createElement('input');upload.type='file';upload.accept='image/*';upload.onchange=()=>{const file=upload.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{l.url=String(reader.result);save();build();};reader.readAsDataURL(file);};panel.appendChild(upload);}
-      if(l.type==='text'||l.type==='words'){f('text','Text','text','');f('font','Font family','text','');f('size','Font size');f('weight','Font weight');f('color','Color','color','#ffffff');f('glow','Text glow');f('italic','Italic','checkbox',false);f('fitTextWidth','Fit text to layer width','checkbox',false);if(l.type==='words'){f('emphasis','Highlighted words','text','');f('accent','Accent','color','#f5df00');f('wordFadeDuration','Word reveal duration (s)','number',.09);field(panel,'Word timing offsets (JSON)',JSON.stringify(l.wordTimes||[]),'textarea',v=>{const a=JSON.parse(v);if(!Array.isArray(a)||a.some(n=>!Number.isFinite(n)))throw Error('Expected numeric array');l.wordTimes=a;});}else{f('reveal','Reveal: character or none','text','none');f('revealDuration','Reveal duration (s)');}}
+      if(l.type==='text'||l.type==='words'){f('text','Text','text','');f('font','Font family','text','');f('size','Font size');f('weight','Font weight');f('color','Color','color','#ffffff');f('glow','Text glow');f('italic','Italic','checkbox',false);f('fitTextWidth','Fit text to layer width','checkbox',false);if(l.type==='words'){f('emphasis','Highlighted words','text','');f('accent','Accent','color','#f5df00');f('textStroke','Text stroke (px)','number',0);f('wordFadeDuration','Word reveal duration (s)','number',.09);field(panel,'Word timing offsets (JSON)',JSON.stringify(l.wordTimes||[]),'textarea',v=>{const a=JSON.parse(v);if(!Array.isArray(a)||a.some(n=>!Number.isFinite(n)))throw Error('Expected numeric array');l.wordTimes=a;});}else{f('reveal','Reveal: character or none','text','none');f('revealDuration','Reveal duration (s)');}}
       if(l.type==='cash'||l.type==='dust'){f('count','Particle count');f('size','Particle size');f('speed','Fall / drift speed');f('seed','Random seed');}
       if(l.type==='arrow'){f('stroke','Stroke width');f('color','Stroke color','color','#ffffff');f('revealDuration','Draw duration');}
       if(l.mask){f('mask','Mask: ink or burn','text',l.mask);f('revealDuration','Mask duration');f('turbulence','Edge turbulence');f('feather','Edge feather');}
@@ -676,7 +709,7 @@
     const canvas=stageEl.querySelector('.ponzi-min7-canvas');
     if(canvas)renderAt(canvas,canvas._ponziTime||0,stageEl._ponziOpeningData);
   };
-  window.PonziMinute7Opening={defaults:()=>copy(defaults),sample,config,maskPath,renderAt,baseline:()=>copy(openingV2Baseline)};
+  window.PonziMinute7Opening={defaults:()=>copy(defaults),sample,config,maskPath,renderAt,baseline:()=>copy(openingV2Baseline),baselineV4:()=>copy(openingV4Baseline)};
 
   window.tplMountPonziMinute7Stage = function (stageEl, data) {
     if (!stageEl) return;
