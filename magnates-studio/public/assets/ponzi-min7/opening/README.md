@@ -1,27 +1,29 @@
 # Ponzi Minute 7 — editable opening
 
-Template ID: `ponzi-minute7-documentary`. The opening covers local time 0–15 seconds (07:00–07:15); 15–60 seconds remain the original implementation. Disable **Use editable opening** in the contextual inspector to restore the legacy opening.
+Template ID: `ponzi-minute7-documentary`. The opening covers local time 0–15 seconds (07:00–07:15); 15–60 seconds retain the original implementation. Disable **Use editable opening** in Content to restore the legacy opening.
 
-## Asset installation
+## Generated images
 
-Copy the separately supplied generated asset ZIP's `magnates-studio/public/assets/ponzi-min7/opening/` files into this directory. The engine uses these filenames:
+All sixteen required replacement images have been assembled in the separate complete asset bundle. They have not yet been uploaded into this directory. `asset-checksums.json` records the exact SHA-256 for each expected file; the verification script deliberately fails if any file is absent or differs.
 
-- office.jpg, city.jpg, table.jpg, currency.jpg, amber.jpg
-- handshake.png, balcony-man.png, watermelon.png, watermelon-slices.png, weights.png
-- banknote-1.png, banknote-2.png
-- merchant.png (corrected generated grayscale merchant, included in the revised asset pack)
-- cash-man.png, portrait.png, distressed-man.png (still require corrected independent generated cutouts; do not treat the supplied concepts as verified historical likenesses)
+Install the bundle's `magnates-studio/public/assets/ponzi-min7/opening/` files into this directory without changing filenames.
 
-The final amber reveal is a distressed man blended with three independent banknote layers, not a glass vessel. The lens flare and masks remain procedural. The new blend-mode control is editable in the inspector.
+- Backgrounds: office.jpg, city.jpg, table.jpg, currency.jpg, amber.jpg.
+- Characters: handshake.png, balcony-man.png, merchant.png, cash-man.png, portrait.png, distressed-man.png.
+- Props: watermelon.png, watermelon-slices.png, weights.png, banknote-1.png, banknote-2.png.
 
-Existing template images are fallback assets where specified. Uninstalled optional cutouts can be missing from the preview; install the generated images before visual acceptance. Do not extract replacement images from reference video frames.
+The portrait and other characters are generated visual reconstructions, not authenticated historical photographs. The final amber reveal uses a distressed man and three independently transformed banknotes. Existing legacy images are fallbacks where specified.
 
-## Native controls
+## Native editing
 
-The existing contextual inspector saves the opening configuration through the Studio contextual data API. Select a layer by name or its timing bar. Adjust in/out points, depth, visibility, order, transform, appearance, image source, text, mask, procedural particle, arrow or flare parameters as applicable. Layer and camera keyframes are editable JSON arrays. The timing bars are inspector-local, not independent tracks in the application's main timeline.
+Select a visible object in the SVG stage or select its layer by name/timing bar in Content. The same layer selection is used in the native Content, Animation (Motion), Look and Effects tabs. The standard Cutout Effects & Animations menu routes to those native tabs. Image replacement, typography, camera and layer keyframes, deterministic particles, vector arrows, organic masks, glow, focus blur and procedural flare remain editable. Additional glow, blur, ink/burn masks and motion presets are applied and saved via the Studio contextual data API. Layer timing bars remain inspector-local, not individual main-timeline tracks.
 
 ## Validation
 
-Engine and inspector JavaScript parse checks passed. A mocked SVG DOM was exercised at all 375 time samples at 25 FPS; unique layer IDs, valid sampled transforms, node persistence, visibility overrides, legacy toggle and 15-second handoff passed. This is not a browser rendering, visual-fidelity, project export, or deployment test.
+From the repository root run:
 
-The generated images, exact typography, final amber foreground, and end-to-end editor behavior still require visual validation.
+```sh
+node magnates-studio/scripts/verify-ponzi-minute7-opening.cjs
+```
+
+Use `--logic-only` to exercise the 375 time samples, 31 layer identities, native inspector classification, persistent effect and animation changes, and legacy handoff without requiring the image bundle. The strict check additionally validates the exact 16 assets. The JavaScript mock-DOM checks were exercised successfully. Full browser render, native timeline/export integration and visual reference comparison have not yet been verified. Keep the PR in draft until those checks and asset installation are complete.
