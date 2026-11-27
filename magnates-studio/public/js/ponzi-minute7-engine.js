@@ -346,12 +346,19 @@
   calibrate('arrow-center',{h:320,y:448});
   calibrate('ponzi-standing',{w:620,h:790,x:112,y:400,keys:[{t:7.92,x:-250},{t:8.36,x:72},{t:8.72,x:112},{t:10.28,x:112}]});
   for(const id of ['headline-1','headline-2','headline-3'])calibrate(id,{font:'Arial Black, Impact, Arial, sans-serif',textStroke:1.15});
-  calibrate('amber',{brightness:.65});
+  calibrate('amber',{brightness:.58});
   calibrate('amber-note-left',{opacity:.44});
   calibrate('amber-note-right',{opacity:.38});
   calibrate('amber-note-center',{opacity:.69});
-  calibrate('distressed-man',{w:670,h:837,x:633,y:405,blend:'normal',brightness:.86,contrast:1.12,opacity:.58,keys:[{t:12.76,opacity:.05},{t:14.28,opacity:.58},{t:15,opacity:.62}]});
+  calibrate('distressed-man',{w:670,h:837,x:633,y:405,blend:'screen',brightness:.92,contrast:1.18,opacity:.56,keys:[{t:12.76,opacity:.05},{t:14.28,opacity:.56},{t:15,opacity:.60}]});
   calibrate('flare',{start:12.76,fadeIn:.16});
+  calibrate('office',{end:1.76,fadeOut:.68});
+  calibrate('handshake',{w:1460,h:1460*768/1376});
+  calibrate('table',{fadeIn:.22});
+  calibrate('fruit-title',{end:8.36,fadeOut:.28});
+  for(const id of ['arrow-left','arrow-center','arrow-right'])calibrate(id,{end:8.36,fadeOut:.28});
+  calibrate('cash-behind',{count:28,brightness:1.18});
+  calibrate('cash-front',{count:11,brightness:1.22});
 
   const copy=o=>JSON.parse(JSON.stringify(o));
   const num=(x,d)=>Number.isFinite(Number(x))?Number(x):d;
@@ -766,4 +773,94 @@
     stageEl._ponziOpeningData=data || {};
     renderAt(canvas, t, stageEl._ponziOpeningData);
   };
+
+  // Deterministic 2D Canvas compositor for native Studio export (startStudioExport)
+  const _imgCache = new Map();
+  function getExportImage(src) {
+    if (!src) return null;
+    if (_imgCache.has(src)) return _imgCache.get(src);
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.src = src;
+    _imgCache.set(src, im);
+    return im;
+  }
+
+  function drawToCanvas(ctx, w, h, t, data) {
+    if (!ctx) return;
+    const localT = Math.max(0, Number(t) || 0) % 60;
+    ctx.save();
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, w, h);
+    const sx = w / W, sy = h / H;
+    ctx.scale(sx, sy);
+
+    const cfg = config(data);
+    const cam = sample(cfg.camera, localT);
+    const active = cfg.layers
+      .filter(l => l.visible !== false && localT >= l.start && localT <= l.end)
+      .sort((a, b) => a.z - b.z);
+
+    for (const l of active) {
+      const p = localT - l.start;
+      const k = sample(l, localT);
+      const fadeIn = l.fadeIn ? clamp01(p / Math.max(0.01, l.fadeIn)) : 1;
+      const fadeOut = l.fadeOut ? clamp01((l.end - localT) / Math.max(0.01, l.fadeOut)) : 1;
+      const alpha = clamp01(num(k.opacity, 1) * fadeIn * fadeOut * (l.type === 'flare' ? num(l.intensity, 1) : 1));
+      if (alpha <= 0.001) continue;
+
+      const depth = 1 + num(l.depth, 0) * 0.18;
+      const cscale = 1 + (num(cam.scale, 1) - 1) * depth;
+      const cx = 640 + (num(k.x, 640) - 640) * cscale + num(cam.x, 0) * depth;
+      const cy = 360 + (num(k.y, 360) - 360) * cscale + num(cam.y, 0) * depth;
+      const rot = (num(k.rotation, 0) + num(cam.rotation, 0)) * Math.PI / 180;
+      const sc = num(k.scale, 1) * cscale;
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (l.blend && l.blend !== 'normal') ctx.globalCompositeOperation = l.blend;
+      const blurPx = Math.max(0, num(k.blur, 0));
+      if (blurPx > 0 || num(l.brightness, 1) !== 1 || num(l.contrast, 1) !== 1 || num(l.saturation, 1) !== 1) {
+        ctx.filter = `blur(${blurPx}px) brightness(${num(l.brightness, 1)}) contrast(${num(l.contrast, 1)}) saturate(${num(l.saturation, 1)})`;
+      }
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      ctx.scale(sc, sc);
+
+      if (l.type === 'image') {
+        const im = getExportImage(imageURL(l));
+        if (im && im.complete && im.naturalWidth > 0) {
+          ctx.drawImage(im, -l.w / 2, -l.h / 2, l.w, l.h);
+        }
+      } else if (l.type === 'text') {
+        const frac = l.reveal === 'character' ? clamp01(p / Math.max(0.01, num(l.revealDuration, 1))) : 1;
+        const txt = String(l.text || '');
+        const shown = txt.slice(0, Math.ceil(txt.length * frac));
+        ctx.font = `${l.italic ? 'italic ' : ''}${l.weight || 700} ${l.size || 64}px ${l.font || 'sans-serif'}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = l.color || '#fff';
+        ctx.fillText(shown, 0, 0, l.w || 1100);
+      } else if (l.type === 'words') {
+        ctx.font = `${l.weight || 900} ${l.size || 72}px ${l.font || 'Arial Black, sans-serif'}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = l.color || '#fff';
+        ctx.fillText(String(l.text || ''), 0, 0, l.w || 1100);
+      } else if (l.type === 'flare') {
+        const grad = ctx.createRadialGradient(num(l.coreX, 0), 0, 8, num(l.coreX, 0), 0, l.w / 2);
+        grad.addColorStop(0, '#fff9eb');
+        grad.addColorStop(0.3, l.color || '#ff8529');
+        grad.addColorStop(1, 'rgba(255,133,41,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(-l.w / 2, -l.h / 2, l.w, l.h);
+      }
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  if (window.PonziMinute7Opening) {
+    window.PonziMinute7Opening.drawToCanvas = drawToCanvas;
+  }
 })();

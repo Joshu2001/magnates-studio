@@ -3338,6 +3338,11 @@ function render(now) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
+    if (typeof topCustomizerState !== 'undefined' && topCustomizerState?.templateId === 'ponzi-minute7-documentary' && typeof window.PonziMinute7Opening?.drawToCanvas === 'function') {
+      const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('ponzi-minute7-documentary') : {};
+      window.PonziMinute7Opening.drawToCanvas(ctx, canvas.width, canvas.height, currentTime, pData);
+    }
+
     // 1. 3D Background Grid (when enabled and preset is cyber_grid)
     if (bgType === 'cyber_grid' && fxState.grid.enabled !== false) {
       drawPerspectiveGrid();

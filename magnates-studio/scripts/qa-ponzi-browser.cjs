@@ -55,8 +55,8 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
     record('legacy handoff at 16s',legacy.includes('BANKRUPT'),{text:legacy.slice(0,180)});
     // Inspect native export routing; this is NOT a native export pass unless
     // actual Ponzi scene rendering reaches the canvas captured by the exporter.
-    const route=await page.evaluate(()=>({exportUsesMainCanvas:String(startStudioExport).includes('canvas.captureStream'),ponziUsesSVG:!!window.PonziMinute7Opening,mainCanvasId:document.getElementById('previewCanvas')?.id||null,customizerSeparate:!!document.getElementById('tpl-modal-preview-stage')}));
-    record('native exporter route includes Ponzi compositor',!route.exportUsesMainCanvas||!route.customizerSeparate,route);
+    const route=await page.evaluate(()=>({exportUsesMainCanvas:String(startStudioExport).includes('canvas.captureStream'),ponziUsesSVG:!!window.PonziMinute7Opening,ponziHasCanvasCompositor:typeof window.PonziMinute7Opening?.drawToCanvas==='function',mainCanvasId:document.getElementById('previewCanvas')?.id||null,customizerSeparate:!!document.getElementById('tpl-modal-preview-stage')}));
+    record('native exporter route includes Ponzi compositor',route.ponziHasCanvasCompositor&&String(render).includes('drawToCanvas'),route);
     fs.rmSync(frames,{recursive:true,force:true});
   }catch(e){record('browser run',false,{error:e.stack});}
   finally{await browser?.close();server.kill();fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));if(report.tests.some(t=>!t.ok))process.exitCode=1;}
