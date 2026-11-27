@@ -1,0 +1,30 @@
+name: Ponzi browser QA
+on:
+  push:
+    branches: [qa/ponzi-browser-export]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: magnates-studio
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm install --no-save --package-lock=false playwright
+      - run: npx playwright install --with-deps chromium
+      - run: sudo apt-get install -y ffmpeg
+      - run: node scripts/verify-ponzi-minute7-opening.cjs
+      - run: node scripts/qa-ponzi-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ponzi-browser-qa
+          path: magnates-studio/qa-ponzi-output/
