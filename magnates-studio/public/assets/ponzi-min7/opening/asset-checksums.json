@@ -1,0 +1,21 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "banknote-1.png": "2cee3128d3f745b72ad87f01e803637178ff50cf84601e73996792beb57a3df2",
+    "amber.jpg": "5990f6a93ae0055de203fdf6b534f05c593a2d81f7f9b4321c1dc6a1f19ac382",
+    "weights.png": "501a1b9adffb4173d64cef5fe16bda4ff886370600f9a0631eeac74f296ddf47",
+    "banknote-2.png": "bd01609aaa4b9dd5ce7e700cf25412f46e966dc24c935000d48a36bd3c1f86d1",
+    "handshake.png": "81d96e7bb9e9ff870b6c6707ccd63c84d1a908799e5e46c916cb97ed10ea6c65",
+    "balcony-man.png": "f8bcd438288c1d87e72b8a4135a42b3ef294453879a9991d721f2a46084d272f",
+    "office.jpg": "05ce8baea31eedacbc579250f6e7e24e6f000cd32b9a04036225888425069603",
+    "city.jpg": "86e985348c9e391c965349a43f5f0b8d4c6bc652fef4dbfb1271e97abaac6583",
+    "currency.jpg": "e0effb24a4503566237b69aa27a61201666c84d708bc9f94877dbeabe4af9eeb",
+    "table.jpg": "ea874db520b60dd469edb032fac410c5942543766723a694197c8ef4693681b9",
+    "watermelon-slices.png": "2110fe3191a44390c6e84d1052a8d42c7211a3ae6cf617e9cb01e43760c4e6bc",
+    "watermelon.png": "40caf21c51fae90530c37135dc12cdc9d5d9931f7e5442dc880b85164a52fffd",
+    "merchant.png": "2d16b816b389fccb356acaec23b75cab05a6cede58ff61fed802fabc160b6345",
+    "cash-man.png": "3debf881683458f07396f6e7401eea079b030af3c13fc948aca18f77002a465f",
+    "portrait.png": "f72dc3d6c4308183d2c4de2ce4a75c73e5d5309605d8da96944c77edc8127422",
+    "distressed-man.png": "c87c91fea9522ba33ef4f3021bf9c2d26f2da9ff16f0fa3df66c79ce72f6d218"
+  }
+}
