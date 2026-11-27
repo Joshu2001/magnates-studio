@@ -29,6 +29,40 @@ for(let i=0;i<375;i++){
   assert.equal(canvas._opening.groups.size,31);
   for(const n of canvas._opening.groups.values())if(n.outer.style.display!=='none')assert(!/NaN|Infinity/.test(n.g.attrs.transform||''),n.l.id+' @ '+i/25);
 }
+// The installed long-arm PNG is 1376×768. Check its actual visible sleeve
+// edge ranges through every animation sample, including camera and parallax.
+const hand=cfg.layers.find(l=>l.id==='handshake');
+assert.equal(hand.sleeveSourceWidth,1376);
+assert.equal(hand.sleeveSourceHeight,768);
+const hw=Math.min(hand.w,hand.h*1376/768),hh=hw*768/1376;
+let minimumClearance=Infinity;
+for(let frame=0;frame<375;frame++){
+  const t=frame/25;if(t>hand.end)break;
+  const k=api.sample(hand,t),cam=api.sample(cfg.camera,t),depth=1+hand.depth*.18;
+  const cs=1+(cam.scale-1)*depth,scale=k.scale*cs,ang=(k.rotation+cam.rotation)*Math.PI/180;
+  const tx=640+(k.x-640)*cs+cam.x*depth,ty=360+(k.y-360)*cs+cam.y*depth;
+  for(const [edge,lo,hi] of [[-hw/2-hand.sleeveOverscan,185,419],[hw/2+hand.sleeveOverscan,138,379]]){
+    for(let row=lo;row<=hi;row++){
+      const dy=(row-384)*hh/768;
+      const px=tx+(edge*Math.cos(ang)-dy*Math.sin(ang))*scale;
+      const py=ty+(edge*Math.sin(ang)+dy*Math.cos(ang))*scale;
+      const clearance=Math.hypot(Math.max(0,-px,px-1280),Math.max(0,-py,py-720));
+      minimumClearance=Math.min(minimumClearance,clearance);
+      assert(clearance>0,'Visible sleeve termination at '+t+'s');
+    }
+  }
+}
+assert(minimumClearance>50,'Insufficient safety overscan');
+assert.equal(api.config({ponziOpeningV2:api.baseline()}).version,4);
+const previous=api.baseline();previous.layers.find(l=>l.id==='merchant').brightness=.7;
+assert.equal(api.config({ponziOpeningV2:previous}).layers.find(l=>l.id==='merchant').brightness,.7);
+api.renderAt(canvas,0,{});
+assert.equal(canvas._opening.groups.get('handshake').g.children.length,3);
+assert.equal(canvas._opening.groups.get('six-months').outer.style.display,'');
+api.renderAt(canvas,6.84,{});
+assert.equal(canvas._opening.groups.get('arrow-center').arrowShafts.length,2);
+console.log('PASS: default sleeve terminations remain offscreen, minimum clearance '+minimumClearance.toFixed(1)+'px; calibration migration preserves user edits.');
+
 const panes=Object.fromEntries(['content','motion','look','effects'].map(k=>[k,new MockNode('div')]));
 const adv=new MockNode('div');window.PonziMinute7SelectedLayer='merchant';window.tplBuildPonziMinute7NativePanes(panes,adv);
 assert(panes.effects.textContent.includes('Object glow'));
