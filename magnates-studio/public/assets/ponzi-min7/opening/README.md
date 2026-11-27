@@ -4,9 +4,9 @@ Template ID: `ponzi-minute7-documentary`. The opening covers local time 0–15 s
 
 ## Generated images
 
-All sixteen required replacement images have been assembled in the separate complete asset bundle. They have not yet been uploaded into this directory. `asset-checksums.json` records the exact SHA-256 for each expected file; the verification script deliberately fails if any file is absent or differs.
+All sixteen required replacement images are installed in this directory. The installed handshake is the 1376×768 long-sleeve RGBA PNG, not the earlier 1672×708 asset-pack version. `asset-checksums.json` records the exact SHA-256 for each expected file; the verification script deliberately fails if any file is absent or differs.
 
-Install the bundle's `magnates-studio/public/assets/ponzi-min7/opening/` files into this directory without changing filenames.
+Retain the filenames when replacing images; update the checksum manifest for approved replacements.
 
 - Backgrounds: office.jpg, city.jpg, table.jpg, currency.jpg, amber.jpg.
 - Characters: handshake.png, balcony-man.png, merchant.png, cash-man.png, portrait.png, distressed-man.png.
@@ -26,4 +26,4 @@ From the repository root run:
 node magnates-studio/scripts/verify-ponzi-minute7-opening.cjs
 ```
 
-Use `--logic-only` to exercise the 375 time samples, 31 layer identities, native inspector classification, persistent effect and animation changes, and legacy handoff without requiring the image bundle. The strict check additionally validates the exact 16 assets. The JavaScript mock-DOM checks were exercised successfully. Full browser render, native timeline/export integration and visual reference comparison have not yet been verified. Keep the PR in draft until those checks and asset installation are complete.
+Use `--logic-only` to exercise the 375 time samples, 31 layer identities, native inspector classification, persistent effect and animation changes, and legacy handoff without requiring the image bundle. The strict check additionally validates the exact 16 assets. The JavaScript mock-DOM checks were exercised successfully, including the native inspector and saved effects. The 375 reference frames were examined for timing and optical flow. The V4 calibration uses a non-destructive sleeve extension, removes the stray balcony cutout fragment, holds the initial typography at t=0, aligns the market transition, calibrates the foreground depth/zoom and portrait position, and animates white/yellow word opacity. The default handshake sleeve boundaries were checked using the actual installed PNG alpha-edge ranges: zero visible edge samples; minimum geometric clearance 269.6 px. A local isolated sleeve prototype was rendered in Chromium using the earlier package asset; the actual installed PNG was inspected and tested geometrically, not rendered in a full browser application. Full editor playback, export and quantitative pixel-fidelity validation remain outstanding. If a saved customized scene overrides the new defaults, use Content → Reset opening to defaults after preserving any desired edits.
