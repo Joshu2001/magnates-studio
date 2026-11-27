@@ -53,9 +53,13 @@ for(let frame=0;frame<375;frame++){
   }
 }
 assert(minimumClearance>50,'Insufficient safety overscan');
-assert.equal(api.config({ponziOpeningV2:api.baseline()}).version,4);
+assert.equal(api.config({ponziOpeningV2:api.baseline()}).version,5);
 const previous=api.baseline();previous.layers.find(l=>l.id==='merchant').brightness=.7;
 assert.equal(api.config({ponziOpeningV2:previous}).layers.find(l=>l.id==='merchant').brightness,.7);
+const oldV4=api.baselineV4();oldV4.layers.find(l=>l.id==='merchant').brightness=.7;
+assert.equal(api.config({ponziOpeningV2:oldV4}).layers.find(l=>l.id==='merchant').brightness,.7);
+assert.equal(api.config({ponziOpeningV2:api.baselineV4()}).layers.find(l=>l.id==='ponzi-standing').w,620);
+assert.equal(api.sample(cfg.layers.find(l=>l.id==='merchant'),9.2).blur,8);
 api.renderAt(canvas,0,{});
 assert.equal(canvas._opening.groups.get('handshake').g.children.length,3);
 assert.equal(canvas._opening.groups.get('six-months').outer.style.display,'');
